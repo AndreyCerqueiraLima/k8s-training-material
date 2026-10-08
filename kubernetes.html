@@ -1,0 +1,1017 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KubeWorld — Aprenda Kubernetes jogando</title>
+  <style>
+    :root {
+      --bg: #07111f; --panel: #0d1b2e; --panel-2: #122641; --line: #234263;
+      --text: #e8f3ff; --muted: #91a9c3; --cyan: #4dd9ff; --blue: #6d8cff;
+      --green: #54e39b; --yellow: #ffd166; --red: #ff6b7a; --purple: #c59bff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; color: var(--text); background:
+        radial-gradient(circle at 85% -10%, #19376a 0, transparent 35%),
+        radial-gradient(circle at -10% 30%, #123b4b 0, transparent 34%), var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      min-height: 100vh;
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; color: var(--text); border: 1px solid var(--line); background: var(--panel-2); border-radius: 10px; padding: 9px 13px; transition: .2s; }
+    button:hover { transform: translateY(-1px); border-color: var(--cyan); background: #1b3759; }
+    button.primary { color: #031321; background: var(--cyan); border-color: var(--cyan); font-weight: 800; }
+    button.danger { border-color: #86404d; color: #ffadba; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px clamp(16px, 4vw, 52px); border-bottom: 1px solid #19324f; backdrop-filter: blur(10px); }
+    .brand { display: flex; gap: 12px; align-items: center; }
+    .brand-icon { font-size: 34px; filter: drop-shadow(0 0 12px #48d7ff); }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font-size: clamp(20px, 3vw, 29px); margin-bottom: 3px; }
+    .brand p { margin: 0; color: var(--muted); font-size: 13px; }
+    .top-stats { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+    .pill { border: 1px solid var(--line); background: #0c1b30; border-radius: 99px; padding: 7px 11px; color: var(--muted); font-size: 12px; }
+    .pill b { color: var(--text); }
+    main { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 17px; padding: 18px clamp(16px, 4vw, 52px) 38px; max-width: 1600px; margin: auto; }
+    @media (max-width: 1050px) { main { grid-template-columns: 1fr; } }
+    .panel { background: linear-gradient(145deg, rgba(18,38,65,.96), rgba(8,22,39,.96)); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 14px 35px #0003; }
+    .sidebar { padding: 16px; align-self: start; position: sticky; top: 14px; }
+    @media (max-width: 1050px) { .sidebar { position: static; } }
+    .eyebrow { color: var(--cyan); font-size: 11px; text-transform: uppercase; letter-spacing: .12em; font-weight: 800; }
+    .mission { margin: 8px 0 15px; padding: 13px; border: 1px solid #3c5874; border-radius: 12px; background: #0b1b2f; }
+    .mission h2 { font-size: 17px; margin: 5px 0; }
+    .mission p { color: var(--muted); font-size: 13px; line-height: 1.45; margin-bottom: 10px; }
+    .progress { height: 6px; overflow: hidden; background: #071321; border-radius: 99px; }
+    .progress div { height: 100%; width: 0; background: linear-gradient(90deg, var(--cyan), var(--purple)); transition: width .4s; }
+    .lesson-list { display: grid; gap: 7px; margin: 14px 0; }
+    .lesson { display: flex; gap: 9px; align-items: center; padding: 9px; border: 1px solid transparent; border-radius: 10px; color: var(--muted); font-size: 13px; }
+    .lesson .num { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #1a3150; color: var(--muted); font-weight: 800; }
+    .lesson.active { color: var(--text); background: #183452; border-color: #315b84; }
+    .lesson.active .num { color: #04131d; background: var(--cyan); }
+    .lesson.done .num { color: #062119; background: var(--green); }
+    .guide { display: flex; gap: 9px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .bot { font-size: 28px; animation: float 2.5s ease-in-out infinite; }
+    @keyframes float { 50% { transform: translateY(-4px) rotate(3deg); } }
+    .guide-text { color: var(--muted); line-height: 1.5; font-size: 13px; }
+    .guide-text b { color: var(--yellow); }
+    .content { min-width: 0; }
+    .hero { display: flex; justify-content: space-between; align-items: end; gap: 15px; margin-bottom: 13px; }
+    .hero h2 { margin: 3px 0 0; font-size: clamp(20px, 3vw, 30px); }
+    .hero p { color: var(--muted); margin: 5px 0 0; font-size: 14px; }
+    .hero-controls { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    #world { position: relative; min-height: 575px; overflow: hidden; border: 1px solid #2a5074; border-radius: 18px; background:
+      linear-gradient(rgba(96,168,210,.055) 1px, transparent 1px) 0 0/32px 32px,
+      linear-gradient(90deg, rgba(96,168,210,.055) 1px, transparent 1px) 0 0/32px 32px, #081827; }
+    #world:before { content: "KUBERNETES CLUSTER"; position: absolute; top: 13px; left: 17px; color: #42779d; font-size: 11px; letter-spacing: .16em; font-weight: 800; }
+    .cluster-boundary { position: absolute; inset: 43px 18px 20px; border: 1px dashed #37648a; border-radius: 17px; pointer-events: none; }
+    .cluster-label { position: absolute; top: 34px; right: 28px; padding: 3px 8px; color: var(--muted); background: #081827; font-size: 11px; }
+    .control-plane { position: absolute; top: 66px; left: 4%; width: 26%; min-width: 190px; padding: 12px; border: 2px solid var(--purple); border-radius: 14px; background: #1a1531dd; box-shadow: 0 0 20px #bd91ff1f; }
+    .control-plane h3 { color: var(--purple); margin: 0 0 3px; font-size: 15px; }
+    .control-plane p, .node p { color: var(--muted); font-size: 11px; margin: 0; }
+    .control-icons { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
+    .control-icons span { padding: 4px 6px; background: #2b2050; border-radius: 6px; color: #d7baff; font-size: 11px; }
+    .control-icons span, [data-structure] { cursor: help; }
+    [data-structure]:hover { filter: brightness(1.18); }
+    .deployment-card { position: absolute; top: 201px; left: 4%; width: 26%; min-width: 190px; padding: 9px 11px; border: 1px solid var(--blue); border-radius: 10px; background: #101f42e8; color: #b8c6ff; font-size: 12px; }
+    .deployment-card b { display: block; color: var(--blue); font-size: 13px; margin-bottom: 2px; }
+    .workload-row { display: flex; justify-content: space-between; gap: 7px; padding: 4px 0; border-top: 1px solid #2b3e6a; font-size: 10px; }
+    .node-area { position: absolute; left: 4%; right: 4%; bottom: 34px; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+    .node { position: relative; min-width: 0; min-height: 202px; border: 2px solid #285070; border-radius: 14px; padding: 10px; background: #0c2034ee; transition: .3s; }
+    .node:hover, .node.highlight { border-color: var(--cyan); box-shadow: 0 0 21px #4dd9ff26; }
+    .node.offline { border-color: var(--red); background: #2d1724dd; }
+    .node-header { display: flex; justify-content: space-between; align-items: start; gap: 4px; margin-bottom: 8px; }
+    .node-title { font-weight: 800; font-size: 14px; }
+    .node-state { font-size: 10px; border-radius: 99px; padding: 3px 6px; background: #123b2b; color: var(--green); }
+    .offline .node-state { color: var(--red); background: #48202d; }
+    .pods { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-top: 10px; min-width: 0; }
+    .pod { position: relative; min-width: 0; min-height: 62px; overflow: hidden; padding: 7px; border: 1px solid #2e617d; border-radius: 9px; background: #102d43; animation: spawn .35s ease-out; }
+    @keyframes spawn { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: scale(1); } }
+    .pod.dead { border-color: var(--red); background: #391b27; opacity: .8; }
+    .pod::before { content: ""; display: block; width: 8px; height: 8px; margin-bottom: 5px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); }
+    .pod.dead::before { background: var(--red); box-shadow: none; }
+    .pod b, .pod small { display: block; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; }
+    .pod small { color: var(--muted); }
+    .traffic { position: absolute; left: 34%; right: 5%; top: 72px; height: 45px; pointer-events: none; }
+    .service-area { position: absolute; right: 4%; top: 100px; z-index: 3; display: flex; flex-wrap: wrap; justify-content: flex-end; align-content: flex-start; gap: 7px; width: 43%; }
+    .service { width: 150px; text-align: center; padding: 9px; border: 2px solid var(--yellow); border-radius: 12px; background: #3f3114e8; box-shadow: 0 0 20px #ffd1662b; }
+    .service b, .service small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .service b { color: var(--yellow); font-size: 13px; }
+    .service small { color: #e8c979; font-size: 10px; }
+    .service.selected-service { outline: 2px solid var(--cyan); outline-offset: 2px; }
+    .arrow { stroke: #31647e; stroke-width: 2; stroke-dasharray: 5 6; fill: none; }
+    .arrow.hot { stroke: var(--yellow); stroke-width: 3; animation: dash 1s linear infinite; }
+    @keyframes dash { to { stroke-dashoffset: -22; } }
+    .packet { position: absolute; z-index: 8; transform: translate(-50%, -50%); padding: 5px 8px; background: var(--yellow); color: #221a04; border-radius: 99px; font-size: 11px; font-weight: 900; box-shadow: 0 0 12px var(--yellow); opacity: 0; transition: left .7s, top .7s, opacity .2s; pointer-events: none; }
+    .eventbar { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 11px 14px; margin-top: 12px; min-height: 55px; }
+    .eventbar p { margin: 0; font-size: 13px; line-height: 1.4; }
+    .eventbar p span { color: var(--cyan); font-weight: 800; }
+    .event-actions { display: flex; gap: 7px; flex-shrink: 0; }
+    .inspector { display: grid; grid-template-columns: minmax(190px, .32fr) 1fr; gap: 18px; padding: 16px 18px; margin-top: 13px; border-color: #3d7093; background: linear-gradient(120deg, #122d49, #0b1b2d); }
+    .inspector-heading { border-right: 1px solid var(--line); padding-right: 18px; }
+    .inspector-heading h3 { margin: 3px 0 6px; font-size: 19px; }
+    .inspector-heading p { color: var(--muted); margin: 0; font-size: 12px; line-height: 1.45; }
+    .inspector-heading .inspect-icon { font-size: 31px; }
+    .inspect-content { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; align-content: center; }
+    .inspect-block { padding: 9px 10px; border-radius: 9px; background: #091a2c; border: 1px solid #244a69; }
+    .inspect-block b { display: block; color: var(--cyan); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+    .inspect-block span { display: block; color: #c8d8e8; font-size: 12px; line-height: 1.45; }
+    .selected-structure { outline: 2px solid var(--yellow); outline-offset: 3px; }
+    .yaml-lab { margin-top: 13px; padding: 16px 18px; }
+    .yaml-head { display: flex; justify-content: space-between; align-items: start; gap: 14px; margin-bottom: 12px; }
+    .yaml-head h3 { margin: 3px 0 5px; font-size: 19px; }
+    .yaml-head p { color: var(--muted); font-size: 12px; line-height: 1.45; margin: 0; max-width: 680px; }
+    .yaml-head strong { color: var(--yellow); }
+    .yaml-actions { display: flex; gap: 7px; flex-wrap: wrap; justify-content: flex-end; }
+    .manifest-tabs { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 8px; }
+    .manifest-tab { white-space: nowrap; padding: 7px 10px; border: 1px solid #2e5271; border-radius: 8px 8px 0 0; background: #091a2c; color: var(--muted); font-size: 12px; }
+    .manifest-tab.active { color: var(--cyan); border-color: var(--cyan); background: #12314a; }
+    .ide-shell { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 10px; }
+    .file-explorer { min-height: 380px; border: 1px solid #254b6b; border-radius: 10px; background: #081827; padding: 9px 7px; }
+    .file-explorer-head { display: flex; align-items: center; justify-content: space-between; gap: 5px; padding: 3px 4px 9px; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .07em; }
+    .file-explorer-head button { padding: 3px 7px; color: var(--cyan); font-size: 16px; line-height: 1; }
+    .manifest-tabs { display: grid; gap: 4px; margin: 0; overflow: visible; }
+    .manifest-tab { display: flex; align-items: center; justify-content: space-between; gap: 5px; width: 100%; text-align: left; white-space: normal; border-radius: 7px; padding: 9px 7px; border-color: transparent; }
+    .manifest-tab small { color: var(--muted); font-size: 9px; }
+    .manifest-tab.active { border-color: var(--cyan); }
+    .editor-pane { min-width: 0; }
+    .editor-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 38px; padding: 0 3px 8px; }
+    .editor-file-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--cyan); font: 12px monospace; }
+    .editor-actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .editor-actions button { padding: 6px 9px; font-size: 11px; }
+    .yaml-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(230px, .85fr); gap: 12px; }
+    #yamlEditor { width: 100%; min-height: 380px; resize: vertical; padding: 14px; border: 1px solid #315a7b; border-radius: 11px; outline: none; color: #cde7ff; background: #06111e; font: 12px/1.65 "SFMono-Regular", Consolas, monospace; tab-size: 2; }
+    #yamlEditor:focus { border-color: var(--cyan); box-shadow: 0 0 0 2px #4dd9ff22; }
+    .yaml-side { display: flex; flex-direction: column; gap: 9px; }
+    .yaml-note { padding: 12px; border: 1px solid #2c5273; border-radius: 10px; background: #0a1c30; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .yaml-note b { display: block; color: var(--cyan); margin-bottom: 4px; }
+    .yaml-note code { color: var(--yellow); }
+    .yaml-status { padding: 11px 12px; border-radius: 10px; border: 1px solid #315a7b; background: #0b1c2e; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .yaml-status.ok { border-color: #2e8764; color: #9cf0c5; }
+    .yaml-status.error { border-color: #9b4759; color: #ffb3c0; }
+    .lower { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-top: 13px; }
+    @media (max-width: 750px) { .lower { grid-template-columns: 1fr; } .hero, .eventbar { align-items: stretch; flex-direction: column; } .node-area { bottom: 15px; top: auto; overflow: visible; } #world { min-height: 575px; } .control-plane { width: 42%; } .service-area { left: 52%; right: 4%; top: 150px; width: 44%; } .service { width: 100%; } .traffic { top: 185px; } }
+    @media (max-width: 750px) { .deployment-card { top: 201px; width: 42%; } .inspector { grid-template-columns: 1fr; gap: 10px; } .inspector-heading { border-right: 0; border-bottom: 1px solid var(--line); padding: 0 0 10px; } .inspect-content { grid-template-columns: 1fr; } }
+    @media (max-width: 750px) { .yaml-head, .yaml-grid { grid-template-columns: 1fr; display: grid; } .yaml-actions { justify-content: flex-start; } #yamlEditor { min-height: 330px; } .ide-shell { grid-template-columns: 1fr; } .file-explorer { min-height: 0; } .manifest-tabs { display: flex; overflow-x: auto; } .manifest-tab { min-width: 150px; } }
+    .info { padding: 15px; }
+    .info h3 { margin-bottom: 9px; font-size: 15px; }
+    .info p, .info li { color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .info ul { padding-left: 18px; margin: 0; }
+    .concept-card { cursor: pointer; border: 1px solid #345573; border-radius: 9px; padding: 9px; margin-top: 7px; background: #0b1a2d; }
+    .concept-card b { color: var(--cyan); font-size: 13px; }
+    .concept-card span { display: block; color: var(--muted); font-size: 12px; margin-top: 3px; }
+    .modal { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 18px; background: #020914dd; }
+    .modal.hidden { display: none; }
+    .modal-box { width: min(680px, 100%); max-height: 90vh; overflow: auto; padding: 27px; border: 1px solid #4a7396; border-radius: 18px; background: linear-gradient(145deg, #122b48, #091626); box-shadow: 0 20px 80px #0009; }
+    .modal-box h2 { font-size: 25px; margin-bottom: 9px; }
+    .modal-box p, .modal-box li { color: #c3d5e7; line-height: 1.6; font-size: 14px; }
+    .modal-box strong { color: var(--cyan); }
+    .modal-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+    .object-modal { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; overflow: hidden; padding: 18px; background: #020812e8; backdrop-filter: blur(8px); }
+    .object-modal.hidden { display: none; }
+    .object-backdrop { position: absolute; inset: 0; }
+    .zoom-shell { position: relative; display: flex; flex-direction: column; width: min(900px, 100%); height: min(780px, calc(100vh - 36px)); max-height: calc(100vh - 36px); overflow: hidden; padding: 22px; border: 1px solid #5ddcff; border-radius: 18px; background: linear-gradient(145deg, #102f4b, #071321 72%); box-shadow: 0 0 0 1px #4dd9ff22, 0 0 45px #4dd9ff33, 0 25px 90px #000b; animation: zoomEnter .5s cubic-bezier(.16,1,.3,1); }
+    .zoom-shell::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, transparent 0 5px, #4dd9ff08 6px 7px); opacity: .45; }
+    .zoom-shell::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; pointer-events: none; background: var(--cyan); box-shadow: 0 0 14px var(--cyan); animation: scan 2.3s linear infinite; }
+    @keyframes zoomEnter { from { opacity: 0; transform: scale(.38) translateY(80px) rotateX(16deg); filter: blur(8px); } 70% { transform: scale(1.015) translateY(-3px); } to { opacity: 1; transform: scale(1) translateY(0) rotateX(0); filter: blur(0); } }
+    @keyframes scan { 0% { top: 0; opacity: 0; } 10% { opacity: .9; } 88% { opacity: .9; } 100% { top: calc(100% - 2px); opacity: 0; } }
+    .zoom-header, .zoom-footer { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .zoom-header { padding-bottom: 15px; border-bottom: 1px solid #315b7b; }
+    .zoom-title { display: flex; align-items: center; gap: 12px; }
+    .zoom-icon { display: grid; place-items: center; width: 55px; height: 55px; border: 1px solid var(--cyan); border-radius: 14px; background: #0a243b; font-size: 28px; box-shadow: 0 0 22px #4dd9ff3b; }
+    .zoom-header h2 { margin: 0; font-size: 24px; }
+    .zoom-header p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+    .zoom-close { width: 34px; height: 34px; padding: 0; border-radius: 50%; font-size: 20px; }
+    .zoom-body { position: relative; z-index: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 18px 5px 18px 0; scrollbar-width: thin; scrollbar-color: #32769a #091a2b; }
+    .telemetry { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+    .telemetry-card { padding: 10px; border: 1px solid #2b5979; border-radius: 9px; background: #091c2e; }
+    .telemetry-card b { display: block; color: var(--cyan); font: 10px monospace; text-transform: uppercase; letter-spacing: .08em; }
+    .telemetry-card span { display: block; margin-top: 5px; color: #e8f3ff; font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .zoom-details { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .zoom-detail { min-height: 90px; padding: 12px; border: 1px solid #244c6b; border-radius: 10px; background: #081a2b; }
+    .zoom-detail b { display: block; margin-bottom: 5px; color: var(--yellow); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
+    .zoom-detail span { color: #c6d8e9; font-size: 13px; line-height: 1.5; }
+    .yaml-preview-wrap { margin-bottom: 14px; padding: 12px; border: 1px solid #315f7c; border-radius: 10px; background: #061321; }
+    .yaml-preview-wrap b { display: block; margin-bottom: 7px; color: var(--cyan); font: 11px monospace; letter-spacing: .08em; }
+    .yaml-preview { max-height: 180px; overflow: auto; margin: 0; color: #c9e5f7; font: 11px/1.55 "SFMono-Regular", Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; scrollbar-width: thin; scrollbar-color: #32769a #091a2b; }
+    .zoom-footer { padding-top: 12px; border-top: 1px solid #315b7b; color: var(--muted); font: 11px monospace; }
+    .focus-object { animation: objectFocus 1.1s ease-in-out 2; }
+    @keyframes objectFocus { 50% { filter: brightness(1.45); box-shadow: 0 0 0 5px #ffd16688, 0 0 35px #4dd9ffaa; } }
+    @media (max-width: 650px) { .telemetry { grid-template-columns: repeat(2, 1fr); } .zoom-details { grid-template-columns: 1fr; } .zoom-shell { padding: 16px; } }
+    .toast { position: fixed; z-index: 30; right: 20px; bottom: 20px; max-width: 330px; padding: 13px 15px; border: 1px solid var(--cyan); border-radius: 12px; background: #102e47f5; box-shadow: 0 10px 35px #0008; transform: translateY(30px); opacity: 0; transition: .3s; pointer-events: none; font-size: 13px; line-height: 1.45; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    code { color: var(--yellow); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">☸️</div>
+      <div><h1>KubeWorld</h1><p data-i18n="brandSubtitle">Uma expedição interativa dentro do Kubernetes</p></div>
+    </div>
+    <div class="top-stats">
+      <div class="pill"><span data-i18n="missionLabel">Missão</span> <b id="missionCount">1</b>/6</div>
+      <div class="pill">XP <b id="xp">0</b></div>
+      <div class="pill">Nodes <b id="nodeCount">3</b></div>
+      <div class="pill"><span data-i18n="activePodsLabel">Pods ativos</span> <b id="podCount">0</b></div>
+      <div class="pill">Cluster <b id="health">saudável</b></div>
+      <button id="languageToggle" title="Switch language">🇺🇸 English</button>
+    </div>
+  </header>
+
+  <main>
+    <aside class="panel sidebar">
+      <div class="eyebrow" data-i18n="trainingCenter">Centro de treinamento</div>
+      <div class="mission">
+        <div class="eyebrow" data-i18n="currentMission">Missão atual</div>
+        <h2 id="missionTitle">Conheça o cluster</h2>
+        <p id="missionText"></p>
+        <div class="progress"><div id="missionProgress"></div></div>
+      </div>
+      <div class="lesson-list" id="lessonList"></div>
+      <div class="guide"><div class="bot">🤖</div><div class="guide-text" id="guideText"></div></div>
+      <button id="helpButton" data-i18n="helpButton" style="width:100%;margin-top:14px">📖 Abrir manual rápido</button>
+    </aside>
+
+    <section class="content">
+      <div class="hero">
+        <div><div class="eyebrow" data-i18n="visualLab">Laboratório visual</div><h2 data-i18n="heroTitle">Seu cluster está vivo</h2><p data-i18n="heroText">Observe o tráfego, crie réplicas e provoque falhas com segurança.</p></div>
+        <div class="hero-controls">
+          <button id="deployButton" class="primary" data-structure="deployment" data-i18n="deployButton">🚀 Criar aplicação</button>
+          <button id="scaleButton" data-structure="scaling" data-i18n="scaleButton">↕ Escalar</button>
+          <button id="killButton" class="danger" data-structure="pod" data-i18n="killButton">💥 Derrubar um pod</button>
+        </div>
+      </div>
+
+      <div id="world">
+        <div class="cluster-boundary"></div><div class="cluster-label" data-structure="cluster" tabindex="0">cluster: kubeworld</div>
+        <div class="control-plane" data-structure="control-plane" tabindex="0">
+          <h3>🎛️ Control Plane</h3><p data-i18n="controlPlaneDescription">O cérebro: observa o estado desejado e coordena tudo.</p>
+          <div class="control-icons"><span data-structure="api-server" tabindex="0">API Server</span><span data-structure="scheduler" tabindex="0">Scheduler</span><span data-structure="controller" tabindex="0">Controller</span><span data-structure="etcd" tabindex="0">etcd</span></div>
+        </div>
+        <div class="deployment-card" id="deploymentArea" data-structure="deployment" tabindex="0"><b data-i18n="deploymentsTitle">📦 Deployments</b><div id="deploymentList"></div></div>
+        <div class="service-area" id="serviceArea"></div>
+        <svg class="traffic" viewBox="0 0 600 60" preserveAspectRatio="none"><path id="trafficLine" class="arrow" d="M0 30 C120 0 250 60 600 30"></path></svg>
+        <div class="node-area" id="nodeArea"></div>
+        <div class="packet" id="packet">request</div>
+      </div>
+      <div class="panel eventbar"><p id="eventText"></p><div class="event-actions"><button id="trafficButton" data-structure="service" data-i18n="trafficButton">📨 Enviar request</button><button id="autoButton" data-i18n="autoButton">▶ Auto</button></div></div>
+      <div class="panel inspector" id="inspector">
+        <div class="inspector-heading"><div class="inspect-icon" id="inspectIcon">🗺️</div><div class="eyebrow" data-i18n="architectureInspector">Inspetor de arquitetura</div><h3 id="inspectTitle">Cluster</h3><p id="inspectHint"></p></div>
+        <div class="inspect-content" id="inspectContent"></div>
+      </div>
+      <div class="panel yaml-lab">
+        <div class="yaml-head">
+          <div><div class="eyebrow" data-i18n="declarativeLab">Laboratório declarativo</div><h3 data-i18n="yamlTitle">Edite o YAML e veja o cluster mudar</h3><p data-i18n="yamlDescription">Altere os valores e clique em <strong>Aplicar YAML</strong>. O simulador interpreta os campos principais e reconcilia a tela com o novo estado desejado.</p></div>
+          <div class="yaml-actions"><button id="applyYaml" class="primary" data-i18n="applyYaml">✓ Aplicar todos</button><button id="resetYaml" data-i18n="resetYaml">↺ Restaurar</button><button id="copyYaml" data-i18n="copyYaml">⧉ Copiar</button></div>
+        </div>
+        <div class="ide-shell">
+          <aside class="file-explorer">
+            <div class="file-explorer-head"><span data-i18n="filesTitle">Arquivos YAML</span><span><button id="newYaml" title="New YAML">＋</button><button id="clusterYaml" title="Cluster YAML" data-i18n="clusterYaml">⚙ Cluster</button></span></div>
+            <div class="manifest-tabs" id="manifestTabs"></div>
+          </aside>
+          <div class="editor-pane">
+            <div class="editor-toolbar"><span class="editor-file-name" id="currentFileName"></span><div class="editor-actions"><button id="renameYaml" data-i18n="renameYaml">✎ Renomear</button><button id="runYaml" class="primary" data-i18n="runYaml">▶ Rodar este YAML</button><button id="deleteYaml" data-i18n="deleteYaml">🗑 Excluir</button></div></div>
+            <div class="yaml-grid">
+              <textarea id="yamlEditor" spellcheck="false" aria-label="Editor YAML do cluster"></textarea>
+              <div class="yaml-side">
+                <div class="yaml-status" id="yamlStatus"></div>
+                <div class="yaml-note"><b>⚙ Cluster</b><span id="clusterDefaultNote" data-i18n="clusterDefault"></span></div>
+                <div class="yaml-note"><b data-i18n="yamlNodesTitle">🖥️ Nodes não são réplicas</b><span data-i18n="yamlNodesText"><code>Cluster.spec.nodes</code> representa computadores do cluster. Altere de <code>3</code> para <code>6</code> e seis Nodes aparecerão.</span></div>
+                <div class="yaml-note"><b data-i18n="yamlPodsTitle">🫛 Pods da aplicação</b><span data-i18n="yamlPodsText"><code>Deployment.spec.replicas</code> representa cópias da aplicação. Altere para <code>5</code> e o Deployment distribuirá cinco Pods pelos Nodes.</span></div>
+                <div class="yaml-note"><b data-i18n="yamlConnectTitle">🔗 Conecte aplicações</b><span data-i18n="yamlConnectText">Crie outro YAML com Deployment + Service. Dentro do cluster, uma aplicação pode chamar outra pelo DNS do Service, por exemplo <code>http://catalog-api:3000</code>.</span></div>
+                <div class="yaml-note"><b data-i18n="yamlIdeaTitle">💡 Ideia central</b><span data-i18n="yamlIdeaText">YAML é declarativo: você descreve o estado desejado; o Kubernetes compara com o estado atual e trabalha para reconciliar os dois.</span></div>
+              </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lower">
+        <div class="panel info"><h3 data-i18n="whatYouSee">🧭 O que você está vendo?</h3><div id="explanation"></div></div>
+        <div class="panel info"><h3 data-i18n="glossaryTitle">📚 Glossário clicável</h3><div id="glossary"></div></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="welcomeModal">
+    <div class="modal-box">
+      <div class="eyebrow" data-i18n="welcomeEyebrow">Bem-vindo, explorador</div>
+      <h2 data-i18n="welcomeTitle">Vamos visitar Kubernetes? 🚀</h2>
+      <p data-i18n="welcomeText">Kubernetes é um <strong>gerente de aplicações</strong>. Você diz como quer que seu sistema fique — por exemplo, “quero 3 cópias do meu site” — e ele trabalha continuamente para manter essa promessa.</p>
+      <p data-i18n="welcomeLearn">Nesta aventura, você vai aprender:</p>
+      <ul data-i18n="welcomeList"><li>como um <strong>cluster</strong> reúne computadores chamados <strong>nodes</strong>;</li><li>como aplicações vivem em <strong>pods</strong>;</li><li>como <strong>Deployments</strong> mantêm cópias e fazem scaling;</li><li>como um <strong>Service</strong> encontra os pods mesmo quando eles mudam;</li><li>como Kubernetes se recupera de falhas automaticamente.</li></ul>
+      <div class="modal-actions"><button class="primary" id="startButton" data-i18n="startButton">Entrar no laboratório ✨</button><button id="skipButton" data-i18n="skipButton">Explorar livremente</button></div>
+    </div>
+  </div>
+  <div class="modal hidden" id="finishModal">
+    <div class="modal-box"><div class="eyebrow" data-i18n="finishEyebrow">Treinamento concluído</div><h2 data-i18n="finishTitle">Você pensa como Kubernetes! 🏆</h2><p id="finishText"></p><p data-i18n="finishTextStatic">O princípio mais importante é este: você declara o <strong>estado desejado</strong>; o Control Plane observa o estado atual e age até os dois combinarem.</p><div class="modal-actions"><button class="primary" id="continueButton" data-i18n="continueButton">Continuar explorando</button><button id="restartButton" data-i18n="restartButton">Refazer treinamento</button></div></div>
+  </div>
+  <div class="object-modal hidden" id="objectModal">
+    <div class="object-backdrop" id="objectBackdrop"></div>
+    <div class="zoom-shell" role="dialog" aria-modal="true" aria-labelledby="zoomTitle">
+      <div class="zoom-header"><div class="zoom-title"><div class="zoom-icon" id="zoomIcon">🔍</div><div><div class="eyebrow" id="zoomEyebrow">INSPEÇÃO EM TEMPO REAL</div><h2 id="zoomTitle">Objeto</h2><p id="zoomSubtitle"></p></div></div><button class="zoom-close" id="zoomClose" aria-label="Close">×</button></div>
+      <div class="zoom-body"><div class="telemetry" id="zoomTelemetry"></div><div class="yaml-preview-wrap"><b id="zoomYamlLabel">YAML PROPERTIES</b><pre class="yaml-preview" id="zoomYaml"></pre></div><div class="zoom-details" id="zoomDetails"></div></div>
+      <div class="zoom-footer"><span id="zoomFooter"></span><span>ESC • CLOSE</span></div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    let language = "pt-BR";
+    const uiText = {
+      "pt-BR": {
+        brandSubtitle: "Uma expedição interativa dentro do Kubernetes", missionLabel: "Missão", activePodsLabel: "Pods ativos", trainingCenter: "Centro de treinamento", currentMission: "Missão atual", helpButton: "📖 Abrir manual rápido", visualLab: "Laboratório visual", heroTitle: "Seu cluster está vivo", heroText: "Observe o tráfego, crie réplicas e provoque falhas com segurança.", deployButton: "🚀 Criar aplicação", scaleButton: "↕ Escalar", killButton: "💥 Derrubar um pod", controlPlaneDescription: "O cérebro: observa o estado desejado e coordena tudo.", deploymentsTitle: "📦 Deployments", trafficButton: "📨 Enviar request", autoButton: "▶ Auto", architectureInspector: "Inspetor de arquitetura", declarativeLab: "Laboratório declarativo", yamlTitle: "Edite o YAML e veja o cluster mudar", yamlDescription: "Altere os valores e clique em <strong>Aplicar YAML</strong>. O simulador interpreta os campos principais e reconcilia a tela com o novo estado desejado.", newYaml: "＋ Novo YAML", deleteYaml: "🗑 Excluir", applyYaml: "✓ Aplicar todos", resetYaml: "↺ Restaurar", copyYaml: "⧉ Copiar", yamlNodesTitle: "🖥️ Nodes não são réplicas", yamlNodesText: "<code>Cluster.spec.nodes</code> representa computadores do cluster. Altere de <code>3</code> para <code>6</code> e seis Nodes aparecerão.", yamlPodsTitle: "🫛 Pods da aplicação", yamlPodsText: "<code>Deployment.spec.replicas</code> representa cópias da aplicação. Altere para <code>5</code> e o Deployment distribuirá cinco Pods pelos Nodes.", yamlConnectTitle: "🔗 Conecte aplicações", yamlConnectText: "Crie outro YAML com Deployment + Service. Dentro do cluster, uma aplicação pode chamar outra pelo DNS do Service, por exemplo <code>http://catalog-api:3000</code>.", yamlIdeaTitle: "💡 Ideia central", yamlIdeaText: "YAML é declarativo: você descreve o estado desejado; o Kubernetes compara com o estado atual e trabalha para reconciliar os dois.", whatYouSee: "🧭 O que você está vendo?", glossaryTitle: "📚 Glossário clicável", welcomeEyebrow: "Bem-vindo, explorador", welcomeTitle: "Vamos visitar Kubernetes? 🚀", welcomeText: "Kubernetes é um <strong>gerente de aplicações</strong>. Você diz como quer que seu sistema fique — por exemplo, “quero 3 cópias do meu site” — e ele trabalha continuamente para manter essa promessa.", welcomeLearn: "Nesta aventura, você vai aprender:", welcomeList: "<li>como um <strong>cluster</strong> reúne computadores chamados <strong>nodes</strong>;</li><li>como aplicações vivem em <strong>pods</strong>;</li><li>como <strong>Deployments</strong> mantêm cópias e fazem scaling;</li><li>como um <strong>Service</strong> encontra os pods mesmo quando eles mudam;</li><li>como Kubernetes se recupera de falhas automaticamente.</li>", startButton: "Entrar no laboratório ✨", skipButton: "Explorar livremente", finishEyebrow: "Treinamento concluído", finishTitle: "Você pensa como Kubernetes! 🏆", finishTextStatic: "O princípio mais importante é este: você declara o <strong>estado desejado</strong>; o Control Plane observa o estado atual e age até os dois combinarem.", continueButton: "Continuar explorando", restartButton: "Refazer treinamento",
+        inspectHint: "Passe o mouse ou clique em qualquer estrutura do cluster para entender o papel dela.", inspectWhat: "O que é", inspectRole: "Para que serve", inspectAnalogy: "Imagine como", inspectConnection: "Como se conecta", healthy: "saudável", reconciling: "reconciliando", ready: "Ready", idle: "Idle", workerZone: "worker • zona-{n}", waitingPods: "aguardando Pods…", noDeployments: "Nenhum Deployment aplicado", serviceEmpty: "nenhum Service aplicado", replicas: "réplicas", endpoints: "endpoint(s)", running: "Running", crashLoop: "CrashLoop", podAge: "10m", request: "request", missionCount: "Missão {n}/6", yamlExampleLoaded: "Manifesto de exemplo carregado. A tela começa vazia até você aplicar o YAML.", yamlEditing: "Editando {name}. Aplicar todos usará todos os arquivos.", yamlUnsaved: "Alterações não aplicadas. Revise o YAML e clique em Aplicar todos.", yamlApplied: "✓ {files} YAML(s) aplicado(s): {nodes} Nodes, {apps} aplicação(ões) e {pods} Pods desejados.", yamlRestored: "Exemplo restaurado. Clique em Aplicar todos para usá-lo.", yamlNew: "Novo manifesto criado: {name}. Edite o name, image e replicas se quiser.", yamlDeleted: "Manifesto excluído. Clique em Aplicar todos para reconciliar o cluster.", yamlValid: "✅ {files} arquivo(s) YAML reconciliado(s) com sucesso.", copySuccess: "📋 YAML copiado para a área de transferência.", copyError: "Selecione o conteúdo do editor e copie manualmente.", noYaml: "O editor está vazio.", missingKind: "Existe um documento sem a propriedade kind.", missingCluster: "O primeiro YAML precisa incluir kind: Cluster e Cluster.spec.nodes.", missingDeployment: "Inclua ao menos um documento kind: Deployment.", missingNodes: "Não encontrei Cluster.spec.nodes.", missingName: "Um recurso precisa de metadata.name.", missingReplicas: "Deployment {name} não possui spec.replicas.", nodesRange: "Nodes deve ser um número entre 1 e 20.", replicasRange: "Réplicas de {name} deve ser um número entre 1 e 50.", deploymentActive: "O Deployment já está ativo. Agora você pode escalar ou testar o self-healing.", createFirst: "Crie a aplicação primeiro: sem um Deployment não há réplicas para escalar.", noDeploymentScale: "Nenhum Deployment disponível para escalar.", noService: "O Service ainda não tem Pods para encontrar. Crie a aplicação primeiro.", selectService: "Selecione uma aplicação que possua um Service.", noPod: "Nenhum Pod para derrubar ainda.", noDeployment: "Nenhum Deployment encontrado.", keepManifest: "Mantenha pelo menos um YAML com o Cluster e a aplicação principal.", protectManifest: "O primeiro YAML contém o Cluster. Edite-o ou exclua os outros manifestos.", noAppApplied: "Nenhum Deployment aplicado", welcomeReady: "Pronto: escolha uma missão e interaja com o cluster.", deploymentCreated: "Deployment criado: o Control Plane agendou 2 Pods nos Nodes disponíveis.", scaleEvent: "Scaling de {app}: estado desejado atualizado para {count} réplicas. O Scheduler distribuiu os Pods pelos Nodes.", trafficEvent: "Request #{n} → {app}: Service escolheu um Pod saudável e encaminhou o tráfego.", failureEvent: "Falha detectada: um Pod de {app} caiu. O Controller vai reconciliar o estado.", selfHealing: "Self-healing concluído: nova réplica criada. O Deployment mantém {count} Pods novamente.", applyEvent: "Manifests aplicados: {apps} agora fazem parte do cluster.", multipleApps: "Existem {count} aplicações no mesmo cluster. Cada uma tem seus próprios Pods e pode ter um Service próprio.", connectApps: "Para conectar aplicações, use o DNS do Service: por exemplo, <code>http://catalog-api:3000</code>. O Service continua encontrando os Pods mesmo quando eles mudam de Node.", noDeployExplain: "O retângulo grande é o <strong>cluster</strong>. Dentro dele, os Nodes são os computadores que podem executar sua aplicação.", controlExplain: "O <strong>Control Plane</strong> não serve páginas: ele toma decisões. Quando você fizer um pedido, ele vai escolher onde colocar os Pods.", killedExplain: "Um Pod desapareceu, mas o Deployment ainda deseja <strong>{count} réplicas</strong>. O Controller detecta a diferença e cria um substituto — isso é <strong>self-healing</strong>.", trafficExplain: "O request chega ao <strong>Service</strong>, que seleciona apenas Pods saudáveis. O cliente não precisa saber em qual Node cada Pod está.", deployExplain: "O Deployment pediu <strong>{count} réplica(s)</strong>. Os Pods são efêmeros: podem nascer e morrer, enquanto o Deployment mantém a quantidade desejada.", finishText: "Você ganhou {xp} XP e completou todas as missões. O cluster terminou com {count} réplicas da aplicação.", toastApplied: "✅ Manifesto válido: os componentes da tela foram atualizados.", toastNewYaml: "📄 Novo YAML criado. Ele será aplicado junto com os demais manifestos.", toastPodDown: "💥 Pod encerrado. Kubernetes não “ressuscita” o processo; ele cria um novo Pod para cumprir o desejo.", guide0: "<b>Comece observando:</b> clique em “Criar aplicação” quando estiver pronto.", guide1: "<b>Pedido recebido!</b> Clique em “Criar aplicação” para transformar sua intenção em Pods.", guide2: "<b>Mais tráfego?</b> Clique em “Escalar” e escolha quantas réplicas o Deployment deve manter.", guide3: "<b>Agora teste a rede:</b> envie requests e observe o Service distribuir o trabalho.", guide4: "<b>Experimento seguro:</b> derrube um Pod. O sistema deve se corrigir sozinho.", guideDone: "<b>Excelente!</b> Agora você já conhece o ciclo de reconciliação do Kubernetes.", stepTitle: "Passo {n}"
+      },
+      "en-US": {
+        brandSubtitle: "An interactive expedition inside Kubernetes", missionLabel: "Mission", activePodsLabel: "Active Pods", trainingCenter: "Training center", currentMission: "Current mission", helpButton: "📖 Open quick guide", visualLab: "Visual lab", heroTitle: "Your cluster is alive", heroText: "Watch traffic, create replicas, and safely trigger failures.", deployButton: "🚀 Create application", scaleButton: "↕ Scale", killButton: "💥 Take down a Pod", controlPlaneDescription: "The brain: watches the desired state and coordinates everything.", deploymentsTitle: "📦 Deployments", trafficButton: "📨 Send request", autoButton: "▶ Auto", architectureInspector: "Architecture inspector", declarativeLab: "Declarative lab", yamlTitle: "Edit YAML and watch the cluster change", yamlDescription: "Change values and click <strong>Apply YAML</strong>. The simulator interprets the main fields and reconciles the screen with the new desired state.", newYaml: "＋ New YAML", deleteYaml: "🗑 Delete", applyYaml: "✓ Apply all", resetYaml: "↺ Restore", copyYaml: "⧉ Copy", yamlNodesTitle: "🖥️ Nodes are not replicas", yamlNodesText: "<code>Cluster.spec.nodes</code> represents the computers in the cluster. Change <code>3</code> to <code>6</code> and six Nodes will appear.", yamlPodsTitle: "🫛 Application Pods", yamlPodsText: "<code>Deployment.spec.replicas</code> represents application copies. Change it to <code>5</code> and the Deployment will distribute five Pods across the Nodes.", yamlConnectTitle: "🔗 Connect applications", yamlConnectText: "Create another YAML with a Deployment + Service. Inside the cluster, one application can call another through the Service DNS, such as <code>http://catalog-api:3000</code>.", yamlIdeaTitle: "💡 Core idea", yamlIdeaText: "YAML is declarative: you describe the desired state; Kubernetes compares it with the current state and works to reconcile both.", whatYouSee: "🧭 What are you seeing?", glossaryTitle: "📚 Clickable glossary", welcomeEyebrow: "Welcome, explorer", welcomeTitle: "Shall we visit Kubernetes? 🚀", welcomeText: "Kubernetes is an <strong>application manager</strong>. You describe how you want your system to look — for example, “I want 3 copies of my website” — and it continuously works to keep that promise.", welcomeLearn: "In this adventure, you will learn:", welcomeList: "<li>how a <strong>cluster</strong> brings together computers called <strong>Nodes</strong>;</li><li>how applications live in <strong>Pods</strong>;</li><li>how <strong>Deployments</strong> maintain copies and scale;</li><li>how a <strong>Service</strong> finds Pods even when they move;</li><li>how Kubernetes recovers from failures automatically.</li>", startButton: "Enter the lab ✨", skipButton: "Explore freely", finishEyebrow: "Training complete", finishTitle: "You think like Kubernetes! 🏆", finishTextStatic: "The most important principle is this: you declare the <strong>desired state</strong>; the Control Plane watches the current state and acts until both match.", continueButton: "Keep exploring", restartButton: "Restart training",
+        inspectHint: "Hover over or click any cluster structure to understand its role.", inspectWhat: "What is it?", inspectRole: "What does it do?", inspectAnalogy: "Think of it as", inspectConnection: "How it connects", healthy: "healthy", reconciling: "reconciling", ready: "Ready", idle: "Idle", workerZone: "worker • zone-{n}", waitingPods: "waiting for Pods…", noDeployments: "No Deployment applied", serviceEmpty: "no Service applied", replicas: "replicas", endpoints: "endpoint(s)", running: "Running", crashLoop: "CrashLoop", podAge: "10m", request: "request", missionCount: "Mission {n}/6", yamlExampleLoaded: "Example manifest loaded. The screen starts empty until you apply the YAML.", yamlEditing: "Editing {name}. Apply all will use every file.", yamlUnsaved: "Unsaved changes. Review the YAML and click Apply all.", yamlApplied: "✓ {files} YAML file(s) applied: <b>{nodes} Nodes</b>, <b>{apps} application(s)</b>, and <b>{pods} desired Pods</b>.", yamlRestored: "Example restored. Click Apply all to use it.", yamlNew: "New manifest created: {name}. Edit the name, image, and replicas if you want.", yamlDeleted: "Manifest deleted. Click Apply all to reconcile the cluster.", yamlValid: "✅ {files} YAML file(s) successfully reconciled.", copySuccess: "📋 YAML copied to the clipboard.", copyError: "Select the editor content and copy it manually.", noYaml: "The editor is empty.", missingKind: "A document is missing the kind property.", missingCluster: "The first YAML must include kind: Cluster and Cluster.spec.nodes.", missingDeployment: "Include at least one kind: Deployment document.", missingNodes: "Cluster.spec.nodes was not found.", missingName: "A resource needs metadata.name.", missingReplicas: "Deployment {name} has no spec.replicas.", nodesRange: "Nodes must be a number between 1 and 20.", replicasRange: "Replicas for {name} must be a number between 1 and 50.", deploymentActive: "The Deployment is already active. You can now scale it or test self-healing.", createFirst: "Create the application first: without a Deployment there are no replicas to scale.", noDeploymentScale: "No Deployment is available to scale.", noService: "The Service has no Pods to find yet. Create the application first.", selectService: "Select an application that has a Service.", noPod: "There is no Pod to take down yet.", noDeployment: "No Deployment found.", keepManifest: "Keep at least one YAML with the Cluster and the main application.", protectManifest: "The first YAML contains the Cluster. Edit it or delete the other manifests.", noAppApplied: "No Deployment applied", welcomeReady: "Ready: choose a mission and interact with the cluster.", deploymentCreated: "Deployment created: the Control Plane scheduled 2 Pods on the available Nodes.", scaleEvent: "Scaling {app}: desired state updated to {count} replicas. The Scheduler distributed the Pods across the Nodes.", trafficEvent: "Request #{n} → {app}: Service selected a healthy Pod and forwarded the traffic.", failureEvent: "Failure detected: a Pod from {app} went down. The Controller will reconcile the state.", selfHealing: "Self-healing complete: a new replica was created. The Deployment keeps {count} Pods again.", applyEvent: "Manifests applied: {apps} are now part of the cluster.", multipleApps: "There are {count} applications in the same cluster. Each has its own Pods and may have its own Service.", connectApps: "To connect applications, use the Service DNS, for example <code>http://catalog-api:3000</code>. The Service keeps finding Pods even when they move between Nodes.", noDeployExplain: "The large rectangle is the <strong>cluster</strong>. Inside it, Nodes are the computers that can run your application.", controlExplain: "The <strong>Control Plane</strong> does not serve pages: it makes decisions. When you make a request, it chooses where to place the Pods.", killedExplain: "A Pod disappeared, but the Deployment still wants <strong>{count} replicas</strong>. The Controller detects the difference and creates a replacement — that is <strong>self-healing</strong>.", trafficExplain: "The request reaches the <strong>Service</strong>, which selects only healthy Pods. The client does not need to know which Node each Pod is on.", deployExplain: "The Deployment requested <strong>{count} replica(s)</strong>. Pods are ephemeral: they can appear and disappear while the Deployment maintains the desired count.", finishText: "You earned {xp} XP and completed every mission. The cluster ended with {count} application replicas.", toastApplied: "✅ Valid manifest: the screen components were updated.", toastNewYaml: "📄 New YAML created. It will be applied together with the other manifests.", toastPodDown: "💥 Pod terminated. Kubernetes does not “resurrect” the process; it creates a new Pod to fulfill the desired state.", guide0: "<b>Start by observing:</b> click “Create application” when you are ready.", guide1: "<b>Request received!</b> Click “Create application” to turn your intent into Pods.", guide2: "<b>More traffic?</b> Click “Scale” and choose how many replicas the Deployment should maintain.", guide3: "<b>Now test the network:</b> send requests and watch the Service distribute the work.", guide4: "<b>Safe experiment:</b> take down a Pod. The system should fix itself.", guideDone: "<b>Excellent!</b> You now know Kubernetes’ reconciliation cycle.", stepTitle: "Step {n}"
+      }
+    };
+    const structureText = {
+      "en-US": {
+        cluster: ["Cluster", "Overview", "A group of machines that work together to run applications managed by Kubernetes.", "It is this simulation’s boundary: the Control Plane and Nodes live inside it.", "Like a city: a central office organizes several neighborhoods where work happens.", "The Control Plane coordinates; Nodes execute; Pods run the application."],
+        "control-plane": ["Control Plane", "Cluster brain", "The set of components that receives requests, stores desired state, and makes decisions.", "It compares what you requested with what is happening and acts to fix differences.", "Like an airport control tower: it does not transport passengers, but organizes movement.", "It uses the API Server, Scheduler, Controllers, and etcd to coordinate Nodes and Pods."],
+        node: ["Node", "Worker machine", "A physical or virtual machine available to run Pods.", "It provides CPU, memory, and networking for containers. The kubelet talks to the Control Plane.", "Like a computer in a factory, ready to receive and execute tasks.", "A cluster has multiple Nodes; the Scheduler chooses where each Pod goes."],
+        pod: ["Pod", "Execution unit", "The smallest unit Kubernetes schedules. It usually contains one application container.", "It groups containers that need to share networking and local storage.", "Like a small capsule carrying one copy of your application to a Node.", "A Deployment creates and maintains Pods; a Service finds healthy Pods by labels."],
+        container: ["Container", "Packaged process", "A lightweight package containing application code and everything it needs to run.", "It runs the process inside a Pod, isolated from the rest of the system.", "Like a standardized box that can travel between Nodes without changing its contents.", "A Pod may have one or more containers; Deployments usually manage Pods."],
+        deployment: ["Deployment", "Desired state", "A declarative resource that says which application should run and how many replicas should exist.", "It creates ReplicaSets, maintains the desired number of Pods, and helps update versions.", "Like a manager saying: “keep 3 boxes from this production line running.”", "Deployment → ReplicaSet → Pods. If a Pod dies, the chain creates another."],
+        service: ["Service", "Stable address", "A fixed access point that forwards traffic to a group of Pods.", "It hides constant Pod changes and distributes requests among healthy Pods.", "Like a building reception: visitors use one address and reception finds the right person.", "It selects Pods by labels; clients do not need individual IPs."],
+        scheduler: ["Scheduler", "Task distributor", "A Control Plane component that chooses the Node where a new Pod will run.", "It considers available resources, rules, and constraints to find a fit.", "Like a dispatcher choosing which truck should carry each load.", "It reads Pods without a Node and binds them to ready Nodes."],
+        controller: ["Controller", "Reconciler", "A process that watches current state and moves it toward desired state.", "It powers self-healing: notices a missing Pod and requests another.", "Like a robot checking a list and replacing whatever is missing.", "Deployments and ReplicaSets use Controllers to maintain replicas."],
+        "api-server": ["API Server", "Entry point", "Kubernetes’ central interface. Tools and components communicate through it.", "It validates requests, authenticates access, and exposes cluster state.", "Like the service desk where everyone files official requests.", "kubectl, Controllers, and the Scheduler pass through the API Server."],
+        etcd: ["etcd", "Cluster memory", "A distributed database that stores cluster configuration and state.", "It preserves important information such as Deployments, Nodes, and desired state.", "Like the city’s official registry book.", "The API Server reads and writes it; other components react to this information."],
+        scaling: ["Scaling", "Capacity adjustment", "Increasing or decreasing the number of replicas to match demand.", "More Pods increase capacity and distribute more requests.", "Like opening more service counters when the line gets longer.", "You change the desired number in the Deployment; Controllers do the work."]
+      }
+    };
+    const t = (key, values = {}) => {
+      const extraText = {
+        "pt-BR": { filesTitle: "Arquivos YAML", renameYaml: "✎ Renomear", runYaml: "▶ Rodar este YAML", clusterYaml: "⚙ Cluster", fileApplied: "executado", filePending: "não executado", fileDirty: "alterado", currentFile: "Arquivo ativo: {name}", runCurrent: "✓ {name} executado: {resources} recurso(s) reconciliado(s).", firstFileCluster: "Este YAML precisa conter kind: Cluster ou outro arquivo precisa definir o Cluster.", clusterDefault: "A configuração do Cluster está oculta. O laboratório usa {nodes} Nodes. Crie um YAML kind: Cluster apenas para sobrescrever este valor." },
+        "en-US": { filesTitle: "YAML files", renameYaml: "✎ Rename", runYaml: "▶ Run this YAML", clusterYaml: "⚙ Cluster", fileApplied: "applied", filePending: "not run", fileDirty: "modified", currentFile: "Active file: {name}", runCurrent: "✓ {name} executed: {resources} resource(s) reconciled.", firstFileCluster: "This YAML must contain kind: Cluster, or another file must define the Cluster.", clusterDefault: "Cluster configuration is hidden. The lab uses {nodes} Nodes. Create a kind: Cluster YAML only when you want to override this value." }
+      };
+      if (extraText[language]?.[key]) {
+        let extra = extraText[language][key];
+        const extraValues = key === "clusterDefault" ? { nodes: state.nodes, ...values } : values;
+        Object.entries(extraValues).forEach(([name, value]) => { extra = extra.replaceAll(`{${name}}`, value); });
+        return extra;
+      }
+      if (key === "yamlConnectText") return language === "en-US"
+        ? "Create one YAML with the Deployment and another with the Service — or combine them. Apply all files and Kubernetes will connect them through the Service selector, such as <code>http://catalog-api:3000</code>."
+        : "Crie um YAML com o Deployment e outro com o Service — ou combine os dois. Ao aplicar todos os arquivos, o Kubernetes relacionará os recursos pelo selector do Service, como <code>http://catalog-api:3000</code>.";
+      let text = uiText[language][key] || uiText["pt-BR"][key] || key;
+      Object.entries(values).forEach(([name, value]) => { text = text.replaceAll(`{${name}}`, value); });
+      return text;
+    };
+    function setYamlStatus(key, values = {}, className = "yaml-status") {
+      $("yamlStatus").className = className;
+      $("yamlStatus").dataset.i18nKey = key;
+      $("yamlStatus").dataset.i18nValues = JSON.stringify(values);
+      $("yamlStatus").innerHTML = key === "yamlError"
+        ? `${language === "en-US" ? "⚠️ YAML not applied" : "⚠️ YAML não aplicado"}: ${values.error}`
+        : t(key, values);
+    }
+    function refreshYamlStatus() {
+      const status = $("yamlStatus");
+      if (!status.dataset.i18nKey) return;
+      setYamlStatus(status.dataset.i18nKey, JSON.parse(status.dataset.i18nValues || "{}"), status.className);
+    }
+    const localStructure = id => {
+      const base = structures[id] || structures.cluster;
+      const translated = structureText[language]?.[id];
+      if (!translated) return base;
+      return { title: translated[0], kind: translated[1], definition: translated[2], role: translated[3], analogy: translated[4], connection: translated[5], icon: base.icon };
+    };
+    function applyLanguage() {
+      document.documentElement.lang = language === "en-US" ? "en-US" : "pt-BR";
+      document.querySelectorAll("[data-i18n]").forEach(element => { element.innerHTML = t(element.dataset.i18n); });
+      $("languageToggle").textContent = language === "pt-BR" ? "🇺🇸 English" : "🇧🇷 Português";
+      $("health").textContent = state.killed ? t("reconciling") : t("healthy");
+      renderGlossary(); renderManifestTabs(); updateUI(); refreshYamlStatus();
+      inspectStructure($("inspectTitle").dataset.structure || "cluster");
+    }
+    const lessons = [
+      { title: "Conheça o cluster", text: "Um cluster é o conjunto de máquinas que trabalham como uma equipe. O Control Plane coordena e os nodes executam.", action: "intro" },
+      { title: "Lance sua aplicação", text: "Um Deployment é seu pedido declarativo: “mantenha estas cópias desta aplicação rodando”.", action: "deploy" },
+      { title: "Faça scaling", text: "Aumente o número de réplicas para atender mais tráfego. Kubernetes distribui os pods pelos nodes.", action: "scale" },
+      { title: "Conecte com um Service", text: "O Service oferece um endereço estável e encaminha requests para pods saudáveis.", action: "traffic" },
+      { title: "Teste o self-healing", text: "Derrube um pod. O Controller percebe que falta uma réplica e cria outra automaticamente.", action: "kill" },
+      { title: "Declare, não opere", text: "Você aprendeu o ciclo central: declarar o desejado, observar e reconciliar automaticamente.", action: "finish" }
+    ];
+    const lessonCopies = {
+      "pt-BR": [
+        ["Conheça o cluster", "Um cluster é o conjunto de máquinas que trabalham como uma equipe. O Control Plane coordena e os Nodes executam."],
+        ["Lance sua aplicação", "Um Deployment é seu pedido declarativo: “mantenha estas cópias desta aplicação rodando”."],
+        ["Faça scaling", "Aumente o número de réplicas para atender mais tráfego. Kubernetes distribui os Pods pelos Nodes."],
+        ["Conecte com um Service", "O Service oferece um endereço estável e encaminha requests para Pods saudáveis."],
+        ["Teste o self-healing", "Derrube um Pod. O Controller percebe que falta uma réplica e cria outra automaticamente."],
+        ["Declare, não opere", "Você aprendeu o ciclo central: declarar o desejado, observar e reconciliar automaticamente."]
+      ],
+      "en-US": [
+        ["Explore the cluster", "A cluster is a group of machines working as a team. The Control Plane coordinates and Nodes execute."],
+        ["Launch your application", "A Deployment is your declarative request: “keep these copies of this application running.”"],
+        ["Scale it", "Increase replicas to handle more traffic. Kubernetes distributes Pods across Nodes."],
+        ["Connect with a Service", "A Service provides a stable address and forwards requests to healthy Pods."],
+        ["Test self-healing", "Take down a Pod. The Controller notices a missing replica and creates another automatically."],
+        ["Declare, don’t operate", "You learned the central cycle: declare the desired state, observe, and reconcile automatically."]
+      ]
+    };
+    const lessonAt = index => lessonCopies[language][index] || lessonCopies["pt-BR"][index];
+    const structures = {
+      cluster: { title: "Cluster", icon: "🗺️", kind: "Visão geral", definition: "Um conjunto de máquinas que trabalham juntas para executar aplicações gerenciadas pelo Kubernetes.", role: "É a fronteira desta simulação: dentro dela ficam o Control Plane e os Nodes.", analogy: "Como uma cidade: há uma central que organiza e vários bairros onde o trabalho acontece.", connection: "Control Plane coordena; Nodes executam; Pods rodam a aplicação." },
+      "control-plane": { title: "Control Plane", icon: "🎛️", kind: "Cérebro do cluster", definition: "É o conjunto de componentes que recebe pedidos, guarda o estado desejado e toma decisões.", role: "Compara o que você pediu com o que está acontecendo e age para corrigir diferenças.", analogy: "Como a torre de controle de um aeroporto: não transporta passageiros, mas organiza todo o movimento.", connection: "Usa API Server, Scheduler, Controllers e etcd para coordenar Nodes e Pods." },
+      node: { title: "Node", icon: "🖥️", kind: "Máquina trabalhadora", definition: "Uma máquina virtual ou física disponível para executar Pods.", role: "Fornece CPU, memória e rede para os containers. O kubelet do Node conversa com o Control Plane.", analogy: "Como um computador em uma fábrica, pronto para receber e executar tarefas.", connection: "Um cluster tem vários Nodes; o Scheduler escolhe onde cada Pod será colocado." },
+      pod: { title: "Pod", icon: "🫛", kind: "Unidade de execução", definition: "A menor unidade que Kubernetes agenda. Normalmente contém um container da sua aplicação.", role: "Agrupa containers que precisam compartilhar rede e armazenamento local.", analogy: "Como uma pequena cápsula que leva uma cópia da sua aplicação para algum Node.", connection: "Deployment cria e mantém Pods; Service encontra Pods saudáveis por labels." },
+      container: { title: "Container", icon: "📦", kind: "Processo empacotado", definition: "Um pacote leve com o código da aplicação e tudo o que ela precisa para rodar.", role: "Executa o processo dentro de um Pod, isolado do restante do sistema.", analogy: "Como uma caixa padronizada: pode viajar para Nodes diferentes sem mudar seu conteúdo.", connection: "Um Pod pode ter um ou mais containers, mas o Deployment normalmente gerencia Pods." },
+      deployment: { title: "Deployment", icon: "📦", kind: "Estado desejado", definition: "Um recurso declarativo que diz qual aplicação deve rodar e quantas réplicas devem existir.", role: "Cria ReplicaSets, mantém a quantidade desejada de Pods e ajuda em atualizações de versão.", analogy: "Como um gerente dizendo: “quero sempre 3 caixas desta linha funcionando”.", connection: "Deployment → ReplicaSet → Pods. Se um Pod morre, a cadeia cria outro." },
+      service: { title: "Service", icon: "🌐", kind: "Endereço estável", definition: "Um ponto de acesso fixo que encaminha tráfego para um grupo de Pods.", role: "Esconde a troca constante de Pods e distribui requests entre os Pods saudáveis.", analogy: "Como a recepção de um prédio: o visitante usa um endereço e ela encontra a pessoa certa.", connection: "Seleciona Pods por labels; o cliente não precisa conhecer IPs individuais." },
+      scheduler: { title: "Scheduler", icon: "📅", kind: "Distribuidor de tarefas", definition: "Componente do Control Plane que escolhe em qual Node um novo Pod será executado.", role: "Considera recursos disponíveis, regras e restrições para fazer o encaixe.", analogy: "Como um despachante que escolhe em qual caminhão colocar cada carga.", connection: "Lê Pods sem Node e os vincula a Nodes prontos." },
+      controller: { title: "Controller", icon: "🔁", kind: "Reconciliador", definition: "Um processo que observa o estado atual e tenta aproximá-lo do estado desejado.", role: "É o responsável pelo self-healing: percebe que falta um Pod e solicita outro.", analogy: "Como um robô conferindo uma lista o tempo todo e repondo o que falta.", connection: "Deployments e ReplicaSets usam controllers para manter réplicas." },
+      "api-server": { title: "API Server", icon: "🚪", kind: "Porta de entrada", definition: "A interface central do Kubernetes. Ferramentas e componentes conversam com ela.", role: "Valida pedidos, autentica acessos e expõe o estado do cluster.", analogy: "Como o balcão de atendimento onde todos registram pedidos oficiais.", connection: "kubectl, Controllers e Scheduler passam pelo API Server." },
+      etcd: { title: "etcd", icon: "🗄️", kind: "Memória do cluster", definition: "Banco de dados distribuído que guarda a configuração e o estado do cluster.", role: "Preserva informações importantes, como Deployments, Nodes e estado desejado.", analogy: "Como o livro oficial de registros da cidade.", connection: "O API Server lê e grava nele; os demais componentes reagem a essas informações." },
+      scaling: { title: "Scaling", icon: "↕️", kind: "Ajuste de capacidade", definition: "Aumentar ou reduzir a quantidade de réplicas para acompanhar a demanda.", role: "Mais Pods aumentam a capacidade e permitem distribuir mais requests.", analogy: "Como abrir mais caixas de atendimento quando a fila cresce.", connection: "Você muda o número desejado no Deployment; Controllers fazem o trabalho." }
+    };
+    const concepts = Object.entries(structures).map(([id, item]) => [id, item.title, item.definition]);
+    const defaultYaml = `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: app-web
+  template:
+    metadata:
+      labels:
+        app: app-web
+    spec:
+      containers:
+        - name: web
+          image: nginx:1.27
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-web
+spec:
+  selector:
+    app: app-web
+  ports:
+    - port: 80
+      targetPort: 80`;
+    const secondaryYaml = `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: catalog-api
+  template:
+    metadata:
+      labels:
+        app: catalog-api
+    spec:
+      containers:
+        - name: api
+          image: node:22-alpine
+          ports:
+            - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog-api
+spec:
+  selector:
+    app: catalog-api
+  ports:
+    - port: 3000
+      targetPort: 3000`;
+    const clusterYaml = `apiVersion: kubeworld/v1
+kind: Cluster
+metadata:
+  name: kubeworld
+spec:
+  nodes: 3`;
+    let manifestFiles = [{ id: "web", name: "app-web.yaml", content: defaultYaml }];
+    let currentManifest = 0;
+    let state = { mission: 0, xp: 0, nodes: 3, replicas: 0, deployed: false, service: true, image: "nginx:1.27", apps: {}, services: {}, clusterYaml: "", selectedApp: "app-web", traffic: 0, killed: false, killedApp: null, auto: false, timer: null };
+
+    function generateYaml() {
+      return `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-web
+spec:
+  replicas: ${state.replicas || 2}
+  selector:
+    matchLabels:
+      app: app-web
+  template:
+    metadata:
+      labels:
+        app: app-web
+    spec:
+      containers:
+        - name: web
+          image: ${state.image}
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-web
+spec:
+  selector:
+    app: app-web
+  ports:
+    - port: 80
+      targetPort: 80`;
+    }
+    function parseYaml(source) {
+      if (!source.trim()) throw new Error(t("noYaml"));
+      const documents = source.split(/^---\s*$/m).map(document => document.trim()).filter(Boolean);
+      const result = { nodes: null, apps: [], services: [], clusterYaml: "" };
+      documents.forEach(document => {
+        const kindMatch = document.match(/^\s*kind:\s*["']?([A-Za-z0-9-]+)["']?/m);
+        if (!kindMatch) throw new Error(t("missingKind"));
+        const kind = kindMatch[1];
+        const nameMatch = document.match(/^\s+name:\s*["']?([A-Za-z0-9._-]+)["']?/m);
+        const name = nameMatch && nameMatch[1];
+        if (kind === "Cluster") {
+          const nodesMatch = document.match(/^\s+nodes:\s*["']?(\d+)["']?\s*(?:#.*)?$/m);
+          if (!nodesMatch) throw new Error(t("missingNodes"));
+          result.nodes = Number(nodesMatch[1]);
+          result.clusterYaml = document;
+        }
+        if (kind === "Deployment") {
+          if (!name) throw new Error(t("missingName"));
+          const replicasMatch = document.match(/^\s+replicas:\s*["']?(\d+)["']?\s*(?:#.*)?$/m);
+          if (!replicasMatch) throw new Error(t("missingReplicas", { name }));
+          const imageMatch = document.match(/^\s+image:\s*["']?([^\s"'#]+)["']?\s*(?:#.*)?$/m);
+          result.apps.push({ name, replicas: Number(replicasMatch[1]), image: imageMatch ? imageMatch[1] : "app:latest", yaml: document });
+        }
+        if (kind === "Service") {
+          if (!name) throw new Error(t("missingName"));
+          const selectorMatch = document.match(/^\s+selector:\s*\n\s+app:\s*["']?([A-Za-z0-9._-]+)["']?/m);
+          result.services.push({ name, selector: selectorMatch ? selectorMatch[1] : name, yaml: document });
+        }
+      });
+      if (!result.apps.length && !result.services.length && result.nodes === null) throw new Error(language === "en-US" ? "This manifest contains no supported Kubernetes resource." : "Este manifesto não contém nenhum recurso Kubernetes compatível.");
+      if (result.nodes !== null && (result.nodes < 1 || result.nodes > 20)) throw new Error(t("nodesRange"));
+      result.apps.forEach(app => {
+        if (app.replicas < 1 || app.replicas > 50) throw new Error(t("replicasRange", { name: app.name }));
+        const service = result.services.find(item => item.selector === app.name || item.name === app.name);
+        app.service = Boolean(service);
+        app.serviceName = service ? service.name : app.name;
+      });
+      return result;
+    }
+    function renderManifestTabs() {
+      $("manifestTabs").innerHTML = manifestFiles.map((file, index) => `<button class="manifest-tab ${index === currentManifest ? "active" : ""}" data-manifest="${index}"><span>📄 ${file.name}</span><small>${file.dirty ? t("fileDirty") : file.lastRun ? t("fileApplied") : t("filePending")}</small></button>`).join("");
+      $("currentFileName").textContent = t("currentFile", { name: manifestFiles[currentManifest]?.name || "" });
+      document.querySelectorAll(".manifest-tab").forEach(tab => tab.onclick = () => selectManifest(Number(tab.dataset.manifest)));
+    }
+    function saveCurrentManifest() {
+      if (manifestFiles[currentManifest]) manifestFiles[currentManifest].content = $("yamlEditor").value;
+    }
+    function selectManifest(index) {
+      saveCurrentManifest();
+      currentManifest = index;
+      $("yamlEditor").value = manifestFiles[currentManifest].content;
+      $("yamlEditor").dataset.dirty = "false";
+      setYamlStatus("yamlEditing", { name: manifestFiles[currentManifest].name });
+      renderManifestTabs();
+    }
+    function applyAllManifests() {
+      saveCurrentManifest();
+      try {
+        const parsedFiles = manifestFiles.map(file => {
+          try { return { file, parsed: parseYaml(file.content) }; }
+          catch (error) { throw new Error(`${file.name}: ${error.message}`); }
+        });
+        const firstWithNodes = parsedFiles.find(item => item.parsed.nodes !== null);
+        const allServices = parsedFiles.flatMap(item => item.parsed.services);
+        const allParsedApps = parsedFiles.flatMap(item => item.parsed.apps);
+        if (!allParsedApps.length) throw new Error(t("missingDeployment"));
+        const apps = {};
+        allParsedApps.forEach(app => {
+          const service = allServices.find(item => item.selector === app.name || item.name === app.name);
+          apps[app.name] = { ...app, service: Boolean(service), serviceName: service ? service.name : app.name, color: Object.keys(apps).length % 2 ? "var(--purple)" : "var(--cyan)" };
+        });
+        const wasDeployed = state.deployed;
+        const previousReplicas = state.replicas;
+        if (firstWithNodes) { state.nodes = firstWithNodes.parsed.nodes; state.clusterYaml = firstWithNodes.parsed.clusterYaml; }
+        state.services = Object.fromEntries(allServices.map(service => [service.name, service]));
+        state.apps = apps; state.selectedApp = apps["app-web"] ? "app-web" : Object.keys(apps)[0];
+        state.replicas = apps["app-web"]?.replicas || apps[state.selectedApp].replicas;
+        state.image = apps["app-web"]?.image || apps[state.selectedApp].image;
+        state.deployed = true; state.service = Object.values(apps).some(app => app.service); state.killed = false; state.killedApp = null; state.traffic = 0;
+        manifestFiles.forEach(file => { file.lastRun = true; file.dirty = false; });
+        $("yamlEditor").dataset.dirty = "false";
+        setYamlStatus("yamlApplied", { files: manifestFiles.length, nodes: state.nodes, apps: Object.keys(apps).length, pods: Object.values(apps).reduce((total, app) => total + app.replicas, 0) }, "yaml-status ok");
+        $("eventText").innerHTML = `<span>${t("applyEvent", { apps: Object.keys(apps).join(", ") })}</span>`;
+        updateUI();
+        if (!wasDeployed && state.mission === 1) progress("deploy");
+        else if (wasDeployed && previousReplicas !== state.replicas && state.mission === 2) progress("scale");
+        showToast(t("yamlValid", { files: manifestFiles.length }));
+      } catch (error) {
+        setYamlStatus("yamlError", { error: error.message }, "yaml-status error");
+        showToast(`⚠️ ${error.message}`);
+      }
+    }
+    function syncYamlFromState() {
+      if (!state.apps["app-web"]) return renderManifestTabs();
+      const generated = generateYaml();
+      if (manifestFiles[0]) { manifestFiles[0].content = generated; manifestFiles[0].dirty = false; manifestFiles[0].lastRun = true; }
+      if (state.apps["app-web"]) state.apps["app-web"].yaml = generated;
+      if (currentManifest === 0) {
+        $("yamlEditor").value = generated;
+        $("yamlEditor").dataset.dirty = "false";
+      }
+      renderManifestTabs();
+    }
+
+    function renderLessons() {
+      $("lessonList").innerHTML = lessons.map((l, i) => `<div class="lesson ${i === state.mission ? "active" : ""} ${i < state.mission ? "done" : ""}"><span class="num">${i < state.mission ? "✓" : i + 1}</span><span>${lessonAt(i)[0]}</span></div>`).join("");
+    }
+    function renderGlossary() {
+      $("glossary").innerHTML = concepts.map(c => { const item = localStructure(c[0]); return `<div class="concept-card" data-term="${c[0]}"><b>${item.title}</b><span>${item.definition}</span></div>`; }).join("");
+      document.querySelectorAll(".concept-card").forEach(card => card.onclick = () => explainTerm(card.dataset.term));
+    }
+    function inspectStructure(id) {
+      const item = localStructure(id);
+      $("inspectIcon").textContent = item.icon;
+      $("inspectTitle").textContent = item.title;
+      $("inspectTitle").dataset.structure = id;
+      $("inspectHint").textContent = `${item.kind}. ${t("inspectHint")}`;
+      $("inspectContent").innerHTML = `
+        <div class="inspect-block"><b>${t("inspectWhat")}</b><span>${item.definition}</span></div>
+        <div class="inspect-block"><b>${t("inspectRole")}</b><span>${item.role}</span></div>
+        <div class="inspect-block"><b>${t("inspectAnalogy")}</b><span>${item.analogy}</span></div>
+        <div class="inspect-block"><b>${t("inspectConnection")}</b><span>${item.connection}</span></div>`;
+      document.querySelectorAll(".selected-structure").forEach(element => element.classList.remove("selected-structure"));
+      document.querySelectorAll(`[data-structure="${id}"]`).forEach(element => element.classList.add("selected-structure"));
+    }
+    function bindInspectors() {
+      document.querySelectorAll("[data-structure]").forEach(element => {
+        if (element.dataset.inspectorBound) return;
+        element.dataset.inspectorBound = "true";
+        element.addEventListener("mouseenter", () => inspectStructure(element.dataset.structure));
+        element.addEventListener("focus", () => inspectStructure(element.dataset.structure));
+        element.addEventListener("click", event => {
+          event.stopPropagation();
+          if (element.dataset.app) {
+            state.selectedApp = element.dataset.app;
+            renderWorld();
+          }
+          inspectStructure(element.dataset.structure);
+          if (element.closest("#world")) openObjectDetail(element.dataset.structure, element, { appName: element.dataset.app, nodeIndex: element.dataset.nodeIndex, serviceName: element.dataset.service });
+        });
+      });
+    }
+    function detailCard(label, value) {
+      return `<div class="zoom-detail"><b>${label}</b><span>${value}</span></div>`;
+    }
+    function telemetryCard(label, value) {
+      return `<div class="telemetry-card"><b>${label}</b><span>${value}</span></div>`;
+    }
+    function yamlForObject(id, metadata = {}) {
+      const english = language === "en-US";
+      if (id === "cluster" || id === "node") return state.clusterYaml || (english ? "No kind: Cluster manifest is active.\nThe simulator is using its default cluster configuration." : "Nenhum manifesto kind: Cluster está ativo.\nO simulador está usando a configuração padrão do cluster.");
+      if (id === "pod") return state.apps[metadata.appName]?.yaml || (english ? "This Pod was created from its Deployment manifest." : "Este Pod foi criado a partir do manifesto do seu Deployment.");
+      if (id === "service") return state.services[metadata.serviceName]?.yaml || (english ? "Service manifest not found." : "Manifesto do Service não encontrado.");
+      if (id === "deployment") return Object.values(state.apps).map(app => app.yaml).filter(Boolean).join("\n\n---\n\n") || (english ? "Deployment manifest not found." : "Manifesto do Deployment não encontrado.");
+      return english ? "This Control Plane component is managed by Kubernetes, not by an application YAML." : "Este componente do Control Plane é gerenciado pelo Kubernetes, não por um YAML da aplicação.";
+    }
+    function openObjectDetail(id, sourceElement, metadata = {}) {
+      const item = localStructure(id);
+      const english = language === "en-US";
+      const copy = english
+        ? { live: "LIVE", state: "STATE", nodes: "NODES", pods: "PODS", services: "SERVICES", role: "ROLE", details: "DETAILS", links: "CONNECTIONS", runtime: "RUNTIME", healthy: "Healthy", running: "Running", idle: "Idle", desired: "Desired state", selected: "Selected target", owner: "Owner", image: "Image", selector: "Selector", dns: "Internal DNS", components: "Components", reconcile: "Reconciliation", resources: "RESOURCES", close: "ESC • CLOSE", clickHint: "Click another object to inspect it" }
+        : { live: "AO VIVO", state: "ESTADO", nodes: "NODES", pods: "PODS", services: "SERVICES", role: "PAPEL", details: "DETALHES", links: "CONEXÕES", runtime: "RUNTIME", healthy: "Saudável", running: "Executando", idle: "Ocioso", desired: "Estado desejado", selected: "Alvo selecionado", owner: "Proprietário", image: "Imagem", selector: "Selector", dns: "DNS interno", components: "Componentes", reconcile: "Reconciliação", resources: "RECURSOS", close: "ESC • FECHAR", clickHint: "Clique em outro objeto para inspecioná-lo" };
+      let telemetry = [];
+      let details = [];
+      const apps = Object.values(state.apps);
+      if (id === "cluster") {
+        telemetry = [[copy.state, state.killed ? t("reconciling") : t("healthy")], [copy.nodes, state.nodes], [copy.pods, $("podCount").textContent], [copy.services, Object.keys(state.services).length]];
+        details = [[copy.role, item.role], [copy.details, item.definition], [copy.links, item.connection], [copy.runtime, item.analogy]];
+      } else if (id === "node") {
+        const nodeIndex = Number(metadata.nodeIndex || 0);
+        const nodePods = [...document.querySelectorAll(`#node-${nodeIndex} .pod`)];
+        telemetry = [[copy.state, nodePods.length ? copy.healthy : copy.idle], [copy.nodes, `node-${nodeIndex + 1}`], [copy.pods, nodePods.length], [copy.resources, "CPU • Memory • Network"]];
+        details = [[copy.role, item.role], [copy.details, `${nodePods.length} ${english ? "Pod(s) are currently scheduled on this Node." : "Pod(s) estão agendados neste Node."}`], [copy.links, item.connection], [copy.runtime, item.analogy]];
+      } else if (id === "pod") {
+        const app = state.apps[metadata.appName] || apps[0];
+        telemetry = [[copy.state, state.killed && state.killedApp === app?.name ? "CrashLoop" : copy.running], [copy.owner, app?.name || "—"], [copy.image, app?.image || "—"], [copy.services, app?.service ? (app.serviceName || app.name) : "—"]];
+        details = [[copy.role, item.role], [copy.details, item.definition], [copy.links, app?.service ? `${copy.dns}: http://${app.serviceName || app.name}` : (english ? "No Service connected." : "Nenhum Service conectado.")], [copy.runtime, item.analogy]];
+      } else if (id === "service") {
+        const service = state.services[metadata.serviceName] || Object.values(state.services).find(entry => entry.selector === metadata.appName);
+        const target = apps.find(app => app.name === service?.selector || app.name === service?.name);
+        telemetry = [[copy.state, service ? copy.healthy : copy.idle], [copy.selector, service?.selector || "—"], [copy.pods, target?.replicas || 0], [copy.dns, service ? `http://${service.name}` : "—"]];
+        details = [[copy.role, item.role], [copy.details, item.definition], [copy.links, target ? `${copy.selected}: ${target.name}` : (english ? "Waiting for a matching Deployment." : "Aguardando um Deployment correspondente.")], [copy.runtime, item.analogy]];
+      } else if (id === "deployment") {
+        const totalReplicas = apps.reduce((sum, app) => sum + app.replicas, 0);
+        telemetry = [[copy.state, state.deployed ? copy.healthy : copy.idle], [copy.nodes, state.nodes], [copy.pods, totalReplicas], [copy.services, apps.filter(app => app.service).length]];
+        details = [[copy.role, item.role], [copy.desired, apps.map(app => `${app.name}: ${app.replicas}`).join(" • ") || "—"], [copy.links, item.connection], [copy.runtime, item.analogy]];
+      } else {
+        telemetry = [[copy.state, copy.healthy], [copy.components, item.title], [copy.reconcile, "active"], [copy.runtime, "online"]];
+        details = [[copy.role, item.role], [copy.details, item.definition], [copy.links, item.connection], [copy.runtime, item.analogy]];
+      }
+      $("zoomIcon").textContent = item.icon;
+      $("zoomEyebrow").textContent = `${copy.live} • ${item.kind}`;
+      $("zoomTitle").textContent = item.title;
+      $("zoomSubtitle").textContent = `${copy.clickHint} · ${new Date().toLocaleTimeString(language)}`;
+      $("zoomTelemetry").innerHTML = telemetry.map(entry => telemetryCard(entry[0], entry[1])).join("");
+      $("zoomYamlLabel").textContent = english ? "PROPERTIES FROM YAML" : "PROPRIEDADES DEFINIDAS NO YAML";
+      $("zoomYaml").textContent = yamlForObject(id, metadata);
+      $("zoomDetails").innerHTML = details.map(entry => detailCard(entry[0], entry[1])).join("");
+      $("zoomFooter").textContent = copy.close;
+      $("objectModal").classList.remove("hidden");
+      document.querySelectorAll(".focus-object").forEach(element => element.classList.remove("focus-object"));
+      let target = sourceElement?.isConnected ? sourceElement : null;
+      if (!target && id === "service") target = document.querySelector(`.service[data-service="${metadata.serviceName}"]`);
+      if (!target && id === "node") target = document.querySelector(`#node-${metadata.nodeIndex || 0}`);
+      if (!target && id === "deployment") target = $("deploymentArea");
+      if (target) { target.classList.add("focus-object"); setTimeout(() => target.classList.remove("focus-object"), 2400); }
+    }
+    function closeObjectDetail() {
+      $("objectModal").classList.add("hidden");
+      document.querySelectorAll(".focus-object").forEach(element => element.classList.remove("focus-object"));
+    }
+    function podMarkup(i, app, dead = false) {
+      return `<div class="pod ${dead ? "dead" : ""}" id="pod-${i}" data-structure="pod" data-app="${app.name}" style="--app-color:${app.color || "var(--cyan)"}" tabindex="0"><b>${app.name}-${String(i).padStart(2, "0")}</b><small>${dead ? t("crashLoop") : t("running")} • ${app.image}</small></div>`;
+    }
+    function renderWorld() {
+      const apps = Object.values(state.apps);
+      const podQueue = [];
+      apps.forEach(app => {
+        const liveReplicas = state.killed && state.killedApp === app.name ? Math.max(0, app.replicas - 1) : app.replicas;
+        for (let i = 0; i < liveReplicas; i++) podQueue.push({ app, id: i + 1 });
+      });
+      const distribution = Array.from({ length: state.nodes }, () => []);
+      podQueue.forEach((pod, index) => distribution[index % state.nodes].push(pod));
+      $("nodeArea").innerHTML = distribution.map((count, n) => {
+        let pods = count.map((pod, i) => podMarkup(n * 100 + i + 1, pod.app));
+        return `<div class="node ${state.killed && n === 0 ? "highlight" : ""}" id="node-${n}" data-structure="node" data-node-index="${n}" tabindex="0"><div class="node-header"><div><div class="node-title">🖥️ node-${n + 1}</div><p>${t("workerZone", { n: n % 3 + 1 })}</p></div><span class="node-state">${count.length ? t("ready") : t("idle")}</span></div><div class="pods">${pods.join("") || `<small style="color:var(--muted)">${t("waitingPods")}</small>`}</div></div>`;
+      }).join("");
+      $("podCount").textContent = podQueue.length;
+      $("nodeCount").textContent = state.nodes;
+      $("health").textContent = state.killed ? t("reconciling") : t("healthy");
+      $("health").style.color = state.killed ? "var(--yellow)" : "var(--green)";
+      $("deploymentList").innerHTML = apps.length ? apps.map(app => `<div class="workload-row"><span>📦 ${app.name}</span><strong>${app.replicas} ${t("replicas")}</strong></div>`).join("") : `<span style="color:var(--muted);font-size:10px">${t("noDeployments")}</span>`;
+      const services = Object.values(state.services);
+      $("serviceArea").innerHTML = services.length ? services.map(service => {
+        const target = apps.find(app => app.name === service.selector || app.name === service.name);
+        const targetName = target ? target.name : service.selector;
+        const endpointCount = target ? target.replicas : 0;
+        return `<div class="service ${state.selectedApp === target?.name ? "selected-service" : ""}" data-structure="service" data-app="${target?.name || ""}" data-service="${service.name}" tabindex="0"><b>🌐 ${service.name}</b><small>→ ${targetName} • ${endpointCount} ${t("endpoints")}</small></div>`;
+      }).join("") : `<div class="service"><b>🌐 Services</b><small>${t("serviceEmpty")}</small></div>`;
+      resizeWorld(distribution, services.length, apps.length);
+      bindInspectors();
+    }
+    function resizeWorld(distribution, serviceCount, workloadCount) {
+      const world = $("world");
+      const mobile = window.innerWidth <= 750;
+      const availableWidth = Math.max(170, world.clientWidth * .92);
+      const columns = Math.max(1, Math.floor(availableWidth / 190));
+      const nodeRows = Math.ceil(state.nodes / columns);
+      const maxPodsOnNode = Math.max(0, ...distribution.map(pods => pods.length));
+      const nodeCardHeight = Math.max(202, 90 + Math.ceil(maxPodsOnNode / 2) * 68);
+      const serviceColumns = mobile ? 1 : Math.max(1, Math.floor(world.clientWidth * .43 / 157));
+      const serviceRows = Math.max(1, Math.ceil(Math.max(1, serviceCount) / serviceColumns));
+      const topContent = Math.max(mobile ? 260 : 330, 205 + workloadCount * 25, (mobile ? 145 : 95) + serviceRows * 58);
+      const nodesHeight = nodeRows * nodeCardHeight + Math.max(0, nodeRows - 1) * 12;
+      world.style.minHeight = `${Math.max(575, topContent + nodesHeight + 34)}px`;
+    }
+    function updateUI() {
+      const l = lessons[state.mission] || lessons[5];
+      $("missionCount").textContent = Math.min(state.mission + 1, 6);
+      $("missionTitle").textContent = lessonAt(state.mission)[0]; $("missionText").textContent = lessonAt(state.mission)[1];
+      $("missionProgress").style.width = `${Math.min(state.mission / 5 * 100, 100)}%`;
+      $("xp").textContent = state.xp; renderLessons(); renderWorld();
+      $("deployButton").disabled = state.deployed; $("scaleButton").disabled = !state.deployed;
+      $("killButton").disabled = !state.deployed || state.replicas === 0;
+      $("explanation").innerHTML = getExplanation();
+      $("guideText").innerHTML = getGuide();
+    }
+    function getExplanation() {
+      if (!state.deployed) return `<p>${t("noDeployExplain")}</p><p>${t("controlExplain")}</p>`;
+      if (state.killed) return `<p>${t("killedExplain", { count: state.replicas })}</p>`;
+      if (state.traffic) return `<p>${t("trafficExplain")}</p>`;
+      if (Object.keys(state.apps).length > 1) return `<p>${t("multipleApps", { count: Object.keys(state.apps).length })}</p><p>${t("connectApps")}</p>`;
+      return `<p>${t("deployExplain", { count: state.replicas })}</p>`;
+    }
+    function getGuide() {
+      if (state.mission === 0) return t("guide0");
+      if (state.mission === 1) return t("guide1");
+      if (state.mission === 2) return t("guide2");
+      if (state.mission === 3) return t("guide3");
+      if (state.mission === 4) return t("guide4");
+      return t("guideDone");
+    }
+    function showToast(text) { const t = $("toast"); t.innerHTML = text; t.classList.add("show"); clearTimeout(showToast.timer); showToast.timer = setTimeout(() => t.classList.remove("show"), 3600); }
+    function explainTerm(term) {
+      const item = localStructure(term);
+      inspectStructure(term);
+      showToast(`<b>${item.title}</b><br>${item.definition}`);
+    }
+    function progress(action) {
+      const expected = lessons[state.mission]?.action;
+      if (expected !== action && !(action === "traffic" && expected === "traffic")) return;
+      state.xp += 100; state.mission = Math.min(state.mission + 1, 5); updateUI();
+      if (state.mission === 5) setTimeout(() => { $("finishText").textContent = t("finishText", { xp: state.xp, count: state.replicas }); $("finishModal").classList.remove("hidden"); }, 700);
+    }
+    function deploy() {
+      if (state.deployed) return showToast(t("deploymentActive"));
+      state.apps["app-web"] = { name: "app-web", replicas: 2, image: state.image, service: true, color: "var(--cyan)" };
+      state.services["app-web"] = { name: "app-web", selector: "app-web" };
+      state.selectedApp = "app-web"; state.deployed = true; state.replicas = 2; state.apps["app-web"].yaml = generateYaml(); $("eventText").innerHTML = `<span>${t("deploymentCreated")}</span>`;
+      updateUI(); syncYamlFromState(); progress("deploy");
+    }
+    function scale() {
+      if (!state.deployed) return showToast(t("createFirst"));
+      const app = state.apps["app-web"] || state.apps[state.selectedApp];
+      if (!app) return showToast(t("noDeploymentScale"));
+      const next = app.replicas >= 5 ? 2 : app.replicas + 1;
+      state.replicas = next; app.replicas = next; state.killed = false; $("eventText").innerHTML = `<span>${t("scaleEvent", { app: app.name, count: next })}</span>`;
+      updateUI(); syncYamlFromState(); progress("scale");
+    }
+    function sendTraffic() {
+      if (!state.deployed) return showToast(t("noService"));
+      const app = state.apps[state.selectedApp] || state.apps["app-web"];
+      if (!app || !app.service) return showToast(t("selectService"));
+      state.traffic++; $("trafficLine").classList.add("hot"); $("eventText").innerHTML = `<span>${t("trafficEvent", { n: state.traffic, app: app.name })}</span>`;
+      animateRequest(app);
+      setTimeout(() => { packet.style.opacity = 0; $("trafficLine").classList.remove("hot"); }, 850);
+      updateUI(); progress("traffic");
+    }
+    function animateRequest(app) {
+      const world = $("world");
+      const packet = $("packet");
+      const service = [...document.querySelectorAll(".service[data-app]")].find(element => element.dataset.app === app.name);
+      const pod = [...document.querySelectorAll(".pod[data-app]")].find(element => element.dataset.app === app.name);
+      if (!service || !pod) return;
+      const worldRect = world.getBoundingClientRect();
+      const point = element => {
+        const rect = element.getBoundingClientRect();
+        return { x: rect.left - worldRect.left + rect.width / 2, y: rect.top - worldRect.top + rect.height / 2 };
+      };
+      const start = point(service);
+      const destination = point(pod);
+      packet.textContent = `${t("request")} #${state.traffic}`;
+      packet.style.transition = "none";
+      packet.style.left = `${start.x}px`;
+      packet.style.top = `${start.y}px`;
+      packet.style.opacity = 1;
+      void packet.offsetWidth;
+      packet.style.transition = "left .72s cubic-bezier(.2,.75,.35,1), top .72s cubic-bezier(.2,.75,.35,1), opacity .2s";
+      requestAnimationFrame(() => {
+        packet.style.left = `${destination.x}px`;
+        packet.style.top = `${destination.y}px`;
+      });
+    }
+    function killPod() {
+      if (!state.deployed) return showToast(t("noPod"));
+      const app = state.apps["app-web"] || state.apps[state.selectedApp];
+      if (!app) return showToast(t("noDeployment"));
+      state.killed = true; state.killedApp = app.name; $("eventText").innerHTML = `<span>${t("failureEvent", { app: app.name })}</span>`;
+      renderWorld(); $("node-0").classList.add("offline"); $("health").textContent = t("reconciling");
+      showToast(t("toastPodDown"));
+      setTimeout(() => { state.killed = false; state.killedApp = null; $("eventText").innerHTML = `<span>${t("selfHealing", { count: app.replicas })}</span>`; updateUI(); progress("kill"); }, 1800);
+    }
+    function applyYaml() {
+      applyAllManifests();
+    }
+    function relinkServices() {
+      Object.values(state.apps).forEach(app => {
+        const service = Object.values(state.services).find(item => item.selector === app.name || item.name === app.name);
+        app.service = Boolean(service);
+        app.serviceName = service ? service.name : app.name;
+      });
+    }
+    function runCurrentYaml() {
+      saveCurrentManifest();
+      const file = manifestFiles[currentManifest];
+      try {
+        const parsed = parseYaml(file.content);
+        if (parsed.nodes !== null) state.nodes = parsed.nodes;
+        if (parsed.clusterYaml) state.clusterYaml = parsed.clusterYaml;
+        parsed.services.forEach(service => { state.services[service.name] = service; });
+        parsed.apps.forEach(app => {
+          const previous = state.apps[app.name];
+          state.apps[app.name] = { ...previous, ...app, color: previous?.color || (Object.keys(state.apps).length % 2 ? "var(--purple)" : "var(--cyan)") };
+        });
+        relinkServices();
+        state.deployed = Object.keys(state.apps).length > 0;
+        state.selectedApp = state.apps[state.selectedApp] ? state.selectedApp : Object.keys(state.apps)[0] || "app-web";
+        const selected = state.apps["app-web"] || state.apps[state.selectedApp];
+        state.replicas = selected?.replicas || 0;
+        state.image = selected?.image || state.image;
+        state.killed = false; state.killedApp = null; state.traffic = 0;
+        file.lastRun = true; file.dirty = false;
+        setYamlStatus("runCurrent", { name: file.name, resources: parsed.apps.length + parsed.services.length + (parsed.nodes !== null ? 1 : 0) }, "yaml-status ok");
+        $("eventText").innerHTML = `<span>${t("applyEvent", { apps: parsed.apps.map(app => app.name).concat(parsed.services.map(service => service.name)).join(", ") || file.name })}</span>`;
+        updateUI(); renderManifestTabs();
+        if (parsed.apps.some(app => app.name === "app-web") && state.mission === 1) progress("deploy");
+        showToast(t("toastApplied"));
+      } catch (error) {
+        setYamlStatus("yamlError", { error: `${file.name}: ${error.message}` }, "yaml-status error");
+        showToast(`⚠️ ${error.message}`);
+      }
+    }
+    function resetYaml() {
+      manifestFiles = [{ id: "web", name: "app-web.yaml", content: defaultYaml }];
+      currentManifest = 0; $("yamlEditor").value = defaultYaml; $("yamlEditor").dataset.dirty = "false";
+      renderManifestTabs();
+      setYamlStatus("yamlRestored");
+    }
+    function renameYaml() {
+      saveCurrentManifest();
+      const file = manifestFiles[currentManifest];
+      const requested = window.prompt(language === "en-US" ? "New YAML file name:" : "Novo nome do arquivo YAML:", file.name);
+      if (!requested || !requested.trim()) return;
+      let name = requested.trim().replace(/\s+/g, "-");
+      if (!/\.ya?ml$/i.test(name)) name += ".yaml";
+      if (manifestFiles.some((item, index) => index !== currentManifest && item.name.toLowerCase() === name.toLowerCase())) {
+        return showToast(language === "en-US" ? "A YAML file with this name already exists." : "Já existe um arquivo YAML com esse nome.");
+      }
+      file.name = name;
+      renderManifestTabs();
+      setYamlStatus("currentFile", { name });
+    }
+    function newYaml() {
+      saveCurrentManifest();
+      const index = manifestFiles.length + 1;
+      const appName = index === 2 ? "catalog-api" : `catalog-api-${index - 1}`;
+      manifestFiles.push({ id: `app-${index}`, name: `catalog-${index}.yaml`, content: secondaryYaml.replaceAll("catalog-api", appName) });
+      currentManifest = manifestFiles.length - 1;
+      $("yamlEditor").value = manifestFiles[currentManifest].content;
+      $("yamlEditor").dataset.dirty = "false";
+      renderManifestTabs();
+      setYamlStatus("yamlNew", { name: manifestFiles[currentManifest].name });
+      showToast(t("toastNewYaml"));
+    }
+    function createClusterYaml() {
+      saveCurrentManifest();
+      const index = manifestFiles.length + 1;
+      const name = index === 2 ? "cluster.yaml" : `cluster-${index - 1}.yaml`;
+      manifestFiles.push({ id: `cluster-${index}`, name, content: clusterYaml.replace("nodes: 3", `nodes: ${state.nodes}`) });
+      currentManifest = manifestFiles.length - 1;
+      $("yamlEditor").value = manifestFiles[currentManifest].content;
+      $("yamlEditor").dataset.dirty = "false";
+      renderManifestTabs();
+      setYamlStatus("yamlNew", { name });
+      showToast(language === "en-US" ? "⚙ Cluster YAML created. Run it to override the current cluster." : "⚙ YAML do Cluster criado. Rode-o para sobrescrever o cluster atual.");
+    }
+    function deleteYaml() {
+      if (manifestFiles.length === 1) return showToast(t("keepManifest"));
+      manifestFiles.splice(currentManifest, 1);
+      currentManifest = Math.max(0, currentManifest - 1);
+      $("yamlEditor").value = manifestFiles[currentManifest].content;
+      $("yamlEditor").dataset.dirty = "false";
+      renderManifestTabs();
+      setYamlStatus("yamlDeleted");
+    }
+    async function copyYaml() {
+      try {
+        await navigator.clipboard.writeText($("yamlEditor").value);
+        showToast(t("copySuccess"));
+      } catch {
+        showToast(t("copyError"));
+      }
+    }
+    function toggleAuto() {
+      state.auto = !state.auto; $("autoButton").textContent = state.auto ? "⏸ Pausar auto" : "▶ Auto";
+      if (state.auto) { state.timer = setInterval(() => { if (!state.deployed) deploy(); else sendTraffic(); }, 2600); } else clearInterval(state.timer);
+    }
+    $("deployButton").onclick = deploy; $("scaleButton").onclick = scale; $("killButton").onclick = killPod; $("trafficButton").onclick = sendTraffic; $("autoButton").onclick = toggleAuto;
+    $("languageToggle").onclick = () => { closeObjectDetail(); language = language === "pt-BR" ? "en-US" : "pt-BR"; applyLanguage(); };
+    $("applyYaml").onclick = applyYaml; $("runYaml").onclick = runCurrentYaml; $("newYaml").onclick = newYaml; $("clusterYaml").onclick = createClusterYaml; $("renameYaml").onclick = renameYaml; $("deleteYaml").onclick = deleteYaml; $("resetYaml").onclick = resetYaml; $("copyYaml").onclick = copyYaml;
+    $("zoomClose").onclick = closeObjectDetail; $("objectBackdrop").onclick = closeObjectDetail;
+    document.addEventListener("keydown", event => { if (event.key === "Escape") closeObjectDetail(); });
+    window.addEventListener("resize", () => renderWorld());
+    $("yamlEditor").addEventListener("input", () => {
+      if (manifestFiles[currentManifest]) {
+        manifestFiles[currentManifest].dirty = true;
+        manifestFiles[currentManifest].lastRun = false;
+      }
+      $("yamlEditor").dataset.dirty = "true";
+      setYamlStatus("yamlUnsaved");
+    });
+    $("helpButton").onclick = () => $("welcomeModal").classList.remove("hidden");
+    $("startButton").onclick = () => { $("welcomeModal").classList.add("hidden"); progress("intro"); };
+    $("skipButton").onclick = () => { $("welcomeModal").classList.add("hidden"); state.mission = 5; updateUI(); };
+    $("continueButton").onclick = () => $("finishModal").classList.add("hidden");
+    $("restartButton").onclick = () => { state = { mission: 0, xp: 0, nodes: 3, replicas: 0, deployed: false, service: true, image: "nginx:1.27", apps: {}, services: {}, clusterYaml: "", selectedApp: "app-web", traffic: 0, killed: false, killedApp: null, auto: false, timer: null }; manifestFiles = [{ id: "web", name: "app-web.yaml", content: defaultYaml }]; currentManifest = 0; $("finishModal").classList.add("hidden"); $("yamlEditor").value = defaultYaml; $("yamlEditor").dataset.dirty = "false"; renderManifestTabs(); setYamlStatus("yamlExampleLoaded"); $("clusterDefaultNote").innerHTML = t("clusterDefault"); updateUI(); };
+    $("yamlEditor").value = defaultYaml;
+    $("yamlEditor").dataset.dirty = "false";
+    renderGlossary(); renderManifestTabs(); setYamlStatus("yamlExampleLoaded"); $("clusterDefaultNote").innerHTML = t("clusterDefault"); updateUI(); inspectStructure("cluster"); $("eventText").innerHTML = `<span>${t("welcomeReady")}</span>`;
+  </script>
+</body>
+</html>

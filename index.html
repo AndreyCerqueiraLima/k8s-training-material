@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="refresh" content="0; url=kubernetes.html">
+<title>Dentro do Processador – Uma aventura didática</title>
+<style>
+  :root{
+    --bg:#0f1220; --panel:#181c32; --panel2:#1f2442; --line:#39406b;
+    --txt:#e9ecff; --mut:#9aa3d6; --ok:#4ade80; --warn:#fbbf24; --bad:#f87171;
+    --c-ram:#38bdf8; --c-pc:#f472b6; --c-ir:#fbbf24; --c-uc:#a78bfa; --c-alu:#fb923c; --c-reg:#4ade80;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(circle at 20% 0%,#1b2050,#0f1220 60%);color:var(--txt);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+  header{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;gap:12px;flex-wrap:wrap}
+  header h1{margin:0;font-size:20px}
+  header h1 span{color:var(--c-uc)}
+  .stats{display:flex;gap:10px;flex-wrap:wrap}
+  .chip{background:var(--panel);border:1px solid var(--line);padding:6px 12px;border-radius:99px;font-size:13px;color:var(--mut)}
+  .chip b{color:var(--txt)}
+  main{display:grid;grid-template-columns:320px 1fr;gap:16px;padding:0 22px 22px}
+  @media(max-width:1000px){main{grid-template-columns:1fr}}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}
+  h2{margin:0 0 8px;font-size:15px;color:var(--mut);text-transform:uppercase;letter-spacing:.08em}
+
+  /* Guia */
+  .guide{display:flex;gap:10px;align-items:flex-start}
+  .avatar{font-size:38px;animation:bob 2s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-4px)}}
+  .bubble{background:var(--panel2);border-radius:12px;padding:12px;font-size:14.5px;line-height:1.5;flex:1;min-height:130px}
+  .bubble .step-title{font-weight:700;color:var(--warn);margin-bottom:4px}
+  .phase{display:flex;gap:6px;margin:12px 0}
+  .phase div{flex:1;text-align:center;padding:6px 2px;border-radius:8px;font-size:12px;background:var(--panel2);color:var(--mut);border:1px solid transparent;transition:.3s}
+  .phase div.on{background:var(--c-uc);color:#fff;border-color:#fff;transform:scale(1.05);font-weight:700}
+  .controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  button{background:var(--panel2);color:var(--txt);border:1px solid var(--line);padding:8px 12px;border-radius:10px;cursor:pointer;font-size:13px;transition:.15s}
+  button:hover{background:#2c3360;transform:translateY(-1px)}
+  button.primary{background:var(--c-uc);border-color:var(--c-uc);color:#fff}
+  button.active{outline:2px solid var(--warn)}
+  .row{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;color:var(--mut)}
+  input[type=range]{flex:1}
+  .legend{font-size:13px;line-height:1.7}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px}
+
+  /* Palco */
+  .stage-wrap{display:flex;flex-direction:column;gap:12px}
+  #stage{position:relative;height:540px;border-radius:16px;overflow:hidden;
+    background:
+      linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px) 0 0/28px 28px,
+      linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px) 0 0/28px 28px,
+      #11142a;
+    border:1px solid var(--line)}
+  #wires{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  #wires line{stroke:#2e3560;stroke-width:4;stroke-linecap:round}
+  #wires line.hot{stroke:var(--warn);stroke-width:5;filter:drop-shadow(0 0 6px var(--warn))}
+  .comp{position:absolute;border-radius:14px;padding:8px 10px;background:var(--panel2);border:2px solid var(--cc);
+    box-shadow:0 0 0 0 transparent;transition:box-shadow .3s,transform .2s;cursor:pointer;user-select:none}
+  .comp:hover{transform:scale(1.02)}
+  .comp .nm{font-weight:800;font-size:13px;color:var(--cc);display:flex;justify-content:space-between;gap:6px}
+  .comp .nick{font-size:11px;color:var(--mut);margin-bottom:4px}
+  .comp .val{font-family:ui-monospace,Menlo,monospace;font-size:20px;font-weight:700;text-align:center;padding:4px;background:#0c0e1d;border-radius:8px;min-height:34px}
+  .comp.target{animation:pulse 1s infinite;z-index:5}
+  .comp.glow{box-shadow:0 0 22px 4px var(--cc)}
+  .comp.shake{animation:shake .35s}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 var(--cc)}50%{box-shadow:0 0 0 10px transparent,0 0 24px 6px var(--cc)}}
+  @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+  #ram{left:2%;top:4%;width:23%;height:92%;--cc:var(--c-ram)}
+  #pc{left:33%;top:4%;width:19%;--cc:var(--c-pc)}
+  #ir{left:33%;top:30%;width:19%;--cc:var(--c-ir)}
+  #uc{left:62%;top:4%;width:34%;--cc:var(--c-uc)}
+  #alu{left:36%;top:62%;width:28%;--cc:var(--c-alu);text-align:center}
+  #regA{left:72%;top:36%;width:11.5%;--cc:var(--c-reg)}
+  #regB{left:85%;top:36%;width:11.5%;--cc:var(--c-reg)}
+  #uc .val{font-size:13px;font-family:system-ui;font-weight:600;min-height:54px;display:flex;align-items:center;justify-content:center}
+  #clock{position:absolute;right:12px;bottom:12px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mut)}
+  #clock .dot{width:14px;height:14px;border-radius:50%;background:#333}
+  #clock .dot.t{background:var(--ok);box-shadow:0 0 10px var(--ok)}
+  #ramcells{display:flex;flex-direction:column;gap:5px;margin-top:4px}
+  .cell{display:flex;gap:6px;align-items:center;background:#0c0e1d;border-radius:8px;padding:5px 7px;font-family:ui-monospace,Menlo,monospace;font-size:12px;border:2px solid transparent;transition:.25s}
+  .cell small{color:var(--mut);width:16px}
+  .cell.cur{border-color:var(--c-pc);background:#2a1630}
+  .cell.wr{border-color:var(--ok);background:#12301e}
+  .cell.data{color:#9be4ff}
+  #packet{position:absolute;z-index:10;padding:5px 10px;border-radius:99px;font-weight:800;font-size:13px;
+    background:var(--warn);color:#222;box-shadow:0 0 16px var(--warn);pointer-events:none;
+    transition:left .8s ease-in-out,top .8s ease-in-out,opacity .3s;opacity:0;transform:translate(-50%,-50%);white-space:nowrap}
+  #log{max-height:120px;overflow:auto;font-size:13px;color:var(--mut);line-height:1.6}
+  #log div b{color:var(--txt)}
+  .modal{position:fixed;inset:0;background:rgba(5,7,18,.85);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+  .modal .box{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:26px;max-width:640px;max-height:90vh;overflow:auto;line-height:1.55}
+  .modal h2{font-size:22px;color:var(--txt);text-transform:none;letter-spacing:0}
+  .modal li{margin:6px 0}
+  .hidden{display:none!important}
+  .stars{font-size:30px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧠 Dentro do <span>Processador</span> – uma aventura</h1>
+  <div class="stats">
+    <div class="chip">Instrução nº <b id="sInstr">0</b></div>
+    <div class="chip">Ciclos de clock: <b id="sCycles">0</b></div>
+    <div class="chip">Acertos: <b id="sOk">0</b></div>
+    <div class="chip">Erros: <b id="sBad">0</b></div>
+  </div>
+</header>
+
+<main>
+  <aside class="panel">
+    <h2>Seu guia</h2>
+    <div class="guide">
+      <div class="avatar">🤖</div>
+      <div class="bubble" id="bubble"></div>
+    </div>
+    <div class="phase" id="phase">
+      <div data-p="BUSCAR">1. Buscar</div>
+      <div data-p="DECODIFICAR">2. Entender</div>
+      <div data-p="EXECUTAR">3. Executar</div>
+    </div>
+
+    <div class="controls">
+      <button id="bMode" class="primary">🎮 Modo: Eu sou o processador</button>
+      <button id="bStep">⏭ Próximo passo</button>
+      <button id="bPlay">▶ Automático</button>
+      <button id="bReset">↺ Reiniciar</button>
+    </div>
+    <div class="row">Velocidade <input type="range" id="speed" min="400" max="2500" value="1500" step="100"> </div>
+
+    <h2 style="margin-top:18px">Mapa</h2>
+    <div class="legend">
+      <div><i style="background:var(--c-ram)"></i><b>Memória (RAM)</b> – a despensa</div>
+      <div><i style="background:var(--c-pc)"></i><b>Contador (PC)</b> – o dedo na receita</div>
+      <div><i style="background:var(--c-ir)"></i><b>Instrução atual (IR)</b> – a linha lida</div>
+      <div><i style="background:var(--c-uc)"></i><b>Unidade de Controle</b> – o chef</div>
+      <div><i style="background:var(--c-alu)"></i><b>ULA</b> – a calculadora</div>
+      <div><i style="background:var(--c-reg)"></i><b>Registradores</b> – a bancada</div>
+    </div>
+    <div class="row"><button id="bHelp">❓ Como jogar</button></div>
+  </aside>
+
+  <section class="stage-wrap">
+    <div id="stage">
+      <svg id="wires"></svg>
+
+      <div class="comp" id="ram" data-name="Memória (RAM)" data-desc="A RAM guarda o programa e os dados. É como uma despensa gigante de gavetas numeradas: cada gaveta tem um endereço.">
+        <div class="nm">MEMÓRIA <span>RAM</span></div>
+        <div class="nick">a despensa de gavetas</div>
+        <div id="ramcells"></div>
+      </div>
+
+      <div class="comp" id="pc" data-name="Contador de Programa (PC)" data-desc="Guarda o número da PRÓXIMA instrução a ser lida. É como o dedo que acompanha a linha da receita.">
+        <div class="nm">PC</div>
+        <div class="nick">dedo na receita</div>
+        <div class="val" id="vPC">0</div>
+      </div>
+
+      <div class="comp" id="ir" data-name="Registrador de Instrução (IR)" data-desc="Guarda a instrução que está sendo executada agora, como o bilhete com a tarefa do momento.">
+        <div class="nm">IR</div>
+        <div class="nick">bilhete da tarefa atual</div>
+        <div class="val" id="vIR">—</div>
+      </div>
+
+      <div class="comp" id="uc" data-name="Unidade de Controle" data-desc="O chef: lê a instrução, entende o que ela pede e manda cada parte trabalhar na ordem certa.">
+        <div class="nm">UNIDADE DE CONTROLE</div>
+        <div class="nick">o chef que dá as ordens</div>
+        <div class="val" id="vUC">Esperando…</div>
+      </div>
+
+      <div class="comp" id="alu" data-name="ULA – Unidade Lógica e Aritmética" data-desc="A calculadora do processador. Faz somas, subtrações e comparações.">
+        <div class="nm" style="justify-content:center">ULA ➕</div>
+        <div class="nick">a calculadora</div>
+        <div class="val" id="vALU">—</div>
+      </div>
+
+      <div class="comp" id="regA" data-name="Registrador A" data-desc="Uma gaveta minúscula e ultra rápida dentro do processador, onde ele guarda números com que está trabalhando.">
+        <div class="nm">REG A</div>
+        <div class="nick">bancada</div>
+        <div class="val" id="vA">0</div>
+      </div>
+      <div class="comp" id="regB" data-name="Registrador B" data-desc="Outra gavetinha rápida. Ter dois registradores permite somar dois números.">
+        <div class="nm">REG B</div>
+        <div class="nick">bancada</div>
+        <div class="val" id="vB">0</div>
+      </div>
+
+      <div id="packet"></div>
+      <div id="clock"><span>CLOCK</span><div class="dot" id="dot"></div></div>
+    </div>
+
+    <div class="panel">
+      <h2>Diário do processador</h2>
+      <div id="log"></div>
+    </div>
+  </section>
+</main>
+
+<!-- Modal de introdução -->
+<div class="modal" id="intro">
+  <div class="box">
+    <h2>👋 Bem-vindo ao interior de um processador!</h2>
+    <p>Imagine o processador como uma <b>cozinha</b> que segue uma receita muito simples, uma linha de cada vez. Nosso programa é:</p>
+    <ol>
+      <li>Coloque o número <b>5</b> na bancada A</li>
+      <li>Coloque o número <b>3</b> na bancada B</li>
+      <li><b>Some</b> A + B</li>
+      <li><b>Guarde</b> o resultado na gaveta 7 da despensa</li>
+      <li><b>Fim</b></li>
+    </ol>
+    <p>Para cada linha, o processador repete sempre o mesmo ciclo:</p>
+    <ul>
+      <li>🔍 <b>Buscar</b>: ler a instrução na memória;</li>
+      <li>🧩 <b>Entender</b>: a Unidade de Controle descobre o que ela pede;</li>
+      <li>⚙️ <b>Executar</b>: fazer a tarefa.</li>
+    </ul>
+    <p><b>Como jogar:</b> no <b>Modo "Eu sou o processador"</b>, uma peça pisca; clique nela para entregar o dado que está viajando. Se errar, o guia dá uma dica. Se preferir só assistir, use o <b>Automático</b>. Passe o mouse sobre as peças para ver o que cada uma faz.</p>
+    <button class="primary" id="bStart">Entrar no processador 🚀</button>
+  </div>
+</div>
+
+<!-- Modal final -->
+<div class="modal hidden" id="end">
+  <div class="box">
+    <h2>🎉 Programa concluído!</h2>
+    <div class="stars" id="stars"></div>
+    <p id="endTxt"></p>
+    <p>Em 5 instruções você viu o essencial de qualquer CPU. Seu celular faz exatamente isso, só que <b>bilhões de vezes por segundo</b>!</p>
+    <button class="primary" id="bAgain">Jogar de novo</button>
+    <button id="bClose">Ver o processador</button>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+/* ---------- Programa na memória ---------- */
+const PROGRAM = [
+  {op:'LOAD', r:'A', n:5, text:'CARREGA A, 5'},
+  {op:'LOAD', r:'B', n:3, text:'CARREGA B, 3'},
+  {op:'ADD',  text:'SOMA A + B → A'},
+  {op:'STORE', addr:7, text:'GUARDA A → [7]'},
+  {op:'HALT', text:'FIM'},
+];
+const RAM_SIZE = 8;
+
+let S;                // estado
+let steps = [], stepIdx = 0;
+let mode = 'game';    // 'game' | 'auto'
+let timer = null, busy = false;
+
+function freshState(){
+  return {pc:0, ir:null, A:0, B:0, alu:null, ram:Array.from({length:RAM_SIZE},(_,i)=>i<PROGRAM.length?PROGRAM[i]:{data:0}),
+          cycles:0, ok:0, bad:0, instr:0, done:false, cur:null, wr:null};
+}
+
+/* ---------- Construção de passos de uma instrução ---------- */
+function buildSteps(){
+  const pc = S.pc, ins = S.ram[pc];
+  const L = [];
+  L.push({phase:'BUSCAR', title:'Pedir a instrução à memória', from:'pc', to:'ram', label:'end. '+pc,
+    text:`O <b>PC</b> marca a linha <b>${pc}</b> da receita. Ele envia esse endereço à <b>Memória</b>. Clique na <b>MEMÓRIA</b> para entregar o pedido.`,
+    run(){S.cur=pc}});
+  L.push({phase:'BUSCAR', title:'A memória responde', from:'ram', to:'ir', label:ins.text,
+    text:`A memória abre a gaveta <b>${pc}</b> e devolve a instrução <code>${ins.text}</code>. Ela vai para o <b>IR</b> (o bilhete da tarefa atual). Clique no <b>IR</b>.`,
+    run(){S.ir=ins}});
+  L.push({phase:'BUSCAR', title:'Avançar o dedo na receita', from:'pc', to:'pc', label:'+1',
+    text:`Antes de executar, o <b>PC</b> já anda para a próxima linha (soma +1), assim o processador nunca se perde. Clique no <b>PC</b>.`,
+    run(){S.pc=pc+1}});
+  L.push({phase:'DECODIFICAR', title:'O chef lê o bilhete', from:'ir', to:'uc', label:ins.text,
+    text:`A <b>Unidade de Controle</b> lê a instrução e entende o que ela significa: <b>${explain(ins)}</b>. Clique na <b>UNIDADE DE CONTROLE</b>.`,
+    run(){$('vUC').textContent=explain(ins)}});
+  if(ins.op==='LOAD'){
+    const id='reg'+ins.r;
+    L.push({phase:'EXECUTAR', title:`Guardar ${ins.n} no registrador ${ins.r}`, from:'ir', to:id, label:ins.n,
+      text:`O número <b>${ins.n}</b> vem escrito na própria instrução. O chef manda guardá-lo no <b>Registrador ${ins.r}</b>. Clique em <b>REG ${ins.r}</b>.`,
+      run(){S[ins.r]=ins.n}});
+  } else if(ins.op==='ADD'){
+    L.push({phase:'EXECUTAR', title:'Mandar o A para a calculadora', from:'regA', to:'alu', label:S.A,
+      text:`O chef pede o valor de <b>A (${S.A})</b> e o envia à <b>ULA</b>. Clique na <b>ULA</b>.`,
+      run(){$('vALU').textContent=S.A+' + ?'}});
+    L.push({phase:'EXECUTAR', title:'Mandar o B para a calculadora', from:'regB', to:'alu', label:S.B,
+      text:`Agora o valor de <b>B (${S.B})</b> também vai para a <b>ULA</b>. Clique na <b>ULA</b> de novo.`,
+      run(){$('vALU').textContent=S.A+' + '+S.B; S.alu=S.A+S.B}});
+    L.push({phase:'EXECUTAR', title:'A calculadora devolve o resultado', from:'alu', to:'regA', label:S.A+S.B,
+      text:`A ULA faz a conta <b>${S.A} + ${S.B} = ${S.A+S.B}</b> e o resultado volta para o <b>Registrador A</b>. Clique em <b>REG A</b>.`,
+      run(){S.A=S.A+S.B; $('vALU').textContent='= '+S.A}});
+  } else if(ins.op==='STORE'){
+    L.push({phase:'EXECUTAR', title:'Guardar de volta na memória', from:'regA', to:'ram', label:S.A,
+      text:`Os registradores são pequenos. Para <b>guardar de forma duradoura</b>, o valor <b>${S.A}</b> vai para a gaveta <b>${ins.addr}</b> da <b>Memória</b>. Clique na <b>MEMÓRIA</b>.`,
+      run(){S.ram[ins.addr]={data:S.A}; S.wr=ins.addr}});
+  } else if(ins.op==='HALT'){
+    L.push({phase:'EXECUTAR', title:'Parar o processador', from:'uc', to:'uc', label:'⏹',
+      text:`A instrução <b>FIM</b> manda o chef parar. O trabalho acabou! Clique na <b>UNIDADE DE CONTROLE</b>.`,
+      run(){S.done=true}});
+  }
+  return L;
+}
+function explain(i){
+  return {LOAD:`colocar ${i.n} no registrador ${i.r}`, ADD:'somar A e B', STORE:`guardar A na gaveta ${i.addr}`, HALT:'parar tudo'}[i.op];
+}
+
+/* ---------- Renderização ---------- */
+function render(){
+  $('vPC').textContent=S.pc;
+  $('vIR').textContent=S.ir?S.ir.text:'—';
+  $('vA').textContent=S.A; $('vB').textContent=S.B;
+  $('sCycles').textContent=S.cycles; $('sOk').textContent=S.ok; $('sBad').textContent=S.bad; $('sInstr').textContent=S.instr;
+  const box=$('ramcells'); box.innerHTML='';
+  S.ram.forEach((c,i)=>{
+    const d=document.createElement('div');
+    d.className='cell'+(c.data!==undefined?' data':'')+(i===S.cur?' cur':'')+(i===S.wr?' wr':'');
+    d.innerHTML=`<small>${i}</small><span>${c.data!==undefined?'dado: '+c.data:c.text}</span>`;
+    box.appendChild(d);
+  });
+}
+
+function say(title,html){ $('bubble').innerHTML=`<div class="step-title">${title}</div>${html}`; }
+function log(html){ const l=$('log'); const d=document.createElement('div'); d.innerHTML=html; l.prepend(d); }
+function setPhase(p){ document.querySelectorAll('#phase div').forEach(d=>d.classList.toggle('on',d.dataset.p===p)); }
+
+/* ---------- Posicionamento / fios ---------- */
+const WIRES=[['pc','ram'],['ram','ir'],['ir','uc'],['ir','regA'],['ir','regB'],['regA','alu'],['regB','alu'],['alu','regA'],['regA','ram'],['uc','alu']];
+function center(id){
+  const s=$('stage').getBoundingClientRect(), r=$(id).getBoundingClientRect();
+  return {x:r.left-s.left+r.width/2, y:r.top-s.top+r.height/2};
+}
+function drawWires(active){
+  const svg=$('wires'); svg.innerHTML='';
+  const seen=new Set();
+  WIRES.forEach(([a,b])=>{
+    const k=[a,b].sort().join('-'); if(seen.has(k))return; seen.add(k);
+    const p=center(a), q=center(b);
+    const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('x1',p.x);l.setAttribute('y1',p.y);l.setAttribute('x2',q.x);l.setAttribute('y2',q.y);
+    if(active && [active.from,active.to].sort().join('-')===k) l.classList.add('hot');
+    svg.appendChild(l);
+  });
+}
+window.addEventListener('resize',()=>drawWires(steps[stepIdx]));
+
+/* ---------- Pacote animado ---------- */
+function movePacket(from,to,label){
+  const p=$('packet'), a=center(from), b=center(to);
+  p.style.transition='none'; p.style.left=a.x+'px'; p.style.top=a.y+'px'; p.textContent=label; p.style.opacity=1;
+  if(from===to){ // pulinho no lugar
+    p.style.transition='top .5s'; requestAnimationFrame(()=>{p.style.top=(a.y-30)+'px'});
+    return 600;
+  }
+  void p.offsetWidth;
+  p.style.transition='left .8s ease-in-out,top .8s ease-in-out,opacity .3s';
+  requestAnimationFrame(()=>{p.style.left=b.x+'px';p.style.top=b.y+'px'});
+  return 850;
+}
+
+/* ---------- Motor de passos ---------- */
+function clearTargets(){ document.querySelectorAll('.comp').forEach(c=>c.classList.remove('target','glow')); }
+
+function presentStep(){
+  if(S.done) return finish();
+  if(stepIdx>=steps.length){ steps=buildSteps(); stepIdx=0; S.instr=S.pc+1; S.cur=null; S.wr=null; $('vALU').textContent='—'; $('vUC').textContent='Esperando…'; }
+  const st=steps[stepIdx];
+  setPhase(st.phase);
+  say(`${st.phase}: ${st.title}`, st.text + (mode==='auto'?'':'<br><small style="color:var(--mut)">💡 Passe o mouse nas peças para saber o que fazem.</small>'));
+  clearTargets();
+  $(st.to).classList.add('target');
+  drawWires(st);
+  render();
+  if(mode==='auto' && $('bPlay').classList.contains('active')){ timer=setTimeout(()=>execStep(true),Number($('speed').value)); }
+}
+
+function execStep(auto){
+  if(busy||S.done) return;
+  busy=true; clearTimeout(timer);
+  const st=steps[stepIdx];
+  clearTargets();
+  const dur=movePacket(st.from,st.to,st.label);
+  const dot=$('dot'); dot.classList.add('t'); setTimeout(()=>dot.classList.remove('t'),250);
+  setTimeout(()=>{
+    $('packet').style.opacity=0;
+    st.run(); S.cycles++;
+    $(st.to).classList.add('glow'); setTimeout(()=>$(st.to).classList.remove('glow'),600);
+    log(`<b>${st.phase.toLowerCase()}</b>: ${st.title}`);
+    stepIdx++; busy=false;
+    if(S.done){ render(); finish(); return; }
+    setTimeout(presentStep, 350);
+    render();
+  },dur);
+}
+
+function playerClick(id){
+  if(mode!=='game'||busy||S.done||!$('intro').classList.contains('hidden')) return;
+  const st=steps[stepIdx];
+  if(id===st.to){ S.ok++; execStep(false); }
+  else {
+    S.bad++; render();
+    const el=$(id); el.classList.add('shake'); setTimeout(()=>el.classList.remove('shake'),400);
+    const nm=el.dataset.name, want=$(st.to).dataset.name;
+    say('Ops! Não foi aí 🙈',`Você clicou em <b>${nm}</b>, mas o dado precisa chegar em <b>${want}</b>. Olha a peça que está piscando!<br><br><small>${el.dataset.desc}</small>`);
+  }
+}
+
+function finish(){
+  clearTargets(); setPhase(null); clearTimeout(timer); stopAuto();
+  say('Missão cumprida! 🏁',`O resultado <b>${S.ram[7].data}</b> (5 + 3) está salvo na gaveta 7 da memória.`);
+  setTimeout(()=>{
+    const stars = mode==='auto'?3 : S.bad===0?3 : S.bad<=3?2 : 1;
+    $('stars').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);
+    $('endTxt').innerHTML=`Resultado: <b>5 + 3 = ${S.ram[7].data}</b>. Foram <b>${S.cycles}</b> passos de clock, com <b>${S.ok}</b> acertos e <b>${S.bad}</b> erros.`;
+    $('end').classList.remove('hidden');
+  },900);
+}
+
+/* ---------- Controles ---------- */
+function stopAuto(){ $('bPlay').textContent='▶ Automático'; $('bPlay').classList.remove('active'); }
+function setMode(m){
+  mode=m; clearTimeout(timer);
+  $('bMode').textContent = m==='game'?'🎮 Modo: Eu sou o processador':'👀 Modo: Assistir';
+  if(m==='game') stopAuto();
+}
+function reset(){
+  clearTimeout(timer); busy=false; stopAuto();
+  S=freshState(); steps=[]; stepIdx=0; $('log').innerHTML='';
+  $('end').classList.add('hidden'); $('packet').style.opacity=0;
+  $('vALU').textContent='—'; $('vUC').textContent='Esperando…';
+  presentStep();
+}
+
+$('bMode').onclick=()=>{
+  if(mode==='game'){ $('bPlay').click(); }
+  else { setMode('game'); if(!busy) presentStep(); }
+};
+$('bStep').onclick=()=>{ if(mode==='auto'){ setMode('game'); } if(!busy){ const st=steps[stepIdx]; if(st){S.ok+=0; execStep(false);} } };
+$('bPlay').onclick=()=>{
+  if(mode==='auto' && $('bPlay').classList.contains('active')){ clearTimeout(timer); stopAuto(); return; }
+  mode='auto'; $('bMode').textContent='👀 Modo: Assistir';
+  $('bPlay').textContent='⏸ Pausar'; $('bPlay').classList.add('active');
+  if(!busy) presentStep();
+};
+$('bReset').onclick=reset;
+$('bHelp').onclick=()=>$('intro').classList.remove('hidden');
+$('bStart').onclick=()=>{ $('intro').classList.add('hidden'); };
+$('bAgain').onclick=reset;
+$('bClose').onclick=()=>$('end').classList.add('hidden');
+
+['ram','pc','ir','uc','alu','regA','regB'].forEach(id=>{
+  $(id).addEventListener('click',()=>playerClick(id));
+  $(id).addEventListener('mouseenter',()=>{ if(mode==='game'&&!busy&&!S.done) return; });
+  $(id).title=$(id).dataset.desc;
+});
+
+/* ---------- Início ---------- */
+S=freshState();
+requestAnimationFrame(()=>{ presentStep(); });
+</script>
+</body>
+</html>
