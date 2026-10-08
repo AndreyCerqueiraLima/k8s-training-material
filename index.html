@@ -132,6 +132,8 @@
     .packet.traffic-request { background: var(--yellow); color: #221a04; box-shadow: 0 0 12px var(--yellow); }
     .packet.traffic-processing { background: #ffb347; color: #2a1800; box-shadow: 0 0 14px #ffb347; animation: packetPulse .42s ease-in-out infinite; }
     .packet.traffic-response { background: var(--green); color: #062119; box-shadow: 0 0 12px var(--green); }
+    .packet.traffic-blocked { background: var(--red); color: #fff; box-shadow: 0 0 12px var(--red); }
+    .service-port-bad { color: #ff9f9f; font-size: 9px; display: block; margin-top: 4px; }
     @keyframes packetPulse { 50% { transform: translate(-50%, -50%) scale(1.1); } }
     #packet { display: none; }
     .eventbar { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 11px 14px; margin-top: 12px; min-height: 55px; }
@@ -191,7 +193,7 @@
     .object-backdrop { position: absolute; inset: 0; }
     .zoom-shell { position: relative; display: flex; flex-direction: column; width: min(900px, 100%); height: min(780px, calc(100vh - 36px)); max-height: calc(100vh - 36px); overflow: hidden; padding: 22px; border: 1px solid #5ddcff; border-radius: 18px; background: linear-gradient(145deg, #102f4b, #071321 72%); box-shadow: 0 0 0 1px #4dd9ff22, 0 0 45px #4dd9ff33, 0 25px 90px #000b; animation: zoomEnter .5s cubic-bezier(.16,1,.3,1); }
     .zoom-shell::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, transparent 0 5px, #4dd9ff08 6px 7px); opacity: .45; }
-    .zoom-shell::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; pointer-events: none; background: var(--cyan); box-shadow: 0 0 14px var(--cyan); animation: scan 2.3s linear infinite; }
+    .zoom-shell::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; pointer-events: none; background: var(--cyan); box-shadow: 0 0 14px var(--cyan); animation: scan 2.3s linear 1 forwards; }
     @keyframes zoomEnter { from { opacity: 0; transform: scale(.38) translateY(80px) rotateX(16deg); filter: blur(8px); } 70% { transform: scale(1.015) translateY(-3px); } to { opacity: 1; transform: scale(1) translateY(0) rotateX(0); filter: blur(0); } }
     @keyframes scan { 0% { top: 0; opacity: 0; } 10% { opacity: .9; } 88% { opacity: .9; } 100% { top: calc(100% - 2px); opacity: 0; } }
     .zoom-header, .zoom-footer { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
@@ -227,6 +229,35 @@
     .k8s-doc-table th { color: var(--cyan); background: #091c2e; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; }
     .k8s-doc-table code { color: var(--yellow); font-size: 10px; white-space: nowrap; }
     .k8s-doc-table td { color: #c6d8e9; line-height: 1.45; }
+    .k8s-doc-types { margin-top: 22px; padding-top: 16px; border-top: 1px solid #244c6b; }
+    .k8s-doc-types-title { margin: 0 0 10px; color: var(--yellow); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+    .k8s-doc-type-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    @media (max-width: 650px) { .k8s-doc-type-grid { grid-template-columns: 1fr; } }
+    .k8s-doc-type-card { padding: 10px 11px; border: 1px solid #244c6b; border-radius: 10px; background: #081a2b; }
+    .k8s-doc-type-card.active { border-color: var(--cyan); box-shadow: 0 0 0 1px #4dd9ff33; background: #0c2236; }
+    .k8s-doc-type-card b { display: block; color: var(--cyan); font-size: 12px; margin-bottom: 6px; }
+    .k8s-doc-type-card p { margin: 0 0 8px; color: #b8cddd; font-size: 11px; line-height: 1.45; }
+    .k8s-doc-type-card a { color: #7ec8e8; font-size: 10px; text-decoration: none; }
+    .k8s-doc-type-card a:hover { text-decoration: underline; }
+    .k8s-doc-type-badge { display: inline-block; margin-bottom: 8px; padding: 3px 8px; border-radius: 6px; background: #12314a; color: var(--cyan); font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+    .container-config-panel { padding: 4px 2px 8px; }
+    .container-config-panel p { margin: 0 0 12px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .container-config-field { margin-bottom: 12px; }
+    .container-config-field label { display: block; margin-bottom: 6px; color: var(--cyan); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+    .container-config-field select { width: 100%; padding: 9px 10px; border: 1px solid #2e5271; border-radius: 9px; background: #091a2c; color: var(--text); font-size: 13px; }
+    .container-config-url { padding: 10px 11px; border: 1px dashed #4a6a88; border-radius: 9px; background: #081a2b; color: #c6d8e9; font-size: 12px; line-height: 1.45; }
+    .container-config-url code { color: var(--yellow); }
+    .container-config-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .container-call-flow { margin-top: 12px; padding: 10px; border: 1px solid #3a4a88; border-radius: 10px; background: #121a38; color: #b8c6ff; font-size: 11px; line-height: 1.5; }
+    .packet.traffic-internal { background: var(--purple); color: #f0e8ff; box-shadow: 0 0 12px #c59bff; }
+    .pod.has-upstream::after { content: "🔗"; position: absolute; top: 4px; right: 5px; font-size: 9px; opacity: .9; }
+    .zoom-tab.hidden-tab { display: none; }
+    .workload-mesh-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px; }
+    .workload-mesh-table th, .workload-mesh-table td { padding: 6px 5px; border-bottom: 1px solid #1e3a52; text-align: left; vertical-align: middle; }
+    .workload-mesh-table th { color: var(--cyan); font-size: 10px; text-transform: uppercase; letter-spacing: .05em; }
+    .workload-mesh-table select { width: 100%; max-width: 220px; padding: 5px 6px; border: 1px solid #2e5271; border-radius: 7px; background: #091a2c; color: var(--text); font-size: 11px; }
+    .workload-mesh-empty { color: var(--muted); font-size: 11px; margin-top: 6px; }
+    .service-chain-hint { display: block; margin-top: 4px; color: #b8a4ff; font-size: 9px; }
     .yaml-preview-wrap { margin-bottom: 14px; padding: 12px; border: 1px solid #315f7c; border-radius: 10px; background: #061321; }
     .yaml-preview-wrap b { display: block; margin-bottom: 7px; color: var(--cyan); font: 11px monospace; letter-spacing: .08em; }
     .yaml-preview { max-height: 180px; overflow: auto; margin: 0; color: #c9e5f7; font: 11px/1.55 "SFMono-Regular", Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; scrollbar-width: thin; scrollbar-color: #32769a #091a2b; }
@@ -306,6 +337,7 @@
                 <div class="yaml-note"><b data-i18n="yamlNodesTitle">🖥️ Nodes não são réplicas</b><span data-i18n="yamlNodesText"><code>Cluster.spec.nodes</code> representa computadores do cluster. Altere de <code>3</code> para <code>6</code> e seis Nodes aparecerão.</span></div>
                 <div class="yaml-note"><b data-i18n="yamlPodsTitle">🫛 Pods da aplicação</b><span data-i18n="yamlPodsText"><code>Deployment.spec.replicas</code> representa cópias da aplicação. Altere para <code>5</code> e o Deployment distribuirá cinco Pods pelos Nodes.</span></div>
                 <div class="yaml-note"><b data-i18n="yamlConnectTitle">🔗 Conecte aplicações</b><span data-i18n="yamlConnectText">Crie outro YAML com Deployment + Service. Dentro do cluster, uma aplicação pode chamar outra pelo DNS do Service, por exemplo <code>http://catalog-api:3000</code>.</span></div>
+                <div class="yaml-note" id="workloadMeshNote"><b data-i18n="workloadMeshTitle">🔀 Comunicação entre workloads</b><p class="workload-mesh-empty" data-i18n="workloadMeshEmpty">Aplique pelo menos dois Deployments com Service para configurar frontend → backend.</p><div id="workloadMeshPanel"></div></div>
                 <div class="yaml-note"><b data-i18n="yamlServiceTypesTitle">🌐 Tipos de Service</b><span data-i18n="yamlServiceTypesText">Use <code>spec.type</code>: <strong>ClusterIP</strong> (padrão, VIP interno), <strong>NodePort</strong> (porta em todos os Nodes), <strong>LoadBalancer</strong> (IP externo + LB na nuvem) ou <strong>ExternalName</strong> (alias DNS <code>externalName</code>, sem endpoints de Pod).</span></div>
                 <div class="yaml-note"><b data-i18n="yamlIdeaTitle">💡 Ideia central</b><span data-i18n="yamlIdeaText">YAML é declarativo: você descreve o estado desejado; o Kubernetes compara com o estado atual e trabalha para reconciliar os dois.</span></div>
                 <div class="yaml-note"><b data-i18n="yamlProbesTitle">🩺 Probes (health checks)</b><span data-i18n="yamlProbesText">No arquivo <code>probe-lab.yaml</code>, a imagem <code>kubeworld/probe-trainer</code> simula uma falha em <code>/health</code> após <strong>30 segundos</strong>. Adicione <code>readinessProbe</code> para tirar o Pod do Service; <code>livenessProbe</code> para o kubelet <strong>substituir</strong> o Pod; <code>startupProbe</code> para apps que demoram a subir.</span></div>
@@ -339,6 +371,7 @@
           <button type="button" class="zoom-tab active" id="zoomTabOverview" data-zoom-tab="overview" role="tab" aria-selected="true"></button>
           <button type="button" class="zoom-tab" id="zoomTabAdvanced" data-zoom-tab="advanced" role="tab" aria-selected="false"></button>
           <button type="button" class="zoom-tab" id="zoomTabDocs" data-zoom-tab="docs" role="tab" aria-selected="false"></button>
+          <button type="button" class="zoom-tab hidden-tab" id="zoomTabContainer" data-zoom-tab="container" role="tab" aria-selected="false"></button>
         </div>
         <div class="zoom-panel" id="zoomPanelOverview" role="tabpanel">
           <div class="telemetry" id="zoomTelemetry"></div>
@@ -351,6 +384,9 @@
         <div class="zoom-panel hidden" id="zoomPanelDocs" role="tabpanel">
           <div id="zoomK8sDocs"></div>
         </div>
+        <div class="zoom-panel hidden" id="zoomPanelContainer" role="tabpanel">
+          <div id="zoomContainerConfig" class="container-config-panel"></div>
+        </div>
       </div>
       <div class="zoom-footer"><div class="zoom-actions" id="zoomActions"></div><span id="zoomFooter"></span><span id="zoomCloseHint">ESC • CLOSE</span></div>
     </div>
@@ -362,7 +398,7 @@
     let language = "pt-BR";
     const uiText = {
       "pt-BR": {
-        brandSubtitle: "Uma expedição interativa dentro do Kubernetes", missionLabel: "Missão", activePodsLabel: "Pods ativos", trainingCenter: "Centro de treinamento", currentMission: "Missão atual", helpButton: "📖 Abrir manual rápido", visualLab: "Laboratório visual", heroTitle: "Seu cluster está vivo", heroText: "Observe o tráfego, crie réplicas e provoque falhas com segurança.", deployButton: "🚀 Criar aplicação", scaleButton: "↕ Escalar", killButton: "💥 Derrubar este Pod", probeLabButton: "🩺 Lab de Probes", actionsMenu: "⚡ Ações do laboratório ▾", autoPauseButton: "⏸ Pausar tráfego auto", controlPlaneDescription: "O cérebro: observa o estado desejado e coordena tudo.", clusterMapTitle: "KUBERNETES CLUSTER", deploymentsTitle: "📦 Deployments", trafficButton: "📨 Enviar request", burstTrafficButton: "⚡ Rajada de requests", trafficNodeBusy: "Atendendo", trafficProcessing: "proc…", trafficResponse: "response", trafficRequestQueued: "Request na fila: todos os Nodes com Pods Ready estão atendendo outra request.", trafficBurstStarted: "Rajada: {count} requests disparadas — o Service distribui entre Nodes livres.", trafficBurstSummary: "Rajada concluída: {count} requests. Fila restante: {queued}. O Service encaminha para Pods em Nodes que não estão atendendo.", autoButton: "▶ Auto", architectureInspector: "Inspetor de arquitetura", declarativeLab: "Laboratório declarativo", yamlTitle: "Edite o YAML e veja o cluster mudar", yamlDescription: "Altere os valores e clique em <strong>Aplicar YAML</strong>. O simulador interpreta os campos principais e reconcilia a tela com o novo estado desejado.", newYaml: "＋ Novo YAML", deleteYaml: "🗑 Excluir", applyYaml: "✓ Aplicar todos", resetYaml: "↺ Restaurar", copyYaml: "⧉ Copiar", yamlNodesTitle: "🖥️ Nodes não são réplicas", yamlNodesText: "<code>Cluster.spec.nodes</code> representa computadores do cluster. Altere de <code>3</code> para <code>6</code> e seis Nodes aparecerão.", yamlPodsTitle: "🫛 Pods da aplicação", yamlPodsText: "<code>Deployment.spec.replicas</code> representa cópias da aplicação. Altere para <code>5</code> e o Deployment distribuirá cinco Pods pelos Nodes.", yamlConnectTitle: "🔗 Conecte aplicações", yamlServiceTypesTitle: "🌐 Tipos de Service", yamlServiceTypesText: "Use <code>spec.type</code>: <strong>ClusterIP</strong> (padrão, VIP interno), <strong>NodePort</strong> (porta em todos os Nodes), <strong>LoadBalancer</strong> (IP externo + LB na nuvem) ou <strong>ExternalName</strong> (alias DNS <code>externalName</code>, sem endpoints de Pod).", svcExternalClient: "Cliente externo", svcNodePortClient: "Cliente fora do cluster", svcNodePortRoute: "Acessa qualquer Node em <code>&lt;NodeIP&gt;:{port}</code>", svcNodePortLabel: "NodePort (todos os Nodes)", svcExternalNameTraffic: "ExternalName só redireciona DNS — não encaminha tráfego para Pods no cluster.", svcTrafficClusterIP: "Request #{n} → {app}: tráfego interno via ClusterIP/DNS do Service até um Pod Ready.", svcTrafficNodePort: "Request #{n} → {app}: cliente externo → NodePort em um Node → Service → Pod.", svcTrafficLoadBalancer: "Request #{n} → {app}: cliente → LoadBalancer ({ip}) → Service → Pod.", svcInsightClusterIP: "VIP interno {ip} — alcance só de dentro do cluster (DNS <code>{name}</code>).", svcInsightNodePort: "Porta <code>{port}</code> aberta em <strong>todos</strong> os Nodes; o kube-proxy encaminha ao Service.", svcInsightLoadBalancer: "Provedor de nuvem provisiona LB com IP <code>{ip}</code> apontando para este Service.", svcInsightExternalName: "Retorna CNAME <code>{host}</code> — sem selector nem endpoints de Pod.", yamlConnectText: "Crie outro YAML com Deployment + Service. Dentro do cluster, uma aplicação pode chamar outra pelo DNS do Service, por exemplo <code>http://catalog-api:3000</code>.", yamlIdeaTitle: "💡 Ideia central", yamlIdeaText: "YAML é declarativo: você descreve o estado desejado; o Kubernetes compara com o estado atual e trabalha para reconciliar os dois.", whatYouSee: "🧭 O que você está vendo?", glossaryTitle: "📚 Glossário clicável", welcomeEyebrow: "Bem-vindo, explorador", welcomeTitle: "Vamos visitar Kubernetes? 🚀", welcomeText: "Kubernetes é um <strong>gerente de aplicações</strong>. Você diz como quer que seu sistema fique — por exemplo, “quero 3 cópias do meu site” — e ele trabalha continuamente para manter essa promessa.", welcomeLearn: "Nesta aventura, você vai aprender:", welcomeList: "<li>como um <strong>cluster</strong> reúne computadores chamados <strong>nodes</strong>;</li><li>como aplicações vivem em <strong>pods</strong>;</li><li>como <strong>Deployments</strong> mantêm cópias e fazem scaling;</li><li>como um <strong>Service</strong> encontra os pods mesmo quando eles mudam;</li><li>como Kubernetes se recupera de falhas automaticamente.</li>", startButton: "Entrar no laboratório ✨", skipButton: "Explorar livremente", finishEyebrow: "Treinamento concluído", finishTitle: "Você pensa como Kubernetes! 🏆", finishTextStatic: "O princípio mais importante é este: você declara o <strong>estado desejado</strong>; o Control Plane observa o estado atual e age até os dois combinarem.", continueButton: "Continuar explorando", restartButton: "Refazer treinamento",
+        brandSubtitle: "Uma expedição interativa dentro do Kubernetes", missionLabel: "Missão", activePodsLabel: "Pods ativos", trainingCenter: "Centro de treinamento", currentMission: "Missão atual", helpButton: "📖 Abrir manual rápido", visualLab: "Laboratório visual", heroTitle: "Seu cluster está vivo", heroText: "Observe o tráfego, crie réplicas e provoque falhas com segurança.", deployButton: "🚀 Criar aplicação", scaleButton: "↕ Escalar", killButton: "💥 Derrubar este Pod", probeLabButton: "🩺 Lab de Probes", actionsMenu: "⚡ Ações do laboratório ▾", autoPauseButton: "⏸ Pausar tráfego auto", controlPlaneDescription: "O cérebro: observa o estado desejado e coordena tudo.", clusterMapTitle: "KUBERNETES CLUSTER", deploymentsTitle: "📦 Deployments", trafficButton: "📨 Enviar request", burstTrafficButton: "⚡ Rajada de requests", trafficNodeBusy: "Atendendo", trafficProcessing: "proc…", trafficResponse: "response", trafficPortBlockedLabel: "porta ✕", trafficPortMismatch: "Tráfego bloqueado em <b>{svc}</b>: <code>targetPort</code> ({targets}) não bate com <code>containerPort</code> do Pod ({containers}). O kube-proxy não encaminha para o container.", trafficNoContainerPorts: "O Deployment <b>{app}</b> não declara <code>containerPort</code>. Adicione ports no container para o Service encaminhar tráfego.", trafficNoServicePorts: "O Service <b>{svc}</b> não declara <code>spec.ports</code>.", trafficPortOk: "Rota: Service:{sport} → Pod:{target}", trafficRequestQueued: "Request na fila: todos os Nodes com Pods Ready estão atendendo outra request.", trafficBurstStarted: "Rajada: {count} requests disparadas — o Service distribui entre Nodes livres.", trafficBurstSummary: "Rajada concluída: {count} requests. Fila restante: {queued}. O Service encaminha para Pods em Nodes que não estão atendendo.", autoButton: "▶ Auto", architectureInspector: "Inspetor de arquitetura", declarativeLab: "Laboratório declarativo", yamlTitle: "Edite o YAML e veja o cluster mudar", yamlDescription: "Altere os valores e clique em <strong>Aplicar YAML</strong>. O simulador interpreta os campos principais e reconcilia a tela com o novo estado desejado.", newYaml: "＋ Novo YAML", deleteYaml: "🗑 Excluir", applyYaml: "✓ Aplicar todos", resetYaml: "↺ Restaurar", copyYaml: "⧉ Copiar", yamlNodesTitle: "🖥️ Nodes não são réplicas", yamlNodesText: "<code>Cluster.spec.nodes</code> representa computadores do cluster. Altere de <code>3</code> para <code>6</code> e seis Nodes aparecerão.", yamlPodsTitle: "🫛 Pods da aplicação", yamlPodsText: "<code>Deployment.spec.replicas</code> representa cópias da aplicação. Altere para <code>5</code> e o Deployment distribuirá cinco Pods pelos Nodes.", yamlConnectTitle: "🔗 Conecte aplicações", yamlServiceTypesTitle: "🌐 Tipos de Service", yamlServiceTypesText: "Use <code>spec.type</code>: <strong>ClusterIP</strong> (padrão, VIP interno), <strong>NodePort</strong> (porta em todos os Nodes), <strong>LoadBalancer</strong> (IP externo + LB na nuvem) ou <strong>ExternalName</strong> (alias DNS <code>externalName</code>, sem endpoints de Pod).", svcExternalClient: "Cliente externo", svcNodePortClient: "Cliente fora do cluster", svcNodePortRoute: "Acessa qualquer Node em <code>&lt;NodeIP&gt;:{port}</code>", svcNodePortLabel: "NodePort (todos os Nodes)", svcExternalNameTraffic: "ExternalName só redireciona DNS — não encaminha tráfego para Pods no cluster.", svcTrafficClusterIP: "Request #{n} → {app}: tráfego interno via ClusterIP/DNS do Service até um Pod Ready.", svcTrafficNodePort: "Request #{n} → {app}: cliente externo → NodePort em um Node → Service → Pod.", svcTrafficLoadBalancer: "Request #{n} → {app}: cliente → LoadBalancer ({ip}) → Service → Pod.", svcInsightClusterIP: "VIP interno {ip} — alcance só de dentro do cluster (DNS <code>{name}</code>).", svcInsightNodePort: "Porta <code>{port}</code> aberta em <strong>todos</strong> os Nodes; o kube-proxy encaminha ao Service.", svcInsightLoadBalancer: "Provedor de nuvem provisiona LB com IP <code>{ip}</code> apontando para este Service.", svcInsightExternalName: "Retorna CNAME <code>{host}</code> — sem selector nem endpoints de Pod.", yamlConnectText: "Crie outro YAML com Deployment + Service. Dentro do cluster, uma aplicação pode chamar outra pelo DNS do Service, por exemplo <code>http://catalog-api:3000</code>.", yamlIdeaTitle: "💡 Ideia central", yamlIdeaText: "YAML é declarativo: você descreve o estado desejado; o Kubernetes compara com o estado atual e trabalha para reconciliar os dois.", whatYouSee: "🧭 O que você está vendo?", glossaryTitle: "📚 Glossário clicável", welcomeEyebrow: "Bem-vindo, explorador", welcomeTitle: "Vamos visitar Kubernetes? 🚀", welcomeText: "Kubernetes é um <strong>gerente de aplicações</strong>. Você diz como quer que seu sistema fique — por exemplo, “quero 3 cópias do meu site” — e ele trabalha continuamente para manter essa promessa.", welcomeLearn: "Nesta aventura, você vai aprender:", welcomeList: "<li>como um <strong>cluster</strong> reúne computadores chamados <strong>nodes</strong>;</li><li>como aplicações vivem em <strong>pods</strong>;</li><li>como <strong>Deployments</strong> mantêm cópias e fazem scaling;</li><li>como um <strong>Service</strong> encontra os pods mesmo quando eles mudam;</li><li>como Kubernetes se recupera de falhas automaticamente.</li>", startButton: "Entrar no laboratório ✨", skipButton: "Explorar livremente", finishEyebrow: "Treinamento concluído", finishTitle: "Você pensa como Kubernetes! 🏆", finishTextStatic: "O princípio mais importante é este: você declara o <strong>estado desejado</strong>; o Control Plane observa o estado atual e age até os dois combinarem.", continueButton: "Continuar explorando", restartButton: "Refazer treinamento",
         inspectHint: "Clique em qualquer parte do cluster para ver os detalhes da arquitetura.", inspectWhat: "O que é", inspectRole: "Para que serve", inspectAnalogy: "Imagine como", inspectConnection: "Como se conecta", healthy: "saudável", reconciling: "reconciliando", ready: "Ready", idle: "Idle", workerZone: "worker • zona-{n}", waitingPods: "aguardando Pods…", noDeployments: "Nenhum Deployment aplicado", serviceEmpty: "nenhum Service aplicado", replicas: "réplicas", endpoints: "endpoint(s)", running: "Running", crashLoop: "CrashLoop", podAge: "10m", request: "request", missionCount: "Missão {n}/7", yamlExampleLoaded: "Manifesto de exemplo carregado. A tela começa vazia até você aplicar o YAML.", yamlEditing: "Editando {name}. Aplicar todos usará todos os arquivos.", yamlUnsaved: "Alterações não aplicadas. Revise o YAML e clique em Aplicar todos.", yamlApplied: "✓ {files} YAML(s) aplicado(s): {nodes} Nodes, {apps} aplicação(ões) e {pods} Pods desejados.", yamlRestored: "Exemplo restaurado. Clique em Aplicar todos para usá-lo.", yamlNew: "Novo manifesto criado: {name}. Edite o name, image e replicas se quiser.", yamlDeleted: "Manifesto excluído. Clique em Aplicar todos para reconciliar o cluster.", yamlValid: "✅ {files} arquivo(s) YAML reconciliado(s) com sucesso.", copySuccess: "📋 YAML copiado para a área de transferência.", copyError: "Selecione o conteúdo do editor e copie manualmente.", noYaml: "O editor está vazio.", missingKind: "Existe um documento sem a propriedade kind.", missingCluster: "O primeiro YAML precisa incluir kind: Cluster e Cluster.spec.nodes.", missingDeployment: "Inclua ao menos um documento kind: Deployment.", missingNodes: "Não encontrei Cluster.spec.nodes.", missingName: "Um recurso precisa de metadata.name.", missingReplicas: "Deployment {name} não possui spec.replicas.", nodesRange: "Nodes deve ser um número entre 1 e 20.", replicasRange: "Réplicas de {name} deve ser um número entre 1 e 50.", deploymentActive: "O Deployment já está ativo. Agora você pode escalar ou testar o self-healing.", createFirst: "Crie a aplicação primeiro: sem um Deployment não há réplicas para escalar.", noDeploymentScale: "Nenhum Deployment disponível para escalar.", noService: "O Service ainda não tem Pods para encontrar. Crie a aplicação primeiro.", selectService: "Selecione uma aplicação que possua um Service.", noPod: "Nenhum Pod para derrubar ainda.", noDeployment: "Nenhum Deployment encontrado.", keepManifest: "Mantenha pelo menos um YAML com o Cluster e a aplicação principal.", protectManifest: "O primeiro YAML contém o Cluster. Edite-o ou exclua os outros manifestos.", noAppApplied: "Nenhum Deployment aplicado", welcomeReady: "Pronto: escolha uma missão e interaja com o cluster.", deploymentCreated: "Deployment criado: o Control Plane agendou 2 Pods nos Nodes disponíveis.", scaleEvent: "Scaling de {app}: estado desejado atualizado para {count} réplicas. O Scheduler distribuiu os Pods pelos Nodes.", trafficEvent: "Request #{n} → {app}: Service escolheu um Pod saudável e encaminhou o tráfego.", failureEvent: "Falha detectada: um Pod de {app} caiu. O Controller vai reconciliar o estado.", selfHealing: "Self-healing concluído: nova réplica criada. O Deployment mantém {count} Pods novamente.", applyEvent: "Manifests aplicados: {apps} agora fazem parte do cluster.", multipleApps: "Existem {count} aplicações no mesmo cluster. Cada uma tem seus próprios Pods e pode ter um Service próprio.", connectApps: "Para conectar aplicações, use o DNS do Service: por exemplo, <code>http://catalog-api:3000</code>. O Service continua encontrando os Pods mesmo quando eles mudam de Node.", noDeployExplain: "O retângulo grande é o <strong>cluster</strong>. Dentro dele, os Nodes são os computadores que podem executar sua aplicação.", controlExplain: "O <strong>Control Plane</strong> não serve páginas: ele toma decisões. Quando você fizer um pedido, ele vai escolher onde colocar os Pods.", killedExplain: "Um Pod desapareceu, mas o Deployment ainda deseja <strong>{count} réplicas</strong>. O Controller detecta a diferença e cria um substituto — isso é <strong>self-healing</strong>.", trafficExplain: "O request chega ao <strong>Service</strong>, que seleciona apenas Pods saudáveis. O cliente não precisa saber em qual Node cada Pod está.", deployExplain: "O Deployment pediu <strong>{count} réplica(s)</strong>. Os Pods são efêmeros: podem nascer e morrer, enquanto o Deployment mantém a quantidade desejada.", finishText: "Você ganhou {xp} XP e completou todas as missões. O cluster terminou com {count} réplicas da aplicação.", toastApplied: "✅ Manifesto válido: os componentes da tela foram atualizados.", toastNewYaml: "📄 Novo YAML criado. Ele será aplicado junto com os demais manifestos.", toastPodDown: "💥 Pod encerrado. Kubernetes não “ressuscita” o processo; ele cria um novo Pod para cumprir o desejo.", guide0: "<b>Comece observando:</b> o cluster está vazio até você aplicar o YAML.", guide1: "<b>Estado desejado:</b> edite o YAML e clique em <strong>Aplicar todos</strong> para criar os Pods.", guide2: "<b>Scaling:</b> altere <code>spec.replicas</code> no YAML e aplique de novo.", guide3: "<b>Rede:</b> use <strong>Ações do laboratório</strong> → Enviar request.", guide4: "<b>Self-healing:</b> clique em um Pod e use <strong>Derrubar este Pod</strong> no painel.", guide5: "<b>Abra o Lab de Probes:</b> aplique o YAML, espere 30s e adicione <code>livenessProbe</code> com <code>path: /health</code>.", guideDone: "<b>Excelente!</b> Agora você já conhece o ciclo de reconciliação do Kubernetes.", stepTitle: "Passo {n}",
         yamlProbesTitle: "🩺 Probes (health checks)", yamlProbesText: "No arquivo <code>probe-lab.yaml</code>, a imagem <code>kubeworld/probe-trainer</code> simula uma falha em <code>/health</code> após <strong>30 segundos</strong>. Adicione <code>readinessProbe</code> para tirar o Pod do Service; <code>livenessProbe</code> para o kubelet <strong>substituir</strong> o Pod; <code>startupProbe</code> para apps que demoram a subir.",
         probeNotReady: "Not Ready", probeUnhealthy: "Unhealthy", probeRestarting: "Restarting", probeLabLoaded: "Lab de Probes carregado. Aplique o YAML e observe o Pod após 30 segundos.",
@@ -373,7 +409,7 @@
         probeLabToast: "🩺 Manifesto probe-lab.yaml pronto. Clique em <strong>Aplicar todos</strong> para iniciar o cronômetro de 30s."
       },
       "en-US": {
-        brandSubtitle: "An interactive expedition inside Kubernetes", missionLabel: "Mission", activePodsLabel: "Active Pods", trainingCenter: "Training center", currentMission: "Current mission", helpButton: "📖 Open quick guide", visualLab: "Visual lab", heroTitle: "Your cluster is alive", heroText: "Watch traffic, create replicas, and safely trigger failures.", deployButton: "🚀 Create application", scaleButton: "↕ Scale", killButton: "💥 Delete this Pod", probeLabButton: "🩺 Probe lab", actionsMenu: "⚡ Lab actions ▾", autoPauseButton: "⏸ Pause auto traffic", controlPlaneDescription: "The brain: watches the desired state and coordinates everything.", clusterMapTitle: "KUBERNETES CLUSTER", deploymentsTitle: "📦 Deployments", trafficButton: "📨 Send request", burstTrafficButton: "⚡ Request burst", trafficNodeBusy: "Serving", trafficProcessing: "proc…", trafficResponse: "response", trafficRequestQueued: "Request queued: every Node with a Ready Pod is already serving another request.", trafficBurstStarted: "Burst: {count} requests fired — the Service spreads across free Nodes.", trafficBurstSummary: "Burst done: {count} requests. Remaining queue: {queued}. The Service forwards to Pods on Nodes that are not busy.", autoButton: "▶ Auto", architectureInspector: "Architecture inspector", declarativeLab: "Declarative lab", yamlTitle: "Edit YAML and watch the cluster change", yamlDescription: "Change values and click <strong>Apply YAML</strong>. The simulator interprets the main fields and reconciles the screen with the new desired state.", newYaml: "＋ New YAML", deleteYaml: "🗑 Delete", applyYaml: "✓ Apply all", resetYaml: "↺ Restore", copyYaml: "⧉ Copy", yamlNodesTitle: "🖥️ Nodes are not replicas", yamlNodesText: "<code>Cluster.spec.nodes</code> represents the computers in the cluster. Change <code>3</code> to <code>6</code> and six Nodes will appear.", yamlPodsTitle: "🫛 Application Pods", yamlPodsText: "<code>Deployment.spec.replicas</code> represents application copies. Change it to <code>5</code> and the Deployment will distribute five Pods across the Nodes.", yamlConnectTitle: "🔗 Connect applications", yamlServiceTypesTitle: "🌐 Service types", yamlServiceTypesText: "Set <code>spec.type</code>: <strong>ClusterIP</strong> (default, internal VIP), <strong>NodePort</strong> (port on every Node), <strong>LoadBalancer</strong> (external IP + cloud LB), or <strong>ExternalName</strong> (DNS alias via <code>externalName</code>, no Pod endpoints).", svcExternalClient: "External client", svcNodePortClient: "Client outside cluster", svcNodePortRoute: "Hits any Node at <code>&lt;NodeIP&gt;:{port}</code>", svcNodePortLabel: "NodePort (every Node)", svcExternalNameTraffic: "ExternalName only redirects DNS — it does not forward traffic to Pods in the cluster.", svcTrafficClusterIP: "Request #{n} → {app}: in-cluster traffic via Service ClusterIP/DNS to a Ready Pod.", svcTrafficNodePort: "Request #{n} → {app}: external client → NodePort on a Node → Service → Pod.", svcTrafficLoadBalancer: "Request #{n} → {app}: client → LoadBalancer ({ip}) → Service → Pod.", svcInsightClusterIP: "Internal VIP {ip} — reachable only inside the cluster (DNS <code>{name}</code>).", svcInsightNodePort: "Port <code>{port}</code> open on <strong>every</strong> Node; kube-proxy forwards to the Service.", svcInsightLoadBalancer: "Cloud provider provisions a LB with IP <code>{ip}</code> targeting this Service.", svcInsightExternalName: "Returns CNAME <code>{host}</code> — no selector or Pod endpoints.", yamlConnectText: "Create another YAML with a Deployment + Service. Inside the cluster, one application can call another through the Service DNS, such as <code>http://catalog-api:3000</code>.", yamlIdeaTitle: "💡 Core idea", yamlIdeaText: "YAML is declarative: you describe the desired state; Kubernetes compares it with the current state and works to reconcile both.", whatYouSee: "🧭 What are you seeing?", glossaryTitle: "📚 Clickable glossary", welcomeEyebrow: "Welcome, explorer", welcomeTitle: "Shall we visit Kubernetes? 🚀", welcomeText: "Kubernetes is an <strong>application manager</strong>. You describe how you want your system to look — for example, “I want 3 copies of my website” — and it continuously works to keep that promise.", welcomeLearn: "In this adventure, you will learn:", welcomeList: "<li>how a <strong>cluster</strong> brings together computers called <strong>Nodes</strong>;</li><li>how applications live in <strong>Pods</strong>;</li><li>how <strong>Deployments</strong> maintain copies and scale;</li><li>how a <strong>Service</strong> finds Pods even when they move;</li><li>how Kubernetes recovers from failures automatically.</li>", startButton: "Enter the lab ✨", skipButton: "Explore freely", finishEyebrow: "Training complete", finishTitle: "You think like Kubernetes! 🏆", finishTextStatic: "The most important principle is this: you declare the <strong>desired state</strong>; the Control Plane watches the current state and acts until both match.", continueButton: "Keep exploring", restartButton: "Restart training",
+        brandSubtitle: "An interactive expedition inside Kubernetes", missionLabel: "Mission", activePodsLabel: "Active Pods", trainingCenter: "Training center", currentMission: "Current mission", helpButton: "📖 Open quick guide", visualLab: "Visual lab", heroTitle: "Your cluster is alive", heroText: "Watch traffic, create replicas, and safely trigger failures.", deployButton: "🚀 Create application", scaleButton: "↕ Scale", killButton: "💥 Delete this Pod", probeLabButton: "🩺 Probe lab", actionsMenu: "⚡ Lab actions ▾", autoPauseButton: "⏸ Pause auto traffic", controlPlaneDescription: "The brain: watches the desired state and coordinates everything.", clusterMapTitle: "KUBERNETES CLUSTER", deploymentsTitle: "📦 Deployments", trafficButton: "📨 Send request", burstTrafficButton: "⚡ Request burst", trafficNodeBusy: "Serving", trafficProcessing: "proc…", trafficResponse: "response", trafficPortBlockedLabel: "port ✕", trafficPortMismatch: "Traffic blocked at <b>{svc}</b>: <code>targetPort</code> ({targets}) does not match Pod <code>containerPort</code> ({containers}). kube-proxy will not forward to the container.", trafficNoContainerPorts: "Deployment <b>{app}</b> has no <code>containerPort</code>. Add ports on the container so the Service can forward traffic.", trafficNoServicePorts: "Service <b>{svc}</b> has no <code>spec.ports</code>.", trafficPortOk: "Route: Service:{sport} → Pod:{target}", trafficRequestQueued: "Request queued: every Node with a Ready Pod is already serving another request.", trafficBurstStarted: "Burst: {count} requests fired — the Service spreads across free Nodes.", trafficBurstSummary: "Burst done: {count} requests. Remaining queue: {queued}. The Service forwards to Pods on Nodes that are not busy.", autoButton: "▶ Auto", architectureInspector: "Architecture inspector", declarativeLab: "Declarative lab", yamlTitle: "Edit YAML and watch the cluster change", yamlDescription: "Change values and click <strong>Apply YAML</strong>. The simulator interprets the main fields and reconciles the screen with the new desired state.", newYaml: "＋ New YAML", deleteYaml: "🗑 Delete", applyYaml: "✓ Apply all", resetYaml: "↺ Restore", copyYaml: "⧉ Copy", yamlNodesTitle: "🖥️ Nodes are not replicas", yamlNodesText: "<code>Cluster.spec.nodes</code> represents the computers in the cluster. Change <code>3</code> to <code>6</code> and six Nodes will appear.", yamlPodsTitle: "🫛 Application Pods", yamlPodsText: "<code>Deployment.spec.replicas</code> represents application copies. Change it to <code>5</code> and the Deployment will distribute five Pods across the Nodes.", yamlConnectTitle: "🔗 Connect applications", yamlServiceTypesTitle: "🌐 Service types", yamlServiceTypesText: "Set <code>spec.type</code>: <strong>ClusterIP</strong> (default, internal VIP), <strong>NodePort</strong> (port on every Node), <strong>LoadBalancer</strong> (external IP + cloud LB), or <strong>ExternalName</strong> (DNS alias via <code>externalName</code>, no Pod endpoints).", svcExternalClient: "External client", svcNodePortClient: "Client outside cluster", svcNodePortRoute: "Hits any Node at <code>&lt;NodeIP&gt;:{port}</code>", svcNodePortLabel: "NodePort (every Node)", svcExternalNameTraffic: "ExternalName only redirects DNS — it does not forward traffic to Pods in the cluster.", svcTrafficClusterIP: "Request #{n} → {app}: in-cluster traffic via Service ClusterIP/DNS to a Ready Pod.", svcTrafficNodePort: "Request #{n} → {app}: external client → NodePort on a Node → Service → Pod.", svcTrafficLoadBalancer: "Request #{n} → {app}: client → LoadBalancer ({ip}) → Service → Pod.", svcInsightClusterIP: "Internal VIP {ip} — reachable only inside the cluster (DNS <code>{name}</code>).", svcInsightNodePort: "Port <code>{port}</code> open on <strong>every</strong> Node; kube-proxy forwards to the Service.", svcInsightLoadBalancer: "Cloud provider provisions a LB with IP <code>{ip}</code> targeting this Service.", svcInsightExternalName: "Returns CNAME <code>{host}</code> — no selector or Pod endpoints.", yamlConnectText: "Create another YAML with a Deployment + Service. Inside the cluster, one application can call another through the Service DNS, such as <code>http://catalog-api:3000</code>.", yamlIdeaTitle: "💡 Core idea", yamlIdeaText: "YAML is declarative: you describe the desired state; Kubernetes compares it with the current state and works to reconcile both.", whatYouSee: "🧭 What are you seeing?", glossaryTitle: "📚 Clickable glossary", welcomeEyebrow: "Welcome, explorer", welcomeTitle: "Shall we visit Kubernetes? 🚀", welcomeText: "Kubernetes is an <strong>application manager</strong>. You describe how you want your system to look — for example, “I want 3 copies of my website” — and it continuously works to keep that promise.", welcomeLearn: "In this adventure, you will learn:", welcomeList: "<li>how a <strong>cluster</strong> brings together computers called <strong>Nodes</strong>;</li><li>how applications live in <strong>Pods</strong>;</li><li>how <strong>Deployments</strong> maintain copies and scale;</li><li>how a <strong>Service</strong> finds Pods even when they move;</li><li>how Kubernetes recovers from failures automatically.</li>", startButton: "Enter the lab ✨", skipButton: "Explore freely", finishEyebrow: "Training complete", finishTitle: "You think like Kubernetes! 🏆", finishTextStatic: "The most important principle is this: you declare the <strong>desired state</strong>; the Control Plane watches the current state and acts until both match.", continueButton: "Keep exploring", restartButton: "Restart training",
         inspectHint: "Click any cluster object to open architecture details.", inspectWhat: "What is it?", inspectRole: "What does it do?", inspectAnalogy: "Think of it as", inspectConnection: "How it connects", healthy: "healthy", reconciling: "reconciling", ready: "Ready", idle: "Idle", workerZone: "worker • zone-{n}", waitingPods: "waiting for Pods…", noDeployments: "No Deployment applied", serviceEmpty: "no Service applied", replicas: "replicas", endpoints: "endpoint(s)", running: "Running", crashLoop: "CrashLoop", podAge: "10m", request: "request", missionCount: "Mission {n}/7", yamlExampleLoaded: "Example manifest loaded. The screen starts empty until you apply the YAML.", yamlEditing: "Editing {name}. Apply all will use every file.", yamlUnsaved: "Unsaved changes. Review the YAML and click Apply all.", yamlApplied: "✓ {files} YAML file(s) applied: <b>{nodes} Nodes</b>, <b>{apps} application(s)</b>, and <b>{pods} desired Pods</b>.", yamlRestored: "Example restored. Click Apply all to use it.", yamlNew: "New manifest created: {name}. Edit the name, image, and replicas if you want.", yamlDeleted: "Manifest deleted. Click Apply all to reconcile the cluster.", yamlValid: "✅ {files} YAML file(s) successfully reconciled.", copySuccess: "📋 YAML copied to the clipboard.", copyError: "Select the editor content and copy it manually.", noYaml: "The editor is empty.", missingKind: "A document is missing the kind property.", missingCluster: "The first YAML must include kind: Cluster and Cluster.spec.nodes.", missingDeployment: "Include at least one kind: Deployment document.", missingNodes: "Cluster.spec.nodes was not found.", missingName: "A resource needs metadata.name.", missingReplicas: "Deployment {name} has no spec.replicas.", nodesRange: "Nodes must be a number between 1 and 20.", replicasRange: "Replicas for {name} must be a number between 1 and 50.", deploymentActive: "The Deployment is already active. You can now scale it or test self-healing.", createFirst: "Create the application first: without a Deployment there are no replicas to scale.", noDeploymentScale: "No Deployment is available to scale.", noService: "The Service has no Pods to find yet. Create the application first.", selectService: "Select an application that has a Service.", noPod: "There is no Pod to take down yet.", noDeployment: "No Deployment found.", keepManifest: "Keep at least one YAML with the Cluster and the main application.", protectManifest: "The first YAML contains the Cluster. Edit it or delete the other manifests.", noAppApplied: "No Deployment applied", welcomeReady: "Ready: choose a mission and interact with the cluster.", deploymentCreated: "Deployment created: the Control Plane scheduled 2 Pods on the available Nodes.", scaleEvent: "Scaling {app}: desired state updated to {count} replicas. The Scheduler distributed the Pods across the Nodes.", trafficEvent: "Request #{n} → {app}: Service selected a healthy Pod and forwarded the traffic.", failureEvent: "Failure detected: a Pod from {app} went down. The Controller will reconcile the state.", selfHealing: "Self-healing complete: a new replica was created. The Deployment keeps {count} Pods again.", applyEvent: "Manifests applied: {apps} are now part of the cluster.", multipleApps: "There are {count} applications in the same cluster. Each has its own Pods and may have its own Service.", connectApps: "To connect applications, use the Service DNS, for example <code>http://catalog-api:3000</code>. The Service keeps finding Pods even when they move between Nodes.", noDeployExplain: "The large rectangle is the <strong>cluster</strong>. Inside it, Nodes are the computers that can run your application.", controlExplain: "The <strong>Control Plane</strong> does not serve pages: it makes decisions. When you make a request, it chooses where to place the Pods.", killedExplain: "A Pod disappeared, but the Deployment still wants <strong>{count} replicas</strong>. The Controller detects the difference and creates a replacement — that is <strong>self-healing</strong>.", trafficExplain: "The request reaches the <strong>Service</strong>, which selects only healthy Pods. The client does not need to know which Node each Pod is on.", deployExplain: "The Deployment requested <strong>{count} replica(s)</strong>. Pods are ephemeral: they can appear and disappear while the Deployment maintains the desired count.", finishText: "You earned {xp} XP and completed every mission. The cluster ended with {count} application replicas.", toastApplied: "✅ Valid manifest: the screen components were updated.", toastNewYaml: "📄 New YAML created. It will be applied together with the other manifests.", toastPodDown: "💥 Pod terminated. Kubernetes does not “resurrect” the process; it creates a new Pod to fulfill the desired state.", guide0: "<b>Start by observing:</b> the cluster stays empty until you apply YAML.", guide1: "<b>Desired state:</b> edit the YAML and click <strong>Apply all</strong> to create Pods.", guide2: "<b>Scaling:</b> change <code>spec.replicas</code> in the YAML and apply again.", guide3: "<b>Networking:</b> use <strong>Lab actions</strong> → Send request.", guide4: "<b>Self-healing:</b> click a Pod and use <strong>Delete this Pod</strong> in the panel.", guide5: "<b>Open the Probe lab:</b> apply the YAML, wait 30s, then add <code>livenessProbe</code> with <code>path: /health</code>.", guideDone: "<b>Excellent!</b> You now know Kubernetes’ reconciliation cycle.", stepTitle: "Step {n}",
         yamlProbesTitle: "🩺 Probes (health checks)", yamlProbesText: "In <code>probe-lab.yaml</code>, the <code>kubeworld/probe-trainer</code> image simulates a failure on <code>/health</code> after <strong>30 seconds</strong>. Add <code>readinessProbe</code> to remove the Pod from the Service; <code>livenessProbe</code> so the kubelet <strong>replaces</strong> the Pod; <code>startupProbe</code> for slow-starting apps.",
         probeNotReady: "Not Ready", probeUnhealthy: "Unhealthy", probeRestarting: "Restarting", probeLabLoaded: "Probe lab loaded. Apply the YAML and watch the Pod after 30 seconds.",
@@ -403,8 +439,8 @@
     };
     const t = (key, values = {}) => {
       const extraText = {
-        "pt-BR": { filesTitle: "Arquivos YAML", renameYaml: "✎ Renomear", runYaml: "▶ Rodar este YAML", clusterYaml: "⚙ Cluster", fileApplied: "executado", filePending: "não executado", fileDirty: "alterado", currentFile: "Arquivo ativo: {name}", runCurrent: "✓ {name} executado: {resources} recurso(s) reconciliado(s).", firstFileCluster: "Este YAML precisa conter kind: Cluster ou outro arquivo precisa definir o Cluster.", clusterDefault: "A configuração do Cluster está oculta. O laboratório usa {nodes} Nodes. Crie um YAML kind: Cluster apenas para sobrescrever este valor.", zoomTabOverview: "Visão geral", zoomTabAdvanced: "Informações avançadas", advManifestTitle: "Manifesto que cria este elemento", advNoYaml: "Este componente não é definido por um YAML da aplicação no laboratório.", advKind: "kind", advApiVersion: "apiVersion", advName: "metadata.name", advReplicas: "spec.replicas", advImage: "container.image", advContainer: "container.name", advContainerPorts: "containerPort", advSelector: "spec.selector", advTemplateLabels: "template.metadata.labels", advServicePort: "spec.ports.port", advServiceTargetPort: "spec.ports.targetPort", advServiceSelector: "spec.selector.app", advClusterNodes: "spec.nodes", advNodeName: "node", advPodOwner: "owner (Deployment)", advPodReady: "ready (simulado)", advPodGeneration: "geração do Pod", advProbeLiveness: "livenessProbe", advProbeReadiness: "readinessProbe", advProbeStartup: "startupProbe",         advProbeNone: "não configurada", advDefaultCluster: "Cluster padrão do simulador", advServiceType: "spec.type", advClusterIP: "clusterIP (simulado)", advExternalIP: "IP externo (simulado)", advExternalName: "spec.externalName", advNodePort: "nodePort", zoomTabDocs: "Documentação K8s", k8sDocSource: "Referência oficial", k8sDocField: "Propriedade", k8sDocType: "Tipo", k8sDocDescription: "Descrição (Kubernetes docs)" },
-        "en-US": { filesTitle: "YAML files", renameYaml: "✎ Rename", runYaml: "▶ Run this YAML", clusterYaml: "⚙ Cluster", fileApplied: "applied", filePending: "not run", fileDirty: "modified", currentFile: "Active file: {name}", runCurrent: "✓ {name} executed: {resources} resource(s) reconciled.", firstFileCluster: "This YAML must contain kind: Cluster, or another file must define the Cluster.", clusterDefault: "Cluster configuration is hidden. The lab uses {nodes} Nodes. Create a kind: Cluster YAML only when you want to override this value.", zoomTabOverview: "Overview", zoomTabAdvanced: "Advanced information", advManifestTitle: "Manifest that creates this object", advNoYaml: "This component is not defined by an application YAML in the lab.", advKind: "kind", advApiVersion: "apiVersion", advName: "metadata.name", advReplicas: "spec.replicas", advImage: "container.image", advContainer: "container.name", advContainerPorts: "containerPort", advSelector: "spec.selector", advTemplateLabels: "template.metadata.labels", advServicePort: "spec.ports.port", advServiceTargetPort: "spec.ports.targetPort", advServiceSelector: "spec.selector.app", advClusterNodes: "spec.nodes", advNodeName: "node", advPodOwner: "owner (Deployment)", advPodReady: "ready (simulated)", advPodGeneration: "Pod generation", advProbeLiveness: "livenessProbe", advProbeReadiness: "readinessProbe", advProbeStartup: "startupProbe", advProbeNone: "not configured", advDefaultCluster: "Simulator default cluster", advServiceType: "spec.type", advClusterIP: "clusterIP (simulated)", advExternalIP: "external IP (simulated)", advExternalName: "spec.externalName", advNodePort: "nodePort", zoomTabDocs: "K8s documentation", k8sDocSource: "Official reference", k8sDocField: "Property", k8sDocType: "Type", k8sDocDescription: "Description (Kubernetes docs)" }
+        "pt-BR": { filesTitle: "Arquivos YAML", renameYaml: "✎ Renomear", runYaml: "▶ Rodar este YAML", clusterYaml: "⚙ Cluster", fileApplied: "executado", filePending: "não executado", fileDirty: "alterado", currentFile: "Arquivo ativo: {name}", runCurrent: "✓ {name} executado: {resources} recurso(s) reconciliado(s).", firstFileCluster: "Este YAML precisa conter kind: Cluster ou outro arquivo precisa definir o Cluster.", clusterDefault: "A configuração do Cluster está oculta. O laboratório usa {nodes} Nodes. Crie um YAML kind: Cluster apenas para sobrescrever este valor.", zoomTabOverview: "Visão geral", zoomTabAdvanced: "Informações avançadas", advManifestTitle: "Manifesto que cria este elemento", advNoYaml: "Este componente não é definido por um YAML da aplicação no laboratório.", advKind: "kind", advApiVersion: "apiVersion", advName: "metadata.name", advReplicas: "spec.replicas", advImage: "container.image", advContainer: "container.name", advContainerPorts: "containerPort", advSelector: "spec.selector", advTemplateLabels: "template.metadata.labels", advServicePort: "spec.ports.port", advServiceTargetPort: "spec.ports.targetPort", advServiceSelector: "spec.selector.app", advClusterNodes: "spec.nodes", advNodeName: "node", advPodOwner: "owner (Deployment)", advPodReady: "ready (simulado)", advPodGeneration: "geração do Pod", advProbeLiveness: "livenessProbe", advProbeReadiness: "readinessProbe", advProbeStartup: "startupProbe",         advProbeNone: "não configurada", advDefaultCluster: "Cluster padrão do simulador", advServiceType: "spec.type", advClusterIP: "clusterIP (simulado)", advExternalIP: "IP externo (simulado)", advExternalName: "spec.externalName", advNodePort: "nodePort", zoomTabDocs: "Documentação K8s", k8sDocSource: "Referência oficial", k8sDocField: "Propriedade", k8sDocType: "Tipo", k8sDocDescription: "Descrição (Kubernetes docs)", k8sDocServiceTypesTitle: "Todos os tipos de Service", k8sDocYourType: "Documentação do tipo", k8sDocTypeActive: "tipo deste manifesto", zoomTabContainer: "Configurações do Container", containerConfigIntro: "Ao usar <strong>Enviar request</strong> no Service deste Deployment, o simulador percorre a cadeia completa (round-robin entre réplicas). O botão abaixo dispara só o trecho Pod → Service → Pod.", containerConfigSelect: "Container / imagem de destino (backend)", containerConfigNone: "— Nenhuma chamada configurada —", containerConfigUrl: "URL interna simulada", containerConfigSimulate: "▶ Simular chamada Pod → Service → Pod", containerConfigFlow: "Fluxo: Pod <b>{from}</b> ({fromImage}) → Service <b>{svc}</b> → Pod <b>{to}</b> ({toImage})", containerCallEvent: "Chamada interna: {from} → {url} → Pod backend {to}", containerCallNoTarget: "Escolha um backend com Service aplicado.", containerCallPortFail: "Backend com portas incompatíveis — ajuste targetPort/containerPort antes de chamar.", zoomTabContainer: "Comunicação entre serviços", workloadMeshTitle: "Comunicação entre workloads", workloadMeshIntro: "Defina qual imagem (Deployment) chama qual <strong>Service</strong> interno. Quando você usar <strong>Enviar request</strong> no Service de entrada, o tráfego passa pelo Pod frontend e segue para o backend — como DNS in-cluster (<code>&lt;service&gt;.&lt;namespace&gt;.svc</code>).", workloadMeshEmpty: "Aplique pelo menos dois Deployments (com Service no destino) para ligar qualquer par de workloads.", workloadMeshColumnApp: "Deployment", workloadMeshColumnImage: "Imagem", workloadMeshColumnBackend: "Chama Service (backend)", workloadMeshClusterTitle: "Mapa de chamadas no cluster", trafficChainedEvent: "Request #{n}: Service <b>{entrySvc}</b> → Pod <b>{from}</b> → <code>{url}</code> → Pod <b>{to}</b> → response", trafficChainedHint: "Cadeia frontend → backend ativa nos requests", meshNoBackend: "Nenhum outro Service no cluster", meshBackendPortWarn: "portas a revisar", meshBackendMissing: "destino ausente — reaplique o YAML" },
+        "en-US": { filesTitle: "YAML files", renameYaml: "✎ Rename", runYaml: "▶ Run this YAML", clusterYaml: "⚙ Cluster", fileApplied: "applied", filePending: "not run", fileDirty: "modified", currentFile: "Active file: {name}", runCurrent: "✓ {name} executed: {resources} resource(s) reconciled.", firstFileCluster: "This YAML must contain kind: Cluster, or another file must define the Cluster.", clusterDefault: "Cluster configuration is hidden. The lab uses {nodes} Nodes. Create a kind: Cluster YAML only when you want to override this value.", zoomTabOverview: "Overview", zoomTabAdvanced: "Advanced information", advManifestTitle: "Manifest that creates this object", advNoYaml: "This component is not defined by an application YAML in the lab.", advKind: "kind", advApiVersion: "apiVersion", advName: "metadata.name", advReplicas: "spec.replicas", advImage: "container.image", advContainer: "container.name", advContainerPorts: "containerPort", advSelector: "spec.selector", advTemplateLabels: "template.metadata.labels", advServicePort: "spec.ports.port", advServiceTargetPort: "spec.ports.targetPort", advServiceSelector: "spec.selector.app", advClusterNodes: "spec.nodes", advNodeName: "node", advPodOwner: "owner (Deployment)", advPodReady: "ready (simulated)", advPodGeneration: "Pod generation", advProbeLiveness: "livenessProbe", advProbeReadiness: "readinessProbe", advProbeStartup: "startupProbe", advProbeNone: "not configured", advDefaultCluster: "Simulator default cluster", advServiceType: "spec.type", advClusterIP: "clusterIP (simulated)", advExternalIP: "external IP (simulated)", advExternalName: "spec.externalName", advNodePort: "nodePort", zoomTabDocs: "K8s documentation", k8sDocSource: "Official reference", k8sDocField: "Property", k8sDocType: "Type", k8sDocDescription: "Description (Kubernetes docs)", k8sDocServiceTypesTitle: "All Service types", k8sDocYourType: "Type documentation", k8sDocTypeActive: "this manifest's type", zoomTabContainer: "Container settings", containerConfigIntro: "When you <strong>Send request</strong> on this Deployment's Service, the simulator runs the full chain (round-robin across replicas). The button below triggers only the Pod → Service → Pod leg.", containerConfigSelect: "Target container / image (backend)", containerConfigNone: "— No upstream configured —", containerConfigUrl: "Simulated internal URL", containerConfigSimulate: "▶ Simulate Pod → Service → Pod call", containerConfigFlow: "Flow: Pod <b>{from}</b> ({fromImage}) → Service <b>{svc}</b> → Pod <b>{to}</b> ({toImage})", containerCallEvent: "Internal call: {from} → {url} → backend Pod {to}", containerCallNoTarget: "Pick a backend with an applied Service.", containerCallPortFail: "Backend ports do not line up — fix targetPort/containerPort before calling.", workloadMeshTitle: "Workload communication", workloadMeshIntro: "Choose which Deployment image calls which internal <strong>Service</strong>. When you <strong>Send request</strong> on the entry Service, traffic hits a frontend Pod then the backend — like in-cluster DNS (<code>&lt;service&gt;.&lt;namespace&gt;.svc</code>).", workloadMeshEmpty: "Apply at least two Deployments (destination needs a Service) to link any workload pair.", workloadMeshColumnApp: "Deployment", workloadMeshColumnImage: "Image", workloadMeshColumnBackend: "Calls Service (backend)", workloadMeshClusterTitle: "Cluster call map", trafficChainedEvent: "Request #{n}: Service <b>{entrySvc}</b> → Pod <b>{from}</b> → <code>{url}</code> → Pod <b>{to}</b> → response", trafficChainedHint: "Frontend → backend chain on requests", zoomTabContainer: "Service communication", meshNoBackend: "No other Service in the cluster", meshBackendPortWarn: "check ports", meshBackendMissing: "target missing — re-apply YAML" }
       };
       if (extraText[language]?.[key]) {
         let extra = extraText[language][key];
@@ -643,6 +679,124 @@
           { path: "spec.clusterIP", type: "string", desc: "Virtual IP of the Service (ClusterIP)." }
         ]}
       },
+      "service-clusterip": {
+        kind: "ClusterIP", apiVersion: "v1", url: "https://kubernetes.io/docs/concepts/services-networking/service/#type-clusterip",
+        pt: {
+          summary: "IP virtual estável só dentro do cluster; padrão quando spec.type é omitido.",
+          intro: "ClusterIP é o tipo padrão de Service. O Kubernetes atribui um IP virtual (VIP) alcançável apenas de dentro do cluster. O kube-proxy (ou dataplane equivalente) encaminha tráfego da porta do Service para Pods Ready que correspondem ao selector. Outros Pods resolvem o nome via DNS interno (<code>my-svc</code> ou FQDN <code>my-svc.namespace.svc.cluster.local</code>).",
+          fields: [
+            { path: "spec.type", type: "string", desc: "Omitido ou ClusterIP — comportamento padrão." },
+            { path: "spec.clusterIP", type: "string", desc: "VIP interno; pode ser None em Services headless." },
+            { path: "spec.selector", type: "map", desc: "Labels dos Pods que compõem os Endpoints." },
+            { path: "spec.ports[].port", type: "integer", desc: "Porta do Service; tráfego entra aqui." },
+            { path: "spec.ports[].targetPort", type: "integer|string", desc: "Porta no Pod (containerPort ou nome)." },
+            { path: "Endpoints", type: "recurso", desc: "Lista de IPs:porta dos Pods Ready (gerenciado automaticamente)." },
+            { path: "kube-proxy / dataplane", type: "componente", desc: "Balanceia conexões do VIP para os Endpoints." },
+            { path: "Lab KubeWorld", type: "simulação", desc: "Diagrama mostra VIP simulado e DNS do Service; tráfego vai Service → Pod dentro do cluster." }
+          ]
+        },
+        en: {
+          summary: "Stable virtual IP reachable only inside the cluster; default when spec.type is omitted.",
+          intro: "ClusterIP is the default Service type. Kubernetes assigns a virtual IP (VIP) reachable only from inside the cluster. kube-proxy (or an equivalent dataplane) forwards traffic from the Service port to Ready Pods matching the selector. Other Pods resolve the name via internal DNS (<code>my-svc</code> or FQDN <code>my-svc.namespace.svc.cluster.local</code>).",
+          fields: [
+            { path: "spec.type", type: "string", desc: "Omitted or ClusterIP — default behavior." },
+            { path: "spec.clusterIP", type: "string", desc: "Internal VIP; can be None for headless Services." },
+            { path: "spec.selector", type: "map", desc: "Labels of Pods that form Endpoints." },
+            { path: "spec.ports[].port", type: "integer", desc: "Service port; traffic enters here." },
+            { path: "spec.ports[].targetPort", type: "integer|string", desc: "Port on the Pod (containerPort or name)." },
+            { path: "Endpoints", type: "resource", desc: "List of Ready Pod IP:port (managed automatically)." },
+            { path: "kube-proxy / dataplane", type: "component", desc: "Load-balances connections from the VIP to Endpoints." },
+            { path: "KubeWorld lab", type: "simulation", desc: "Diagram shows a simulated VIP and Service DNS; traffic flows Service → Pod inside the cluster." }
+          ]
+        }
+      },
+      "service-nodeport": {
+        kind: "NodePort", apiVersion: "v1", url: "https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport",
+        pt: {
+          summary: "Expõe o Service em uma porta estática em cada Node (além do ClusterIP).",
+          intro: "NodePort abre uma porta no intervalo configurado do cluster (padrão 30000–32767) em todos os Nodes. O Service continua tendo ClusterIP interno; tráfego externo pode usar <code>&lt;NodeIP&gt;:nodePort</code> e o kube-proxy redireciona para os Pods. Útil para acesso externo simples ou antes de um LoadBalancer/Ingress.",
+          fields: [
+            { path: "spec.type", type: "string", desc: "Deve ser NodePort." },
+            { path: "spec.ports[].nodePort", type: "integer", desc: "Porta no Node; se omitida, o cluster aloca uma livre." },
+            { path: "spec.ports[].port", type: "integer", desc: "Porta do Service (ClusterIP)." },
+            { path: "spec.ports[].targetPort", type: "integer|string", desc: "Porta no Pod." },
+            { path: "Todos os Nodes", type: "comportamento", desc: "A mesma nodePort fica aberta em cada Node, mesmo sem Pod local." },
+            { path: "Firewall / segurança", type: "operação", desc: "É preciso liberar a nodePort na rede dos Nodes." },
+            { path: "Lab KubeWorld", type: "simulação", desc: "Chips NodePort em cada Node; animação: cliente externo → Node → Service → Pod → resposta." }
+          ]
+        },
+        en: {
+          summary: "Exposes the Service on a static port on every Node (in addition to ClusterIP).",
+          intro: "NodePort opens a port in the cluster’s configured range (default 30000–32767) on every Node. The Service still has an internal ClusterIP; external traffic can use <code>&lt;NodeIP&gt;:nodePort</code> and kube-proxy forwards to Pods. Useful for simple external access or before a LoadBalancer/Ingress.",
+          fields: [
+            { path: "spec.type", type: "string", desc: "Must be NodePort." },
+            { path: "spec.ports[].nodePort", type: "integer", desc: "Port on the Node; if omitted, the cluster allocates a free one." },
+            { path: "spec.ports[].port", type: "integer", desc: "Service (ClusterIP) port." },
+            { path: "spec.ports[].targetPort", type: "integer|string", desc: "Port on the Pod." },
+            { path: "Every Node", type: "behavior", desc: "The same nodePort is open on each Node, even without a local Pod." },
+            { path: "Firewall / security", type: "operations", desc: "You must allow the nodePort through Node network firewalls." },
+            { path: "KubeWorld lab", type: "simulation", desc: "NodePort chips on every Node; animation: external client → Node → Service → Pod → response." }
+          ]
+        }
+      },
+      "service-loadbalancer": {
+        kind: "LoadBalancer", apiVersion: "v1", url: "https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer",
+        pt: {
+          summary: "Provisiona um balanceador externo (nuvem) com IP/DNS público apontando para o Service.",
+          intro: "LoadBalancer é pensado para clusters com integração a provedor de nuvem. Ao criar o Service, o controlador cloud provisiona um LB externo que encaminha para o NodePort/ClusterIP do Service. Clientes na internet usam o IP ou hostname do LB. Em bare metal, alternativas como MetalLB podem simular esse comportamento.",
+          fields: [
+            { path: "spec.type", type: "string", desc: "Deve ser LoadBalancer." },
+            { path: "status.loadBalancer.ingress", type: "object", desc: "IP ou hostname atribuído pelo provedor (somente leitura)." },
+            { path: "spec.ports[]", type: "ServicePort", desc: "Mesmas portas do Service; o LB publica portas para o exterior." },
+            { path: "NodePort implícito", type: "comportamento", desc: "Cloud controllers normalmente criam NodePort associado." },
+            { path: "spec.loadBalancerIP", type: "string", desc: "IP fixo solicitado (quando o provedor suporta)." },
+            { path: "spec.externalTrafficPolicy", type: "string", desc: "Cluster ou Local — afeta preservação de IP de origem." },
+            { path: "Lab KubeWorld", type: "simulação", desc: "Caixa LoadBalancer com IP externo simulado; tráfego: cliente → LB → Service → Pod." }
+          ]
+        },
+        en: {
+          summary: "Provisions an external load balancer (cloud) with a public IP/DNS targeting the Service.",
+          intro: "LoadBalancer targets clusters with cloud provider integration. Creating the Service triggers a cloud controller to provision an external LB forwarding to the Service’s NodePort/ClusterIP. Internet clients use the LB IP or hostname. On bare metal, alternatives such as MetalLB can emulate this.",
+          fields: [
+            { path: "spec.type", type: "string", desc: "Must be LoadBalancer." },
+            { path: "status.loadBalancer.ingress", type: "object", desc: "IP or hostname assigned by the provider (read-only)." },
+            { path: "spec.ports[]", type: "ServicePort", desc: "Same Service ports; the LB publishes them externally." },
+            { path: "Implicit NodePort", type: "behavior", desc: "Cloud controllers usually create an associated NodePort." },
+            { path: "spec.loadBalancerIP", type: "string", desc: "Requested static IP (when supported)." },
+            { path: "spec.externalTrafficPolicy", type: "string", desc: "Cluster or Local — affects source IP preservation." },
+            { path: "KubeWorld lab", type: "simulation", desc: "LoadBalancer box with simulated external IP; traffic: client → LB → Service → Pod." }
+          ]
+        }
+      },
+      "service-externalname": {
+        kind: "ExternalName", apiVersion: "v1", url: "https://kubernetes.io/docs/concepts/services-networking/service/#type-externalname",
+        pt: {
+          summary: "Mapeia o Service para um nome DNS externo (CNAME); sem Endpoints de Pod.",
+          intro: "ExternalName não cria proxy para Pods. O DNS do cluster retorna um CNAME para <code>spec.externalName</code> (ex.: banco gerenciado fora do cluster). Não há selector nem Endpoints — aplicações dentro do cluster usam o nome do Service como alias para o host externo.",
+          fields: [
+            { path: "spec.type", type: "string", desc: "Deve ser ExternalName." },
+            { path: "spec.externalName", type: "string", desc: "Hostname externo alvo do CNAME (obrigatório)." },
+            { path: "spec.selector", type: "—", desc: "Não usado neste tipo." },
+            { path: "Endpoints", type: "—", desc: "Não há Endpoints de Pod." },
+            { path: "Resolução DNS", type: "comportamento", desc: "Consulta ao Service retorna CNAME para externalName." },
+            { path: "Casos de uso", type: "conceito", desc: "Migrar serviços legados, apontar para SaaS/DB externo com nome estável no cluster." },
+            { path: "Lab KubeWorld", type: "simulação", desc: "Card tracejado com CNAME; rajada de tráfego não encaminha para Pods." }
+          ]
+        },
+        en: {
+          summary: "Maps the Service to an external DNS name (CNAME); no Pod Endpoints.",
+          intro: "ExternalName does not proxy to Pods. Cluster DNS returns a CNAME to <code>spec.externalName</code> (e.g. a managed database outside the cluster). There is no selector or Endpoints — in-cluster apps use the Service name as an alias for the external host.",
+          fields: [
+            { path: "spec.type", type: "string", desc: "Must be ExternalName." },
+            { path: "spec.externalName", type: "string", desc: "External hostname for the CNAME target (required)." },
+            { path: "spec.selector", type: "—", desc: "Not used for this type." },
+            { path: "Endpoints", type: "—", desc: "No Pod Endpoints." },
+            { path: "DNS resolution", type: "behavior", desc: "Queries for the Service name return a CNAME to externalName." },
+            { path: "Use cases", type: "concept", desc: "Legacy migrations, stable in-cluster name for external SaaS/DB." },
+            { path: "KubeWorld lab", type: "simulation", desc: "Dashed card with CNAME; traffic burst does not forward to Pods." }
+          ]
+        }
+      },
       probes: {
         kind: "Probe", apiVersion: "v1 (Container)", url: "https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes",
         pt: { intro: "Probes de container (liveness, readiness, startup) — documentação de conceitos e API Probe.", fields: [
@@ -811,7 +965,10 @@ spec:
     let manifestFiles = [{ id: "web", name: "app-web.yaml", content: defaultYaml }];
     let currentManifest = 0;
     let probeTimers = { failure: {}, tick: null, countdown: null };
-    const trafficSim = { nodeBusyUntil: [], nodeClearTimers: {}, queue: [], roundRobin: {}, burstActive: false, packetZ: 8 };
+    const trafficSim = { nodeBusyUntil: [], nodeClearTimers: {}, queue: [], roundRobin: {}, burstActive: false, packetZ: 8, hopMsExtra: 200 };
+    function trafficHopMs(baseMs) {
+      return baseMs + trafficSim.hopMsExtra;
+    }
     let state = { mission: 0, xp: 0, nodes: 3, replicas: 0, deployed: false, service: true, image: "nginx:1.27", apps: {}, services: {}, clusterYaml: "", selectedApp: "app-web", traffic: 0, killed: false, killedApp: null, auto: false, timer: null, probeLabActive: false, trainingCompleteAwarded: false, trainingFinishShown: false, inspectTarget: null, zoomActiveTab: "overview" };
     const labMenuActions = [
       { id: "probeLab", labelKey: "probeLabButton", structure: "probes", run: () => loadProbeLab() },
@@ -898,22 +1055,24 @@ spec:
       document.split(/\n\s*-\s+port:/).slice(1).forEach(section => {
         const portMatch = section.match(/^(\d+)/);
         if (!portMatch) return;
-        const targetMatch = section.match(/targetPort:\s*(\d+)/);
+        const targetMatch = section.match(/targetPort:\s*["']?([^"'\n#]+)["']?/);
         const nodePortMatch = section.match(/nodePort:\s*(\d+)/);
+        const targetRaw = targetMatch ? targetMatch[1].trim() : String(portMatch[1]);
         ports.push({
           port: Number(portMatch[1]),
-          targetPort: Number(targetMatch ? targetMatch[1] : portMatch[1]),
+          targetPort: /^\d+$/.test(targetRaw) ? Number(targetRaw) : targetRaw,
           nodePort: nodePortMatch ? Number(nodePortMatch[1]) : null
         });
       });
       if (!ports.length) {
         const singlePort = document.match(/port:\s*(\d+)/);
-        const singleTarget = document.match(/targetPort:\s*(\d+)/);
+        const singleTarget = document.match(/targetPort:\s*["']?([^"'\n#]+)["']?/);
         const singleNodePort = document.match(/nodePort:\s*(\d+)/);
         if (singlePort) {
+          const targetRaw = singleTarget ? singleTarget[1].trim() : singlePort[1];
           ports.push({
             port: Number(singlePort[1]),
-            targetPort: Number(singleTarget ? singleTarget[1] : singlePort[1]),
+            targetPort: /^\d+$/.test(targetRaw) ? Number(targetRaw) : targetRaw,
             nodePort: singleNodePort ? Number(singleNodePort[1]) : null
           });
         }
@@ -971,13 +1130,26 @@ spec:
       if (type === "LoadBalancer") return `${service.externalIP} → ${service.clusterIP} • ${endpointCount} ${t("endpoints")}`;
       return `→ ${targetName} • ${endpointCount} ${t("endpoints")}`;
     }
+    function servicePortWarningHtml(service) {
+      const type = service.type || "ClusterIP";
+      if (type === "ExternalName") return "";
+      const app = appForService(service);
+      if (!app) return "";
+      const check = validateTrafficPorts(app, service);
+      if (check.ok) return "";
+      return `<span class="service-port-bad">⚠ ${language === "en-US" ? "targetPort ≠ containerPort" : "targetPort ≠ containerPort"}</span>`;
+    }
     function serviceExtraHint(service) {
       const type = service.type || "ClusterIP";
-      if (type === "ClusterIP") return `<div class="service-route-hint">DNS <code>${service.name}</code></div>`;
-      if (type === "NodePort") return `<div class="service-route-hint">${t("svcNodePortRoute", { port: service.nodePort })}</div>`;
-      if (type === "LoadBalancer") return `<div class="service-route-hint">LB <code>${service.externalIP}</code></div>`;
+      const app = appForService(service);
+      const chain = app?.callsTarget
+        ? `<span class="service-chain-hint">↪ ${t("trafficChainedHint")}: <code>${escapeHtmlText(app.callsTarget.url)}</code></span>`
+        : "";
+      if (type === "ClusterIP") return `<div class="service-route-hint">DNS <code>${service.name}</code>${chain}</div>`;
+      if (type === "NodePort") return `<div class="service-route-hint">${t("svcNodePortRoute", { port: service.nodePort })}${chain}</div>`;
+      if (type === "LoadBalancer") return `<div class="service-route-hint">LB <code>${service.externalIP}</code>${chain}</div>`;
       if (type === "ExternalName") return `<div class="service-route-hint">🔗 <code>${service.externalName}</code></div>`;
-      return "";
+      return chain ? `<div class="service-route-hint">${chain}</div>` : "";
     }
     function renderExternalAccess(services) {
       const layer = $("externalAccessLayer");
@@ -1048,6 +1220,201 @@ spec:
       });
       return targets;
     }
+    function getAppContainerPorts(app) {
+      const meta = app.manifestMeta || (app.yaml ? extractDeploymentManifestMeta(app.yaml) : null);
+      return meta?.containerPorts || [];
+    }
+    function resolveTargetPortOnPod(app, targetPortRaw) {
+      if (targetPortRaw === null || targetPortRaw === undefined) return null;
+      if (typeof targetPortRaw === "number") return targetPortRaw;
+      const raw = String(targetPortRaw).trim();
+      if (/^\d+$/.test(raw)) return Number(raw);
+      const doc = app.yaml || "";
+      const named = doc.match(new RegExp(`- name:\\s*${raw}[\\s\\S]*?containerPort:\\s*(\\d+)`, "m"));
+      if (named) return Number(named[1]);
+      const portBlocks = [...doc.matchAll(/ports:\s*\n([\s\S]*?)(?=\n\s*\w|\n\s*#|$)/m)];
+      for (const block of portBlocks) {
+        const local = block[1].match(new RegExp(`name:\\s*${raw}[\\s\\S]*?containerPort:\\s*(\\d+)`, "m"));
+        if (local) return Number(local[1]);
+      }
+      return null;
+    }
+    function validateTrafficPorts(app, service) {
+      const svc = normalizeServiceRecord(service);
+      if (svc.type === "ExternalName") return { ok: false, reason: "external" };
+      const containerPorts = getAppContainerPorts(app);
+      if (!containerPorts.length) return { ok: false, reason: "noContainerPorts", containerPorts: [], app, service: svc };
+      const svcPorts = svc.ports || [];
+      if (!svcPorts.length) return { ok: false, reason: "noServicePorts", containerPorts, app, service: svc };
+      const routing = [];
+      svcPorts.forEach(sp => {
+        const resolvedTarget = resolveTargetPortOnPod(app, sp.targetPort);
+        if (resolvedTarget != null && containerPorts.includes(resolvedTarget)) {
+          routing.push({ servicePort: sp.port, targetPort: resolvedTarget, nodePort: sp.nodePort || null });
+        }
+      });
+      if (!routing.length) {
+        return {
+          ok: false,
+          reason: "portMismatch",
+          serviceTargets: svcPorts.map(p => p.targetPort),
+          containerPorts,
+          app,
+          service: svc
+        };
+      }
+      return { ok: true, routing, primary: routing[0], app, service: svc };
+    }
+    function appForService(service) {
+      const selector = service.selector;
+      if (selector) {
+        const bySelector = state.apps[selector] || Object.values(state.apps).find(app => {
+          const meta = app.manifestMeta;
+          return app.name === selector || meta?.selectorApp === selector || meta?.templateApp === selector;
+        });
+        if (bySelector) return bySelector;
+      }
+      return state.apps[service.name] || Object.values(state.apps).find(app => app.name === service.name);
+    }
+    function findServiceForApp(app, services) {
+      return services.find(item => {
+        const selector = item.selector;
+        if (!selector) return item.name === app.name;
+        if (selector === app.name || item.name === app.name) return true;
+        const meta = app.manifestMeta;
+        if (meta?.selectorApp && selector === meta.selectorApp) return true;
+        if (meta?.templateApp && selector === meta.templateApp) return true;
+        return false;
+      });
+    }
+    function listBackendCandidates(fromAppName) {
+      const byApp = new Map();
+      Object.values(state.services).forEach(raw => {
+        const svc = normalizeServiceRecord(raw);
+        if (svc.type === "ExternalName") return;
+        const targetApp = appForService(svc);
+        if (!targetApp || targetApp.name === fromAppName) return;
+        const existing = byApp.get(targetApp.name);
+        const preferred = state.apps[targetApp.name]?.serviceName === svc.name;
+        if (!existing || preferred) byApp.set(targetApp.name, { app: targetApp, service: svc });
+      });
+      return Array.from(byApp.values()).sort((a, b) => a.app.name.localeCompare(b.app.name));
+    }
+    function buildCallsTargetFromCandidate(candidate) {
+      const portCheck = validateTrafficPorts(candidate.app, candidate.service);
+      const sport = portCheck.ok
+        ? portCheck.primary.servicePort
+        : (candidate.service.ports?.[0]?.port ?? candidate.service.ports?.[0] ?? 80);
+      const portNum = typeof sport === "number" ? sport : Number(sport) || 80;
+      return {
+        appName: candidate.app.name,
+        serviceName: candidate.service.name,
+        servicePort: portNum,
+        image: candidate.app.image,
+        url: `http://${candidate.service.name}:${portNum}`,
+        portValid: portCheck.ok
+      };
+    }
+    function backendCandidateLabel(candidate) {
+      const portCheck = validateTrafficPorts(candidate.app, candidate.service);
+      const base = `${candidate.app.name} · ${candidate.service.name}`;
+      if (!portCheck.ok) return `${base} (${t("meshBackendPortWarn")})`;
+      return `${base} :${portCheck.primary.servicePort}`;
+    }
+    function reconcileCallsTargets() {
+      Object.values(state.apps).forEach(fromApp => {
+        if (!fromApp.callsTarget) return;
+        const targetName = fromApp.callsTarget.appName;
+        if (state.apps[targetName]) {
+          const candidate = listBackendCandidates(fromApp.name).find(item => item.app.name === targetName);
+          if (candidate) fromApp.callsTarget = buildCallsTargetFromCandidate(candidate);
+          return;
+        }
+        const svc = state.services[fromApp.callsTarget.serviceName];
+        const resolved = svc ? appForService(svc) : null;
+        if (resolved) {
+          const candidate = { app: resolved, service: normalizeServiceRecord(svc) };
+          fromApp.callsTarget = buildCallsTargetFromCandidate(candidate);
+          return;
+        }
+        fromApp.callsTarget = null;
+      });
+    }
+    function buildTrafficIngressPath(serviceMeta) {
+      const world = $("world");
+      const serviceEl = document.querySelector(`.service[data-service="${serviceMeta.name}"]`);
+      if (!serviceEl) return null;
+      const worldRect = world.getBoundingClientRect();
+      const centerOf = element => {
+        const rect = element.getBoundingClientRect();
+        return { x: rect.left - worldRect.left + rect.width / 2, y: rect.top - worldRect.top + rect.height / 2 };
+      };
+      const type = serviceMeta.type || "ClusterIP";
+      const points = [];
+      if (type === "LoadBalancer") {
+        const client = document.querySelector(`#extClient-${serviceMeta.name}`) || document.querySelector(".external-client");
+        const lb = document.querySelector(`.load-balancer-box[data-service="${serviceMeta.name}"]`);
+        if (client) points.push(centerOf(client));
+        if (lb) points.push(centerOf(lb));
+      } else if (type === "NodePort") {
+        const client = document.querySelector(".nodeport-client");
+        const node = document.querySelector("#node-0");
+        if (client) points.push(centerOf(client));
+        else if (node) points.push(centerOf(node));
+      }
+      points.push(centerOf(serviceEl));
+      const hopMs = trafficHopMs(type === "ClusterIP" ? 620 : 480);
+      return { points, hopMs };
+    }
+    function animateTrafficPortBlocked(serviceRecord) {
+      const path = buildTrafficIngressPath(serviceRecord);
+      if (!path || path.points.length < 1) return;
+      const world = $("world");
+      const packet = document.createElement("div");
+      packet.className = "packet traffic-packet traffic-request";
+      packet.textContent = t("request");
+      trafficSim.packetZ += 1;
+      packet.style.zIndex = String(trafficSim.packetZ);
+      world.appendChild(packet);
+      const moveTo = (point, animate) => {
+        packet.style.transition = animate ? `left ${path.hopMs / 1000}s cubic-bezier(.2,.75,.35,1), top ${path.hopMs / 1000}s cubic-bezier(.2,.75,.35,1), opacity .25s` : "none";
+        packet.style.left = `${point.x}px`;
+        packet.style.top = `${point.y}px`;
+      };
+      moveTo(path.points[0], false);
+      void packet.offsetWidth;
+      let hop = 1;
+      const advance = () => {
+        if (hop >= path.points.length) {
+          packet.classList.remove("traffic-request");
+          packet.classList.add("traffic-blocked");
+          packet.textContent = t("trafficPortBlockedLabel");
+          setTimeout(() => { packet.style.opacity = "0"; setTimeout(() => packet.remove(), 260); }, 700);
+          return;
+        }
+        moveTo(path.points[hop], true);
+        hop += 1;
+        setTimeout(advance, path.hopMs);
+      };
+      setTimeout(advance, 30);
+    }
+    function reportTrafficPortFailure(portCheck) {
+      const app = portCheck.app;
+      const svc = portCheck.service;
+      if (portCheck.reason === "noContainerPorts") {
+        $("eventText").innerHTML = `<span>${t("trafficNoContainerPorts", { app: app.name })}</span>`;
+      } else if (portCheck.reason === "noServicePorts") {
+        $("eventText").innerHTML = `<span>${t("trafficNoServicePorts", { svc: svc.name })}</span>`;
+      } else if (portCheck.reason === "portMismatch") {
+        $("eventText").innerHTML = `<span>${t("trafficPortMismatch", { svc: svc.name, targets: portCheck.serviceTargets.join(", "), containers: portCheck.containerPorts.join(", ") })}</span>`;
+        animateTrafficPortBlocked(svc);
+      }
+      const toastKey = portCheck.reason === "portMismatch" ? "trafficPortMismatch" : portCheck.reason === "noContainerPorts" ? "trafficNoContainerPorts" : "trafficNoServicePorts";
+      const toastValues = portCheck.reason === "portMismatch"
+        ? { svc: svc.name, targets: portCheck.serviceTargets.join(", "), containers: portCheck.containerPorts.join(", ") }
+        : portCheck.reason === "noContainerPorts" ? { app: app.name } : { svc: svc.name };
+      showToast(t(toastKey, toastValues));
+    }
     function pickPodTarget(app) {
       const available = listReadyPodTargets(app.name).filter(target => !isNodeBusy(target.nodeIndex));
       if (!available.length) return null;
@@ -1089,7 +1456,7 @@ spec:
         else if (node) points.push(centerOf(node));
       }
       points.push(centerOf(service), centerOf(podEl));
-      const hopMs = type === "ClusterIP" ? 620 : 480;
+      const hopMs = trafficHopMs(type === "ClusterIP" ? 620 : 480);
       const legs = Math.max(0, points.length - 1);
       return { points, hopMs, legs, roundTripMs: hopMs * legs * 2 };
     }
@@ -1097,6 +1464,90 @@ spec:
       const path = buildTrafficPath(serviceRecord, podEl);
       if (!path) return 2400;
       return path.roundTripMs + processMs + 320;
+    }
+    function estimateChainedTrafficMs(frontService, frontPodEl, backService, backPodEl, options = {}) {
+      const ingress = buildTrafficPath(frontService, frontPodEl);
+      const internal = buildPodToPodPath(backService, frontPodEl, backPodEl);
+      if (!ingress || !internal) return estimateTrafficRoundTripMs(frontService, frontPodEl, options.processMs);
+      const processFrontMs = options.processFrontMs ?? 260;
+      const processBackMs = options.processBackMs ?? 360;
+      const forwardLegs = (ingress.points.length - 1) + (internal.points.length - 1);
+      const hopBlend = (ingress.hopMs + internal.hopMs) / 2;
+      return forwardLegs * hopBlend * 2 + processFrontMs + processBackMs + 360;
+    }
+    function animateAlongPoints(packet, points, hopMsList, onArrive) {
+      if (!points.length) {
+        onArrive?.();
+        return;
+      }
+      const moveTo = (point, animate, ms) => {
+        packet.style.transition = animate ? `left ${ms / 1000}s cubic-bezier(.2,.75,.35,1), top ${ms / 1000}s cubic-bezier(.2,.75,.35,1), opacity .25s` : "none";
+        packet.style.left = `${point.x}px`;
+        packet.style.top = `${point.y}px`;
+      };
+      moveTo(points[0], false, hopMsList[0] || trafficHopMs(480));
+      void packet.offsetWidth;
+      let hop = 1;
+      const step = () => {
+        if (hop >= points.length) {
+          onArrive?.();
+          return;
+        }
+        const ms = hopMsList[hop - 1] || hopMsList[0] || trafficHopMs(480);
+        moveTo(points[hop], true, ms);
+        hop += 1;
+        setTimeout(step, ms);
+      };
+      setTimeout(step, 30);
+    }
+    function animateChainedServiceTraffic(frontService, frontPodEl, backService, backPodEl, label, options = {}) {
+      const ingress = buildTrafficPath(frontService, frontPodEl);
+      const internal = buildPodToPodPath(backService, frontPodEl, backPodEl);
+      if (!ingress || !internal) return animateTrafficRoundTrip(frontService, frontPodEl, label, options);
+      const processFrontMs = options.processFrontMs ?? 260;
+      const processBackMs = options.processBackMs ?? 360;
+      const forwardPoints = [...ingress.points, internal.points[1], internal.points[2]];
+      const backwardPoints = [internal.points[2], internal.points[1], ...ingress.points.slice(0, -1).reverse()];
+      const forwardHops = [];
+      for (let i = 0; i < forwardPoints.length - 1; i += 1) {
+        forwardHops.push(i < ingress.points.length - 1 ? ingress.hopMs : internal.hopMs);
+      }
+      const backwardHops = [];
+      for (let i = 0; i < backwardPoints.length - 1; i += 1) {
+        backwardHops.push(i < internal.points.length - 1 ? internal.hopMs : ingress.hopMs);
+      }
+      const world = $("world");
+      const packet = document.createElement("div");
+      packet.className = "packet traffic-packet traffic-request";
+      packet.textContent = label || t("request");
+      trafficSim.packetZ += 1;
+      packet.style.zIndex = String(trafficSim.packetZ);
+      world.appendChild(packet);
+      const runBackward = () => {
+        animateAlongPoints(packet, backwardPoints, backwardHops, () => {
+          packet.style.opacity = "0";
+          setTimeout(() => packet.remove(), 240);
+        });
+      };
+      animateAlongPoints(packet, forwardPoints, forwardHops, () => {
+        frontPodEl.classList.add("processing");
+        packet.classList.remove("traffic-request");
+        packet.classList.add("traffic-internal");
+        packet.textContent = "API";
+        setTimeout(() => {
+          frontPodEl.classList.remove("processing");
+          backPodEl.classList.add("processing");
+          packet.textContent = t("trafficProcessing");
+          setTimeout(() => {
+            backPodEl.classList.remove("processing");
+            packet.classList.remove("traffic-processing");
+            packet.classList.add("traffic-response");
+            packet.textContent = t("trafficResponse");
+            runBackward();
+          }, processBackMs);
+        }, processFrontMs);
+      });
+      return estimateChainedTrafficMs(frontService, frontPodEl, backService, backPodEl, options);
     }
     function animateTrafficRoundTrip(serviceRecord, podEl, label, options = {}) {
       const path = buildTrafficPath(serviceRecord, podEl);
@@ -1157,6 +1608,20 @@ spec:
       if (ctx.error === "external") return { ok: false, reason: "external" };
       if (ctx.error === "notReady") return { ok: false, reason: "notReady" };
       const { app, service } = ctx;
+      const portCheck = validateTrafficPorts(app, service);
+      if (!portCheck.ok) {
+        if (!options.silentEvent) reportTrafficPortFailure(portCheck);
+        return { ok: false, reason: portCheck.reason };
+      }
+      const chainApp = app.callsTarget ? state.apps[app.callsTarget.appName] : null;
+      if (chainApp?.service) {
+        const backSvc = normalizeServiceRecord(state.services[chainApp.serviceName]);
+        const backPortCheck = validateTrafficPorts(chainApp, backSvc);
+        if (!backPortCheck.ok) {
+          if (!options.silentEvent) reportTrafficPortFailure(backPortCheck);
+          return { ok: false, reason: backPortCheck.reason };
+        }
+      }
       const target = pickPodTarget(app);
       if (!target) {
         if (options.queue !== false) {
@@ -1165,20 +1630,55 @@ spec:
         }
         return { ok: false, reason: "busy" };
       }
+      let backTarget = null;
+      if (chainApp?.service) {
+        backTarget = pickPodTarget(chainApp);
+        if (!backTarget) {
+          if (options.queue !== false) {
+            trafficSim.queue.push({ app, service, options: { ...options, appName: app.name } });
+            return { ok: true, queued: true };
+          }
+          return { ok: false, reason: "busy" };
+        }
+      }
       state.traffic += 1;
       const processMs = options.processMs ?? 420;
-      const roundTripMs = estimateTrafficRoundTripMs(service, target.pod, processMs);
+      const chained = Boolean(chainApp?.service && backTarget);
+      const backSvc = chained ? normalizeServiceRecord(state.services[chainApp.serviceName]) : null;
+      const roundTripMs = chained
+        ? estimateChainedTrafficMs(service, target.pod, backSvc, backTarget.pod, { processMs })
+        : estimateTrafficRoundTripMs(service, target.pod, processMs);
       const nodeHoldMs = options.nodeHoldMs ?? roundTripMs;
       lockNode(target.nodeIndex, nodeHoldMs);
       target.pod.classList.add("serving");
       setTimeout(() => target.pod.classList.remove("serving"), nodeHoldMs);
-      const flyMs = animateTrafficRoundTrip(service, target.pod, `#${state.traffic}`, { processMs });
+      let flyMs;
+      if (chained) {
+        lockNode(backTarget.nodeIndex, nodeHoldMs);
+        backTarget.pod.classList.add("serving");
+        setTimeout(() => backTarget.pod.classList.remove("serving"), nodeHoldMs);
+        flyMs = animateChainedServiceTraffic(service, target.pod, backSvc, backTarget.pod, `#${state.traffic}`, { processMs });
+      } else {
+        flyMs = animateTrafficRoundTrip(service, target.pod, `#${state.traffic}`, { processMs });
+      }
       if (!options.silentEvent) {
         $("trafficLine").classList.add("hot");
-        $("eventText").innerHTML = `<span>${trafficEventForService(app, service)} → <b>node-${target.nodeIndex + 1}</b> → ${t("trafficResponse")}</span>`;
+        const route = portCheck.primary;
+        const routeHint = route ? ` • ${t("trafficPortOk", { sport: route.servicePort, target: route.targetPort })}` : "";
+        if (chained) {
+          $("eventText").innerHTML = `<span>${t("trafficChainedEvent", {
+            n: state.traffic,
+            entrySvc: service.name,
+            from: app.name,
+            url: app.callsTarget.url,
+            to: chainApp.name
+          })}${routeHint}</span>`;
+        } else {
+          $("eventText").innerHTML = `<span>${trafficEventForService(app, service)} → <b>node-${target.nodeIndex + 1}</b>${routeHint} → ${t("trafficResponse")}</span>`;
+        }
         setTimeout(() => $("trafficLine").classList.remove("hot"), flyMs + 120);
       }
-      return { ok: true, queued: false, nodeIndex: target.nodeIndex, flyMs };
+      return { ok: true, queued: false, nodeIndex: target.nodeIndex, flyMs, chained };
     }
     function drainTrafficQueue() {
       while (trafficSim.queue.length) {
@@ -1206,6 +1706,11 @@ spec:
       if (ctx.error === "noService") return showToast(t("noService"));
       if (ctx.error === "external") return showToast(t("svcExternalNameTraffic"));
       if (ctx.error === "notReady") return showToast(t("probeNoReadyPod"));
+      const portCheck = validateTrafficPorts(ctx.app, ctx.service);
+      if (!portCheck.ok) {
+        reportTrafficPortFailure(portCheck);
+        return;
+      }
       if (trafficSim.burstActive) return;
       trafficSim.burstActive = true;
       renderActionMenu();
@@ -1314,17 +1819,298 @@ spec:
         return `<div class="advanced-field"><b>${row.label}</b><span>${row.value}</span></div>`;
       }).join("");
     }
-    function resolveK8sDocKey(id) {
+    const SERVICE_TYPE_DOC_KEYS = ["service-clusterip", "service-nodeport", "service-loadbalancer", "service-externalname"];
+    function serviceTypeFromMetadata(metadata = {}) {
+      const service = state.services[metadata.serviceName];
+      if (!service) return "ClusterIP";
+      return normalizeServiceRecord(service).type || "ClusterIP";
+    }
+    function serviceDocKeyForType(type) {
+      return ({ ClusterIP: "service-clusterip", NodePort: "service-nodeport", LoadBalancer: "service-loadbalancer", ExternalName: "service-externalname" })[type] || "service-clusterip";
+    }
+    function serviceTypeDocLocale(type) {
+      const doc = k8sApiDocs[serviceDocKeyForType(type)];
+      if (!doc) return null;
+      return language === "en-US" ? doc.en : doc.pt;
+    }
+    function resolveK8sDocKey(id, metadata = {}) {
+      if (id === "service") return serviceDocKeyForType(serviceTypeFromMetadata(metadata));
       if (id === "pod" && state.probeLabActive) return "probes";
       if (k8sApiDocs[id]) return id;
       return "cluster";
     }
-    function renderK8sDocumentationHtml(id) {
-      const key = resolveK8sDocKey(id);
-      const doc = k8sApiDocs[key] || k8sApiDocs.cluster;
+    function renderK8sDocTable(doc) {
       const locale = language === "en-US" ? doc.en : doc.pt;
       const rows = locale.fields.map(field => `<tr><td><code>${field.path}</code></td><td>${field.type}</td><td>${field.desc}</td></tr>`).join("");
       return `<p class="k8s-doc-intro">${locale.intro}</p><a class="k8s-doc-link" href="${doc.url}" target="_blank" rel="noopener noreferrer">${t("k8sDocSource")}: ${doc.kind}${doc.apiVersion !== "—" ? ` (${doc.apiVersion})` : ""}</a><table class="k8s-doc-table"><thead><tr><th>${t("k8sDocField")}</th><th>${t("k8sDocType")}</th><th>${t("k8sDocDescription")}</th></tr></thead><tbody>${rows}</tbody></table>`;
+    }
+    function renderServiceTypesComparisonHtml(activeType) {
+      const activeKey = serviceDocKeyForType(activeType);
+      const cards = SERVICE_TYPE_DOC_KEYS.map(key => {
+        const doc = k8sApiDocs[key];
+        const locale = language === "en-US" ? doc.en : doc.pt;
+        const active = key === activeKey ? " active" : "";
+        const badge = key === activeKey ? `<span class="k8s-doc-type-badge">${t("k8sDocTypeActive")}</span>` : "";
+        return `<article class="k8s-doc-type-card${active}">${badge}<b>${doc.kind}</b><p>${locale.summary || locale.intro}</p><a href="${doc.url}" target="_blank" rel="noopener noreferrer">${t("k8sDocSource")}</a></article>`;
+      }).join("");
+      return `<section class="k8s-doc-types"><h3 class="k8s-doc-types-title">${t("k8sDocServiceTypesTitle")}</h3><div class="k8s-doc-type-grid">${cards}</div></section>`;
+    }
+    function renderK8sDocumentationHtml(id, metadata = {}) {
+      const key = resolveK8sDocKey(id, metadata);
+      const doc = k8sApiDocs[key] || k8sApiDocs.cluster;
+      if (id !== "service") return renderK8sDocTable(doc);
+      const svcType = serviceTypeFromMetadata(metadata);
+      const locale = serviceTypeDocLocale(svcType);
+      const genericTitle = language === "en-US" ? "Generic Service API" : "API genérica de Service";
+      let html = `<span class="k8s-doc-type-badge">${t("k8sDocYourType")}: ${svcType}</span>`;
+      if (locale?.summary) html += `<p class="k8s-doc-intro"><strong>${locale.summary}</strong></p>`;
+      html += renderK8sDocTable(doc);
+      html += renderServiceTypesComparisonHtml(svcType);
+      html += `<section class="k8s-doc-types"><h3 class="k8s-doc-types-title">${genericTitle}</h3>${renderK8sDocTable(k8sApiDocs.service)}</section>`;
+      return html;
+    }
+    function escapeHtmlText(value) {
+      return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+    }
+    function resolveInspectAppName(id, metadata = {}) {
+      if (id === "pod") return metadata.appName || state.selectedApp;
+      if (id === "deployment") return metadata.appName || state.selectedApp || Object.keys(state.apps)[0];
+      if (id === "service") {
+        return metadata.appName || state.services[metadata.serviceName]?.selector || null;
+      }
+      return null;
+    }
+    function backendSelectOptions(fromAppName, selectedApp) {
+      const backends = listBackendCandidates(fromAppName);
+      let html = `<option value="">${escapeHtmlText(t("containerConfigNone"))}</option>`;
+      if (!backends.length) {
+        html += `<option value="" disabled>${escapeHtmlText(t("meshNoBackend"))}</option>`;
+        return html;
+      }
+      backends.forEach(candidate => {
+        const label = `${backendCandidateLabel(candidate)} — ${candidate.app.image}`;
+        html += `<option value="${escapeHtmlText(candidate.app.name)}"${selectedApp === candidate.app.name ? " selected" : ""}>${escapeHtmlText(label)}</option>`;
+      });
+      if (selectedApp && !backends.some(item => item.app.name === selectedApp)) {
+        const orphan = state.apps[selectedApp];
+        if (orphan) {
+          html += `<option value="${escapeHtmlText(selectedApp)}" selected>${escapeHtmlText(selectedApp)} (${t("meshBackendMissing")})</option>`;
+        }
+      }
+      return html;
+    }
+    function renderWorkloadMeshTable(hostElement, filterAppName = null) {
+      const apps = Object.values(state.apps);
+      const visible = filterAppName ? apps.filter(app => app.name === filterAppName) : apps;
+      if (!visible.length) {
+        hostElement.innerHTML = "";
+        return;
+      }
+      const rows = visible.map(app => {
+        const selected = app.callsTarget?.appName || "";
+        return `<tr><td><b>${escapeHtmlText(app.name)}</b></td><td><code>${escapeHtmlText(app.image)}</code></td><td><select class="mesh-backend-select" data-from-app="${escapeHtmlText(app.name)}">${backendSelectOptions(app.name, selected)}</select></td></tr>`;
+      }).join("");
+      hostElement.innerHTML = `<table class="workload-mesh-table"><thead><tr><th>${t("workloadMeshColumnApp")}</th><th>${t("workloadMeshColumnImage")}</th><th>${t("workloadMeshColumnBackend")}</th></tr></thead><tbody>${rows}</tbody></table>`;
+      hostElement.querySelectorAll(".mesh-backend-select").forEach(select => {
+        select.onchange = () => setAppCallsTarget(select.dataset.fromApp, select.value || null);
+      });
+    }
+    function renderWorkloadMeshSidebar() {
+      const panel = $("workloadMeshPanel");
+      const note = $("workloadMeshNote");
+      if (!panel || !note) return;
+      const apps = Object.values(state.apps);
+      const emptyEl = note.querySelector(".workload-mesh-empty");
+      if (!state.deployed || !apps.length) {
+        if (emptyEl) {
+          emptyEl.style.display = "block";
+          emptyEl.textContent = t("workloadMeshEmpty");
+        }
+        panel.innerHTML = "";
+        return;
+      }
+      if (emptyEl) emptyEl.style.display = apps.length < 2 ? "block" : "none";
+      if (apps.length < 2 && emptyEl) emptyEl.textContent = t("workloadMeshEmpty");
+      panel.innerHTML = `<p style="margin:0 0 8px;color:var(--muted);font-size:11px;line-height:1.5">${t("workloadMeshIntro")}</p>`;
+      const wrap = document.createElement("div");
+      panel.appendChild(wrap);
+      renderWorkloadMeshTable(wrap, null);
+    }
+    function setAppCallsTarget(fromAppName, toAppName) {
+      const fromApp = state.apps[fromAppName];
+      if (!fromApp) return;
+      if (!toAppName) {
+        fromApp.callsTarget = null;
+        renderWorld();
+        if (state.inspectTarget) renderCommunicationPanel(state.inspectTarget.id, state.inspectTarget.metadata);
+        renderWorkloadMeshSidebar();
+        return;
+      }
+      const candidate = listBackendCandidates(fromAppName).find(item => item.app.name === toAppName);
+      if (!candidate) {
+        showToast(t("meshNoBackend"));
+        return;
+      }
+      fromApp.callsTarget = buildCallsTargetFromCandidate(candidate);
+      if (!fromApp.callsTarget.portValid) showToast(t("containerCallPortFail"));
+      renderWorld();
+      renderWorkloadMeshSidebar();
+      if (state.inspectTarget) renderCommunicationPanel(state.inspectTarget.id, state.inspectTarget.metadata);
+    }
+    function updateContainerTabVisibility(id) {
+      const show = id === "pod" || id === "deployment" || id === "cluster" || id === "service";
+      $("zoomTabContainer").classList.toggle("hidden-tab", !show);
+      if (!show && state.zoomActiveTab === "container") state.zoomActiveTab = "overview";
+    }
+    function renderCommunicationPanel(inspectId, metadata = {}) {
+      const host = $("zoomContainerConfig");
+      if (!host) return;
+      if (inspectId === "cluster") {
+        host.innerHTML = `<p>${t("workloadMeshIntro")}</p><h3 style="margin:12px 0 8px;font-size:13px;color:var(--cyan)">${t("workloadMeshClusterTitle")}</h3><div id="zoomMeshTableHost"></div>`;
+        const tableHost = $("zoomMeshTableHost");
+        if (!state.deployed || !Object.keys(state.apps).length) {
+          tableHost.innerHTML = `<p class="workload-mesh-empty">${t("workloadMeshEmpty")}</p>`;
+        } else {
+          renderWorkloadMeshTable(tableHost, null);
+        }
+        return;
+      }
+      const fromAppName = resolveInspectAppName(inspectId, metadata);
+      const app = fromAppName ? state.apps[fromAppName] : null;
+      if (!app || (inspectId !== "pod" && inspectId !== "deployment" && inspectId !== "service")) {
+        host.innerHTML = "";
+        return;
+      }
+      const url = app.callsTarget?.url;
+      const urlBlock = url ? `GET <code>${escapeHtmlText(url)}/…</code>` : "—";
+      const flow = app.callsTarget
+        ? t("containerConfigFlow", {
+          from: fromAppName,
+          fromImage: app.image,
+          svc: app.callsTarget.serviceName,
+          to: app.callsTarget.appName,
+          toImage: app.callsTarget.image
+        })
+        : "";
+      host.innerHTML = `
+        <p>${t("workloadMeshIntro")}</p>
+        <div class="container-config-field">
+          <label for="containerTargetSelect">${t("containerConfigSelect")}</label>
+          <select id="containerTargetSelect">${backendSelectOptions(fromAppName, app.callsTarget?.appName || "")}</select>
+        </div>
+        <div class="container-config-field">
+          <label>${t("containerConfigUrl")}</label>
+          <div class="container-config-url">${urlBlock}</div>
+        </div>
+        ${flow ? `<div class="container-call-flow">${flow}</div>` : ""}
+        <p style="margin:10px 0 0;color:var(--muted);font-size:11px">${t("containerConfigIntro")}</p>
+        <div class="container-config-actions">
+          <button type="button" class="primary" id="containerSimulateBtn"${app.callsTarget ? "" : " disabled"}>${t("containerConfigSimulate")}</button>
+        </div>`;
+      const select = $("containerTargetSelect");
+      if (select) select.onchange = () => setAppCallsTarget(fromAppName, select.value || null);
+      const simulateBtn = $("containerSimulateBtn");
+      if (simulateBtn) simulateBtn.onclick = () => simulateContainerToContainerCall(fromAppName, metadata);
+    }
+    function buildPodToPodPath(serviceMeta, fromPodEl, toPodEl) {
+      const world = $("world");
+      const serviceEl = document.querySelector(`.service[data-service="${serviceMeta.name}"]`);
+      if (!serviceEl || !fromPodEl || !toPodEl) return null;
+      const worldRect = world.getBoundingClientRect();
+      const centerOf = element => {
+        const rect = element.getBoundingClientRect();
+        return { x: rect.left - worldRect.left + rect.width / 2, y: rect.top - worldRect.top + rect.height / 2 };
+      };
+      const hopMs = trafficHopMs(520);
+      const points = [centerOf(fromPodEl), centerOf(serviceEl), centerOf(toPodEl)];
+      const legs = Math.max(0, points.length - 1);
+      return { points, hopMs, roundTripMs: hopMs * legs * 2 };
+    }
+    function animatePodToPodRoundTrip(fromPodEl, serviceRecord, toPodEl, label) {
+      const path = buildPodToPodPath(serviceRecord, fromPodEl, toPodEl);
+      if (!path) return 900;
+      const processMs = 380;
+      const world = $("world");
+      const packet = document.createElement("div");
+      packet.className = "packet traffic-packet traffic-internal";
+      packet.textContent = label || "API";
+      trafficSim.packetZ += 1;
+      packet.style.zIndex = String(trafficSim.packetZ);
+      world.appendChild(packet);
+      const moveTo = (point, animate) => {
+        packet.style.transition = animate ? `left ${path.hopMs / 1000}s cubic-bezier(.2,.75,.35,1), top ${path.hopMs / 1000}s cubic-bezier(.2,.75,.35,1), opacity .25s` : "none";
+        packet.style.left = `${point.x}px`;
+        packet.style.top = `${point.y}px`;
+      };
+      moveTo(path.points[0], false);
+      void packet.offsetWidth;
+      let hop = 1;
+      const runForward = () => {
+        if (hop >= path.points.length) {
+          runProcessing();
+          return;
+        }
+        moveTo(path.points[hop], true);
+        hop += 1;
+        setTimeout(runForward, path.hopMs);
+      };
+      const runProcessing = () => {
+        toPodEl.classList.add("processing");
+        packet.textContent = t("trafficProcessing");
+        setTimeout(() => {
+          toPodEl.classList.remove("processing");
+          packet.classList.add("traffic-response");
+          packet.textContent = t("trafficResponse");
+          runBackward(path.points.length - 2);
+        }, processMs);
+      };
+      const runBackward = index => {
+        if (index < 0) {
+          packet.style.opacity = "0";
+          setTimeout(() => packet.remove(), 240);
+          return;
+        }
+        moveTo(path.points[index], true);
+        setTimeout(() => runBackward(index - 1), path.hopMs);
+      };
+      setTimeout(runForward, 30);
+      return path.roundTripMs + processMs + 320;
+    }
+    function simulateContainerToContainerCall(fromAppName, metadata = {}) {
+      const fromApp = state.apps[fromAppName];
+      if (!fromApp?.callsTarget) {
+        showToast(t("containerCallNoTarget"));
+        return;
+      }
+      const toApp = state.apps[fromApp.callsTarget.appName];
+      if (!toApp?.service) {
+        showToast(t("containerCallNoTarget"));
+        return;
+      }
+      const service = normalizeServiceRecord(state.services[toApp.serviceName]);
+      const portCheck = validateTrafficPorts(toApp, service);
+      if (!portCheck.ok) {
+        $("eventText").innerHTML = `<span>${t("containerCallPortFail")}</span>`;
+        reportTrafficPortFailure(portCheck);
+        return;
+      }
+      const fromTargets = listReadyPodTargets(fromAppName).filter(target => !isNodeBusy(target.nodeIndex));
+      if (!fromTargets.length) return showToast(t("probeNoReadyPod"));
+      const fromTarget = fromTargets[0];
+      const toTarget = pickPodTarget(toApp);
+      if (!toTarget) return showToast(t("trafficNodeBusy"));
+      const roundTripMs = animatePodToPodRoundTrip(fromTarget.pod, service, toTarget.pod, "API");
+      lockNode(fromTarget.nodeIndex, roundTripMs);
+      lockNode(toTarget.nodeIndex, roundTripMs);
+      fromTarget.pod.classList.add("serving");
+      toTarget.pod.classList.add("serving");
+      setTimeout(() => {
+        fromTarget.pod.classList.remove("serving");
+        toTarget.pod.classList.remove("serving");
+      }, roundTripMs);
+      const route = portCheck.primary;
+      const routeHint = route ? ` • ${t("trafficPortOk", { sport: route.servicePort, target: route.targetPort })}` : "";
+      $("eventText").innerHTML = `<span>${t("containerCallEvent", { from: fromAppName, url: fromApp.callsTarget.url, to: toApp.name })}${routeHint}</span>`;
     }
     function switchZoomTab(tab) {
       state.zoomActiveTab = tab;
@@ -1336,11 +2122,16 @@ spec:
       $("zoomPanelOverview").classList.toggle("hidden", tab !== "overview");
       $("zoomPanelAdvanced").classList.toggle("hidden", tab !== "advanced");
       $("zoomPanelDocs").classList.toggle("hidden", tab !== "docs");
+      $("zoomPanelContainer").classList.toggle("hidden", tab !== "container");
+      if (tab === "container" && state.inspectTarget) {
+        renderCommunicationPanel(state.inspectTarget.id, state.inspectTarget.metadata);
+      }
     }
     function refreshZoomTabLabels() {
       $("zoomTabOverview").textContent = t("zoomTabOverview");
       $("zoomTabAdvanced").textContent = t("zoomTabAdvanced");
       $("zoomTabDocs").textContent = t("zoomTabDocs");
+      $("zoomTabContainer").textContent = t("zoomTabContainer");
       $("zoomAdvancedYamlLabel").textContent = t("advManifestTitle");
     }
     function defaultProbeRuntime() {
@@ -1566,7 +2357,7 @@ spec:
       if (result.nodes !== null && (result.nodes < 1 || result.nodes > 20)) throw new Error(t("nodesRange"));
       result.apps.forEach(app => {
         if (app.replicas < 1 || app.replicas > 50) throw new Error(t("replicasRange", { name: app.name }));
-        const service = result.services.find(item => item.selector === app.name || item.name === app.name);
+        const service = findServiceForApp(app, result.services);
         app.service = Boolean(service);
         app.serviceName = service ? service.name : app.name;
       });
@@ -1601,14 +2392,22 @@ spec:
         if (!allParsedApps.length) throw new Error(t("missingDeployment"));
         const apps = {};
         allParsedApps.forEach(app => {
-          const service = allServices.find(item => item.selector === app.name || item.name === app.name);
-          apps[app.name] = { ...app, service: Boolean(service), serviceName: service ? service.name : app.name, color: Object.keys(apps).length % 2 ? "var(--purple)" : "var(--cyan)" };
+          const service = findServiceForApp(app, allServices);
+          apps[app.name] = {
+            ...app,
+            service: Boolean(service),
+            serviceName: service ? service.name : app.name,
+            color: Object.keys(apps).length % 2 ? "var(--purple)" : "var(--cyan)",
+            callsTarget: state.apps[app.name]?.callsTarget || null
+          };
         });
         const wasDeployed = state.deployed;
         const previousReplicas = state.replicas;
         if (firstWithNodes) { state.nodes = firstWithNodes.parsed.nodes; state.clusterYaml = firstWithNodes.parsed.clusterYaml; }
         state.services = Object.fromEntries(allServices.map(service => [service.name, normalizeServiceRecord(service)]));
-        state.apps = apps; state.selectedApp = apps["app-web"] ? "app-web" : Object.keys(apps)[0];
+        state.apps = apps;
+        reconcileCallsTargets();
+        state.selectedApp = apps["app-web"] ? "app-web" : Object.keys(apps)[0];
         state.replicas = apps["app-web"]?.replicas || apps[state.selectedApp].replicas;
         state.image = apps["app-web"]?.image || apps[state.selectedApp].image;
         state.deployed = true; state.service = Object.values(apps).some(app => app.service); state.killed = false; state.killedApp = null; state.traffic = 0;
@@ -1719,6 +2518,16 @@ spec:
           [copy.selector, service?.selector || "—"],
           [copy.pods, endpointCount]
         ];
+        const typeDoc = serviceTypeDocLocale(svcType);
+        if (typeDoc?.summary) insightExtras.unshift([t("k8sDocYourType"), `<strong>${svcType}</strong> — ${typeDoc.summary}`]);
+        if (target && svcType !== "ExternalName") {
+          const portCheck = validateTrafficPorts(target, service);
+          if (portCheck.ok && portCheck.primary) {
+            insightExtras.push([language === "en-US" ? "Port routing" : "Roteamento de portas", t("trafficPortOk", { sport: portCheck.primary.servicePort, target: portCheck.primary.targetPort })]);
+          } else if (!portCheck.ok && portCheck.reason === "portMismatch") {
+            insightExtras.push([language === "en-US" ? "Port routing" : "Roteamento de portas", t("trafficPortMismatch", { svc: service.name, targets: portCheck.serviceTargets.join(", "), containers: portCheck.containerPorts.join(", ") })]);
+          }
+        }
         if (svcType === "ClusterIP") {
           telemetry.push([copy.dns, service ? `http://${service.name}` : "—"]);
           if (service) insightExtras.push([copy.dns, t("svcInsightClusterIP", { ip: service.clusterIP, name: service.name })]);
@@ -1747,7 +2556,9 @@ spec:
       $("zoomDetails").innerHTML = architectureInsightHtml(item, insightExtras);
       $("zoomAdvancedFields").innerHTML = advancedFieldsHtml(advancedFieldsForObject(id, metadata));
       $("zoomAdvancedYaml").textContent = yamlForObject(id, metadata);
-      $("zoomK8sDocs").innerHTML = renderK8sDocumentationHtml(id);
+      $("zoomK8sDocs").innerHTML = renderK8sDocumentationHtml(id, metadata);
+      updateContainerTabVisibility(id);
+      renderCommunicationPanel(id, metadata);
       refreshZoomTabLabels();
       switchZoomTab(state.zoomActiveTab || "overview");
       $("zoomFooter").textContent = copy.close;
@@ -1787,7 +2598,8 @@ spec:
       }
       const gen = probeLab && rt?.generation > 1 ? ` • g${rt.generation}` : "";
       const ready = !dead && (!probeLab || !rt || rt.ready);
-      return `<div class="pod ${extraClass}" id="pod-${i}" data-structure="pod" data-app="${app.name}" data-ready="${ready}" style="--app-color:${app.color || "var(--cyan)"}" tabindex="0"><b>${app.name}-${String(i).padStart(2, "0")}</b><small>${status}${gen} • ${app.image}</small></div>`;
+      const upstreamClass = app.callsTarget ? " has-upstream" : "";
+      return `<div class="pod ${extraClass}${upstreamClass}" id="pod-${i}" data-structure="pod" data-app="${app.name}" data-ready="${ready}" style="--app-color:${app.color || "var(--cyan)"}" tabindex="0"><b>${app.name}-${String(i).padStart(2, "0")}</b><small>${status}${gen} • ${app.image}</small></div>`;
     }
     function renderWorld() {
       const apps = Object.values(state.apps);
@@ -1817,11 +2629,12 @@ spec:
         const target = apps.find(app => app.name === service.selector || app.name === service.name);
         const endpointCount = type === "ExternalName" ? 0 : (target ? readyEndpointsForApp(target) : 0);
         const icon = type === "ExternalName" ? "🔗" : "🌐";
-        return `<div class="service ${serviceTypeClass(type)} ${state.selectedApp === target?.name ? "selected-service" : ""}" data-structure="service" data-service-type="${type}" data-app="${target?.name || ""}" data-service="${service.name}" tabindex="0"><span class="service-type-badge">${type}</span><b>${icon} ${service.name}</b><small>${serviceSubtitle(service, target, endpointCount)}</small>${serviceExtraHint(service)}</div>`;
+        return `<div class="service ${serviceTypeClass(type)} ${state.selectedApp === target?.name ? "selected-service" : ""}" data-structure="service" data-service-type="${type}" data-app="${target?.name || ""}" data-service="${service.name}" tabindex="0"><span class="service-type-badge">${type}</span><b>${icon} ${service.name}</b><small>${serviceSubtitle(service, target, endpointCount)}</small>${servicePortWarningHtml(service)}${serviceExtraHint(service)}</div>`;
       }).join("") : `<div class="service"><b>🌐 Services</b><small>${t("serviceEmpty")}</small></div>`;
       resizeWorld(distribution, services.length, apps.length);
       bindInspectors();
       syncNodeBusyVisuals();
+      renderWorkloadMeshSidebar();
       if (state.inspectTarget && !$("objectModal").classList.contains("hidden")) {
         openObjectDetail(state.inspectTarget.id, null, state.inspectTarget.metadata);
       }
@@ -1891,6 +2704,7 @@ spec:
         else if (result.reason === "external") showToast(t("svcExternalNameTraffic"));
         else if (result.reason === "notReady") showToast(t("probeNoReadyPod"));
         else if (result.reason === "busy") showToast(t("trafficRequestQueued"));
+        else if (result.reason === "portMismatch" || result.reason === "noContainerPorts" || result.reason === "noServicePorts") return;
         return;
       }
       if (result.queued) showToast(t("trafficRequestQueued"));
@@ -1968,11 +2782,29 @@ spec:
       renderManifestTabs();
       setYamlStatus("currentFile", { name });
     }
+    function nextWorkloadName() {
+      const used = new Set(Object.keys(state.apps));
+      manifestFiles.forEach(file => {
+        const match = file.content.match(/kind:\s*Deployment[\s\S]*?name:\s*["']?([A-Za-z0-9._-]+)["']?/m);
+        if (match) used.add(match[1]);
+      });
+      let index = manifestFiles.length + 1;
+      let name = `workload-${index}`;
+      while (used.has(name)) {
+        index += 1;
+        name = `workload-${index}`;
+      }
+      return name;
+    }
     function newYaml() {
       saveCurrentManifest();
       const index = manifestFiles.length + 1;
-      const appName = index === 2 ? "catalog-api" : `catalog-api-${index - 1}`;
-      manifestFiles.push({ id: `app-${index}`, name: `catalog-${index}.yaml`, content: secondaryYaml.replaceAll("catalog-api", appName) });
+      const appName = nextWorkloadName();
+      const workloadFiles = manifestFiles.filter(file => !/kind:\s*Cluster/m.test(file.content)).length;
+      const useApiTemplate = workloadFiles % 2 === 1;
+      const seed = useApiTemplate ? "catalog-api" : "app-web";
+      const template = useApiTemplate ? secondaryYaml : defaultYaml;
+      manifestFiles.push({ id: `app-${index}`, name: `${appName}.yaml`, content: template.replaceAll(seed, appName) });
       currentManifest = manifestFiles.length - 1;
       $("yamlEditor").value = manifestFiles[currentManifest].content;
       $("yamlEditor").dataset.dirty = "false";
