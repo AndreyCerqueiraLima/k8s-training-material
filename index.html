@@ -35,6 +35,7 @@
     main { display: block; padding: 18px clamp(16px, 4vw, 52px) 38px; max-width: 1600px; margin: auto; }
     .panel { background: linear-gradient(145deg, rgba(18,38,65,.96), rgba(8,22,39,.96)); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 14px 35px #0003; }
     .eyebrow { color: var(--cyan); font-size: 11px; text-transform: uppercase; letter-spacing: .12em; font-weight: 800; }
+    .zoom-shell .eyebrow, .zoom-shell #zoomEyebrow { color: var(--zoom-accent); }
     .content { min-width: 0; }
     .hero { display: flex; justify-content: space-between; align-items: end; gap: 15px; margin-bottom: 13px; }
     .hero h2 { margin: 3px 0 0; font-size: clamp(20px, 3vw, 30px); }
@@ -168,13 +169,14 @@
     .zoom-insights { display: flex; flex-direction: row; flex-wrap: wrap; align-items: stretch; gap: 10px; }
     .zoom-insights > .inspect-block { flex: 1 1 0; min-width: 155px; }
     .inspect-block { padding: 9px 10px; border-radius: 9px; background: #091a2c; border: 1px solid #244a69; }
-    .inspect-block b { display: block; color: var(--cyan); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+    .zoom-shell .inspect-block b { display: block; color: var(--zoom-accent); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
     .inspect-block span { display: block; color: #c8d8e8; font-size: 12px; line-height: 1.45; }
     .inspect-block.inspect-block-wide { flex: 1 1 100%; min-width: 100%; }
     .apiserver-terms { margin-top: 6px; }
     .apiserver-terms table { width: 100%; border-collapse: collapse; font-size: 12px; }
     .apiserver-terms th, .apiserver-terms td { padding: 6px 8px; border: 1px solid #244a69; text-align: left; vertical-align: top; }
     .apiserver-terms th { color: var(--cyan); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; background: #0c2238; }
+    .zoom-shell .apiserver-terms th { color: var(--zoom-accent); }
     .apiserver-terms p { margin: 0 0 8px; }
     .apiserver-terms p:last-child { margin-bottom: 0; margin-top: 8px; }
     .selected-structure { outline: 2px solid var(--yellow); outline-offset: 3px; }
@@ -222,22 +224,22 @@
     .object-modal { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; overflow: hidden; padding: 18px; background: #020812e8; backdrop-filter: blur(8px); }
     .object-modal.hidden { display: none; }
     .object-backdrop { position: absolute; inset: 0; }
-    .zoom-shell { position: relative; display: flex; flex-direction: column; width: min(900px, 100%); height: min(780px, calc(100vh - 36px)); max-height: calc(100vh - 36px); overflow: hidden; padding: 22px; border: 1px solid #5ddcff; border-radius: 18px; background: linear-gradient(145deg, #102f4b, #071321 72%); box-shadow: 0 0 0 1px #4dd9ff22, 0 0 45px #4dd9ff33, 0 25px 90px #000b; animation: zoomEnter .5s cubic-bezier(.16,1,.3,1); }
-    .zoom-shell::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, transparent 0 5px, #4dd9ff08 6px 7px); opacity: .45; }
-    .zoom-shell::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; pointer-events: none; background: var(--cyan); box-shadow: 0 0 14px var(--cyan); animation: scan 2.3s linear 1 forwards; }
+    .zoom-shell { --zoom-accent: var(--cyan); position: relative; display: flex; flex-direction: column; width: min(900px, 100%); height: min(780px, calc(100vh - 36px)); max-height: calc(100vh - 36px); overflow: hidden; padding: 22px; border: 1px solid color-mix(in srgb, var(--zoom-accent) 62%, white 12%); border-radius: 18px; background: linear-gradient(145deg, color-mix(in srgb, var(--zoom-accent) 16%, #102f4b), #071321 72%); box-shadow: 0 0 0 1px color-mix(in srgb, var(--zoom-accent) 18%, transparent), 0 0 45px color-mix(in srgb, var(--zoom-accent) 30%, transparent), 0 25px 90px #000b; animation: zoomEnter .5s cubic-bezier(.16,1,.3,1); transition: border-color .25s, box-shadow .25s, background .25s; }
+    .zoom-shell::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, transparent 0 5px, color-mix(in srgb, var(--zoom-accent) 7%, transparent) 6px 7px); opacity: .45; }
+    .zoom-shell::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; pointer-events: none; background: var(--zoom-accent); box-shadow: 0 0 14px var(--zoom-accent); animation: scan 2.3s linear 1 forwards; }
     @keyframes zoomEnter { from { opacity: 0; transform: scale(.38) translateY(80px) rotateX(16deg); filter: blur(8px); } 70% { transform: scale(1.015) translateY(-3px); } to { opacity: 1; transform: scale(1) translateY(0) rotateX(0); filter: blur(0); } }
     @keyframes scan { 0% { top: 0; opacity: 0; } 10% { opacity: .9; } 88% { opacity: .9; } 100% { top: calc(100% - 2px); opacity: 0; } }
     .zoom-header, .zoom-footer { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-    .zoom-header { padding-bottom: 15px; border-bottom: 1px solid #315b7b; }
+    .zoom-header { padding-bottom: 15px; border-bottom: 1px solid color-mix(in srgb, var(--zoom-accent) 38%, #315b7b); }
     .zoom-title { display: flex; align-items: center; gap: 12px; }
-    .zoom-icon { display: grid; place-items: center; width: 55px; height: 55px; border: 1px solid var(--cyan); border-radius: 14px; background: #0a243b; font-size: 28px; box-shadow: 0 0 22px #4dd9ff3b; }
+    .zoom-icon { display: grid; place-items: center; width: 55px; height: 55px; border: 1px solid var(--zoom-accent); border-radius: 14px; background: color-mix(in srgb, var(--zoom-accent) 8%, #0a243b); font-size: 28px; box-shadow: 0 0 22px color-mix(in srgb, var(--zoom-accent) 34%, transparent); }
     .zoom-header h2 { margin: 0; font-size: 24px; }
     .zoom-header p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
     .zoom-close { width: 34px; height: 34px; padding: 0; border-radius: 50%; font-size: 20px; }
     .zoom-body { position: relative; z-index: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 18px 5px 18px 0; scrollbar-width: thin; scrollbar-color: #32769a #091a2b; }
     .telemetry { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
     .telemetry-card { padding: 10px; border: 1px solid #2b5979; border-radius: 9px; background: #091c2e; }
-    .telemetry-card b { display: block; color: var(--cyan); font: 10px monospace; text-transform: uppercase; letter-spacing: .08em; }
+    .zoom-shell .telemetry-card b { display: block; color: var(--zoom-accent); font: 10px monospace; text-transform: uppercase; letter-spacing: .08em; }
     .telemetry-card span { display: block; margin-top: 5px; color: #e8f3ff; font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .zoom-details { display: block; }
     .zoom-detail { min-height: 90px; padding: 12px; border: 1px solid #244c6b; border-radius: 10px; background: #081a2b; }
@@ -245,19 +247,19 @@
     .zoom-detail span { color: #c6d8e9; font-size: 13px; line-height: 1.5; }
     .zoom-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
     .zoom-tab { padding: 8px 14px; border: 1px solid #2e5271; border-radius: 9px; background: #091a2c; color: var(--muted); font-size: 12px; font-weight: 700; }
-    .zoom-tab.active { color: var(--cyan); border-color: var(--cyan); background: #12314a; box-shadow: 0 0 0 1px #4dd9ff33; }
+    .zoom-shell .zoom-tab.active { color: var(--zoom-accent); border-color: var(--zoom-accent); background: color-mix(in srgb, var(--zoom-accent) 11%, #12314a); box-shadow: 0 0 0 1px color-mix(in srgb, var(--zoom-accent) 28%, transparent); }
     .zoom-panel.hidden { display: none; }
     .advanced-grid { display: flex; flex-direction: row; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
     .advanced-field { flex: 1 1 160px; min-width: 140px; padding: 10px 11px; border: 1px solid #244c6b; border-radius: 9px; background: #081a2b; }
-    .advanced-field b { display: block; color: var(--cyan); font: 10px monospace; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 5px; }
+    .zoom-shell .advanced-field b { display: block; color: var(--zoom-accent); font: 10px monospace; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 5px; }
     .advanced-field span { display: block; color: #d4e6f5; font-size: 12px; line-height: 1.45; overflow-wrap: anywhere; }
     .advanced-group-title { width: 100%; margin: 4px 0 2px; color: var(--yellow); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; }
     .k8s-doc-intro { margin: 0 0 10px; color: var(--muted); font-size: 12px; line-height: 1.55; }
-    .k8s-doc-link { display: inline-block; margin-bottom: 14px; color: var(--cyan); font-size: 12px; text-decoration: none; }
+    .zoom-shell .k8s-doc-link { display: inline-block; margin-bottom: 14px; color: var(--zoom-accent); font-size: 12px; text-decoration: none; }
     .k8s-doc-link:hover { text-decoration: underline; }
     .k8s-doc-table { width: 100%; border-collapse: collapse; font-size: 11px; }
     .k8s-doc-table th, .k8s-doc-table td { border: 1px solid #244c6b; padding: 8px 10px; text-align: left; vertical-align: top; }
-    .k8s-doc-table th { color: var(--cyan); background: #091c2e; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; }
+    .zoom-shell .k8s-doc-table th { color: var(--zoom-accent); background: #091c2e; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; }
     .k8s-doc-table code { color: var(--yellow); font-size: 10px; white-space: nowrap; }
     .k8s-doc-table td { color: #c6d8e9; line-height: 1.45; }
     .k8s-doc-types { margin-top: 22px; padding-top: 16px; border-top: 1px solid #244c6b; }
@@ -265,16 +267,16 @@
     .k8s-doc-type-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
     @media (max-width: 650px) { .k8s-doc-type-grid { grid-template-columns: 1fr; } }
     .k8s-doc-type-card { padding: 10px 11px; border: 1px solid #244c6b; border-radius: 10px; background: #081a2b; }
-    .k8s-doc-type-card.active { border-color: var(--cyan); box-shadow: 0 0 0 1px #4dd9ff33; background: #0c2236; }
-    .k8s-doc-type-card b { display: block; color: var(--cyan); font-size: 12px; margin-bottom: 6px; }
+    .zoom-shell .k8s-doc-type-card.active { border-color: var(--zoom-accent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--zoom-accent) 28%, transparent); background: #0c2236; }
+    .zoom-shell .k8s-doc-type-card b { display: block; color: var(--zoom-accent); font-size: 12px; margin-bottom: 6px; }
     .k8s-doc-type-card p { margin: 0 0 8px; color: #b8cddd; font-size: 11px; line-height: 1.45; }
     .k8s-doc-type-card a { color: #7ec8e8; font-size: 10px; text-decoration: none; }
     .k8s-doc-type-card a:hover { text-decoration: underline; }
-    .k8s-doc-type-badge { display: inline-block; margin-bottom: 8px; padding: 3px 8px; border-radius: 6px; background: #12314a; color: var(--cyan); font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+    .zoom-shell .k8s-doc-type-badge { display: inline-block; margin-bottom: 8px; padding: 3px 8px; border-radius: 6px; background: color-mix(in srgb, var(--zoom-accent) 12%, #12314a); color: var(--zoom-accent); font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
     .container-config-panel { padding: 4px 2px 8px; }
     .container-config-panel p { margin: 0 0 12px; color: var(--muted); font-size: 12px; line-height: 1.55; }
     .container-config-field { margin-bottom: 12px; }
-    .container-config-field label { display: block; margin-bottom: 6px; color: var(--cyan); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+    .zoom-shell .container-config-field label { display: block; margin-bottom: 6px; color: var(--zoom-accent); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
     .container-config-field select { width: 100%; padding: 9px 10px; border: 1px solid #2e5271; border-radius: 9px; background: #091a2c; color: var(--text); font-size: 13px; }
     .container-config-url { padding: 10px 11px; border: 1px dashed #4a6a88; border-radius: 9px; background: #081a2b; color: #c6d8e9; font-size: 12px; line-height: 1.45; }
     .container-config-url code { color: var(--yellow); }
@@ -285,12 +287,13 @@
     .zoom-tab.hidden-tab { display: none; }
     .workload-mesh-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px; }
     .workload-mesh-table th, .workload-mesh-table td { padding: 6px 5px; border-bottom: 1px solid #1e3a52; text-align: left; vertical-align: middle; }
-    .workload-mesh-table th { color: var(--cyan); font-size: 10px; text-transform: uppercase; letter-spacing: .05em; }
+    .zoom-shell .workload-mesh-table th { color: var(--zoom-accent); font-size: 10px; text-transform: uppercase; letter-spacing: .05em; }
+    .zoom-shell .zoom-panel-title { margin: 12px 0 8px; font-size: 13px; color: var(--zoom-accent); }
     .workload-mesh-table select { width: 100%; max-width: 220px; padding: 5px 6px; border: 1px solid #2e5271; border-radius: 7px; background: #091a2c; color: var(--text); font-size: 11px; }
     .workload-mesh-empty { color: var(--muted); font-size: 11px; margin-top: 6px; }
     .service-chain-hint { display: block; margin-top: 4px; color: #b8a4ff; font-size: 9px; }
     .yaml-preview-wrap { margin-bottom: 14px; padding: 12px; border: 1px solid #315f7c; border-radius: 10px; background: #061321; }
-    .yaml-preview-wrap b { display: block; margin-bottom: 7px; color: var(--cyan); font: 11px monospace; letter-spacing: .08em; }
+    .zoom-shell .yaml-preview-wrap b { display: block; margin-bottom: 7px; color: var(--zoom-accent); font: 11px monospace; letter-spacing: .08em; }
     .yaml-preview { max-height: 180px; overflow: auto; margin: 0; color: #c9e5f7; font: 11px/1.55 "SFMono-Regular", Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; scrollbar-width: thin; scrollbar-color: #32769a #091a2b; }
     .zoom-footer { padding-top: 12px; border-top: 1px solid #315b7b; color: var(--muted); font: 11px monospace; }
     .focus-object { animation: objectFocus 1.1s ease-in-out 2; }
@@ -2060,7 +2063,7 @@ spec:
       const host = $("zoomContainerConfig");
       if (!host) return;
       if (inspectId === "cluster") {
-        host.innerHTML = `<p>${t("workloadMeshIntro")}</p><h3 style="margin:12px 0 8px;font-size:13px;color:var(--cyan)">${t("workloadMeshClusterTitle")}</h3><div id="zoomMeshTableHost"></div>`;
+        host.innerHTML = `<p>${t("workloadMeshIntro")}</p><h3 class="zoom-panel-title">${t("workloadMeshClusterTitle")}</h3><div id="zoomMeshTableHost"></div>`;
         const tableHost = $("zoomMeshTableHost");
         if (!state.deployed || !Object.keys(state.apps).length) {
           tableHost.innerHTML = `<p class="workload-mesh-empty">${t("workloadMeshEmpty")}</p>`;
@@ -2774,6 +2777,60 @@ spec:
     function telemetryCard(label, value) {
       return `<div class="telemetry-card"><b>${label}</b><span>${value}</span></div>`;
     }
+    const inspectAccentFallback = "#4dd9ff";
+    const serviceTypeAccent = {
+      ClusterIP: "#ffd166",
+      NodePort: "#6eb5ff",
+      LoadBalancer: "#54e39b",
+      ExternalName: "#c59bff"
+    };
+    function resolveCssVarColor(value, fallback = inspectAccentFallback) {
+      const trimmed = String(value || "").trim();
+      if (!trimmed) return fallback;
+      if (trimmed.startsWith("var(")) {
+        const prop = trimmed.match(/var\((--[^)]+)\)/)?.[1];
+        if (prop) {
+          const resolved = getComputedStyle(document.documentElement).getPropertyValue(prop).trim();
+          return resolved || fallback;
+        }
+      }
+      return trimmed;
+    }
+    function serviceAccentForType(type) {
+      return serviceTypeAccent[type] || serviceTypeAccent.ClusterIP;
+    }
+    function podAccentForApp(appName, podElement) {
+      if (podElement) {
+        const fromPod = getComputedStyle(podElement).getPropertyValue("--app-color").trim();
+        if (fromPod) return resolveCssVarColor(fromPod);
+      }
+      return resolveCssVarColor(state.apps[appName]?.color);
+    }
+    function resolveInspectAccent(id, element, metadata = {}) {
+      if (element?.classList?.contains("pod") || id === "pod") {
+        const appName = metadata.appName || element?.dataset?.app;
+        return podAccentForApp(appName, element?.classList?.contains("pod") ? element : document.querySelector(`.pod[data-app="${appName}"]`));
+      }
+      if (element?.classList?.contains("service") || id === "service") {
+        const type = element?.dataset?.serviceType || state.services[metadata.serviceName]?.type || "ClusterIP";
+        return serviceAccentForType(type);
+      }
+      if (id === "node" || element?.classList?.contains("node")) return "#4dd9ff";
+      if (id === "deployment" || element?.classList?.contains("deployment-card")) {
+        const appName = metadata.appName || state.selectedApp;
+        return state.apps[appName] ? podAccentForApp(appName, null) : "#6d8cff";
+      }
+      if (id === "cluster" || element?.classList?.contains("cluster-scope")) return "#5a9fd4";
+      if (id === "control-plane" || element?.closest?.(".control-plane") || ["api-server", "scheduler", "controller", "etcd"].includes(id)) {
+        return "#c59bff";
+      }
+      return inspectAccentFallback;
+    }
+    function applyZoomShellTheme(accent) {
+      const shell = document.querySelector(".zoom-shell");
+      if (!shell) return;
+      shell.style.setProperty("--zoom-accent", accent || inspectAccentFallback);
+    }
     function yamlForObject(id, metadata = {}) {
       const english = language === "en-US";
       if (id === "cluster" || id === "node") return state.clusterYaml || (english ? "No kind: Cluster manifest is active.\nThe simulator is using its default cluster configuration." : "Nenhum manifesto kind: Cluster está ativo.\nO simulador está usando a configuração padrão do cluster.");
@@ -2866,9 +2923,16 @@ spec:
       document.querySelectorAll(".focus-object").forEach(element => element.classList.remove("focus-object"));
       let target = sourceElement?.isConnected ? sourceElement : null;
       if (!target && id === "service") target = document.querySelector(`.service[data-service="${metadata.serviceName}"]`);
+      if (!target && id === "pod") target = document.querySelector(`.pod[data-app="${metadata.appName}"]`);
       if (!target && id === "node") target = document.querySelector(`#node-${metadata.nodeIndex || 0}`);
       if (!target && id === "deployment") target = $("deploymentArea");
       if (!target && id === "cluster") target = document.querySelector(".cluster-scope");
+      if (!target && id === "control-plane") target = document.querySelector(".control-plane");
+      if (!target && ["api-server", "scheduler", "controller", "etcd"].includes(id)) {
+        target = document.querySelector(`[data-structure="${id}"]`);
+      }
+      const themeElement = sourceElement?.isConnected ? sourceElement : target;
+      applyZoomShellTheme(resolveInspectAccent(id, themeElement, metadata));
       if (target) { target.classList.add("focus-object"); setTimeout(() => target.classList.remove("focus-object"), 2400); }
     }
     function closeObjectDetail() {
