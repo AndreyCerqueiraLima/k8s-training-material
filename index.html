@@ -3059,7 +3059,7 @@ spec:
       else if (wasDeployed && previousReplicas !== state.replicas && state.mission === 2) progress("scale");
       return { wasDeployed, previousReplicas };
     }
-    async function applyAllManifests() {
+    async function applyAllManifests(options = {}) {
       if (cpApplyLock) return;
       saveCurrentManifest();
       try {
@@ -3072,7 +3072,7 @@ spec:
         cpApplyLock = true;
         setYamlApplyBusy(true);
         try {
-          await playControlPlaneApplySequence($("applyYaml"));
+          if (!options.skipControlPlane) await playControlPlaneApplySequence($("applyYaml"));
           commitApplyPayload(payload, { markAllManifests: true });
         } finally {
           cpApplyLock = false;
@@ -3469,8 +3469,19 @@ spec:
       showToast(t("toastPodDown"));
       setTimeout(() => { state.killed = false; state.killedApp = null; $("eventText").innerHTML = `<span>${t("selfHealing", { count: app.replicas })}</span>`; updateUI(); progress("kill"); }, 1800);
     }
-    function applyYaml() {
-      applyAllManifests();
+    let applyAllClickTimer = null;
+    function scheduleApplyAllFromClick() {
+      clearTimeout(applyAllClickTimer);
+      applyAllClickTimer = setTimeout(() => {
+        applyAllClickTimer = null;
+        applyAllManifests();
+      }, 280);
+    }
+    function applyAllFromDoubleClick(event) {
+      event.preventDefault();
+      clearTimeout(applyAllClickTimer);
+      applyAllClickTimer = null;
+      applyAllManifests({ skipControlPlane: true });
     }
     function relinkServices() {
       Object.values(state.apps).forEach(app => {
@@ -3618,7 +3629,9 @@ spec:
     $("actionMenuToggle").onclick = event => { event.stopPropagation(); toggleActionMenu(); };
     document.addEventListener("click", event => { if (!$("actionDropdown").contains(event.target)) closeActionMenu(); });
     $("languageToggle").onclick = () => { closeObjectDetail(); language = language === "pt-BR" ? "en-US" : "pt-BR"; applyLanguage(); };
-    $("applyYaml").onclick = applyYaml; $("runYaml").onclick = runCurrentYaml; $("newYaml").onclick = newYaml; $("clusterYaml").onclick = createClusterYaml; $("renameYaml").onclick = renameYaml; $("deleteYaml").onclick = deleteYaml; $("resetYaml").onclick = resetYaml; $("copyYaml").onclick = copyYaml;
+    $("applyYaml").onclick = scheduleApplyAllFromClick;
+    $("applyYaml").ondblclick = applyAllFromDoubleClick;
+    $("runYaml").onclick = runCurrentYaml; $("newYaml").onclick = newYaml; $("clusterYaml").onclick = createClusterYaml; $("renameYaml").onclick = renameYaml; $("deleteYaml").onclick = deleteYaml; $("resetYaml").onclick = resetYaml; $("copyYaml").onclick = copyYaml;
     $("zoomClose").onclick = closeObjectDetail; $("objectBackdrop").onclick = closeObjectDetail;
     document.querySelectorAll(".zoom-tab").forEach(button => button.onclick = () => switchZoomTab(button.dataset.zoomTab));
     document.addEventListener("keydown", event => { if (event.key === "Escape") closeObjectDetail(); });
