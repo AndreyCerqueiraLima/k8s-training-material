@@ -99,15 +99,15 @@
     .node.busy { border-color: var(--yellow); box-shadow: 0 0 18px #ffd16644; }
     .node.busy .node-state { color: #221a04; background: var(--yellow); }
     .pod.serving { border-color: var(--yellow); box-shadow: 0 0 12px #ffd16655; }
-    .pod.processing { outline: 2px dashed var(--yellow); outline-offset: 2px; animation: podProcess .55s ease-in-out infinite; }
-    @keyframes podProcess { 50% { filter: brightness(1.2); } }
+    .pod.processing { outline: 2px dashed var(--yellow); outline-offset: 2px; filter: brightness(1.08); }
     .node.offline { border-color: var(--red); background: #2d1724dd; }
     .node-header { display: flex; justify-content: space-between; align-items: start; gap: 4px; margin-bottom: 8px; }
     .node-title { font-weight: 800; font-size: 14px; }
     .node-state { font-size: 10px; border-radius: 99px; padding: 3px 6px; background: #123b2b; color: var(--green); }
     .offline .node-state { color: var(--red); background: #48202d; }
     .pods { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-top: 10px; min-width: 0; }
-    .pod { position: relative; min-width: 0; min-height: 62px; overflow: hidden; padding: 7px; border: 1px solid #2e617d; border-radius: 9px; background: #102d43; animation: spawn .35s ease-out; }
+    .pod { position: relative; min-width: 0; min-height: 62px; overflow: hidden; padding: 7px; border: 1px solid #2e617d; border-radius: 9px; background: #102d43; }
+    .pod.pod-enter { animation: spawn .35s ease-out; }
     @keyframes spawn { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: scale(1); } }
     .pod.dead { border-color: var(--red); background: #391b27; opacity: .8; }
     .pod.not-ready { border-color: var(--yellow); background: #3a3218; }
@@ -156,11 +156,10 @@
     .packet { position: absolute; z-index: 8; transform: translate(-50%, -50%); padding: 5px 8px; background: var(--yellow); color: #221a04; border-radius: 99px; font-size: 11px; font-weight: 900; box-shadow: 0 0 12px var(--yellow); opacity: 0; transition: left .7s, top .7s, opacity .2s; pointer-events: none; }
     .packet.traffic-packet { opacity: 1; font-size: 10px; padding: 4px 7px; }
     .packet.traffic-request { background: var(--yellow); color: #221a04; box-shadow: 0 0 12px var(--yellow); }
-    .packet.traffic-processing { background: #ffb347; color: #2a1800; box-shadow: 0 0 14px #ffb347; animation: packetPulse .42s ease-in-out infinite; }
+    .packet.traffic-processing { background: #ffb347; color: #2a1800; box-shadow: 0 0 14px #ffb347; }
     .packet.traffic-response { background: var(--green); color: #062119; box-shadow: 0 0 12px var(--green); }
     .packet.traffic-blocked { background: var(--red); color: #fff; box-shadow: 0 0 12px var(--red); }
     .service-port-bad { color: #ff9f9f; font-size: 9px; display: block; margin-top: 4px; }
-    @keyframes packetPulse { 50% { transform: translate(-50%, -50%) scale(1.1); } }
     #packet { display: none; }
     .eventbar { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 11px 14px; margin-top: 12px; min-height: 55px; }
     .eventbar p { margin: 0; font-size: 13px; line-height: 1.4; }
@@ -291,6 +290,17 @@
     .zoom-shell .zoom-panel-title { margin: 12px 0 8px; font-size: 13px; color: var(--zoom-accent); }
     .workload-mesh-table select { width: 100%; max-width: 220px; padding: 5px 6px; border: 1px solid #2e5271; border-radius: 7px; background: #091a2c; color: var(--text); font-size: 11px; }
     .workload-mesh-empty { color: var(--muted); font-size: 11px; margin-top: 6px; }
+    .image-registry-intro { margin: 6px 0 0; font-size: 11px; color: var(--muted); }
+    .image-registry-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px; }
+    .image-registry-table th, .image-registry-table td { padding: 6px 5px; border-bottom: 1px solid #1e3a52; text-align: left; vertical-align: middle; }
+    .image-registry-table th { color: var(--cyan); font-size: 10px; text-transform: uppercase; letter-spacing: .05em; }
+    .image-registry-input { width: 100%; min-width: 0; padding: 5px 6px; border: 1px solid #2e5271; border-radius: 7px; background: #091a2c; color: var(--text); font-size: 11px; }
+    .image-registry-add { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; align-items: center; }
+    .image-registry-add input { flex: 1 1 90px; }
+    .image-registry-add button { flex: 0 0 auto; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--cyan); background: #0d2a44; color: var(--cyan); cursor: pointer; font-weight: 700; }
+    .image-registry-remove { padding: 2px 8px; border: 1px solid #5a3040; border-radius: 6px; background: #2a1520; color: var(--red); cursor: pointer; font-size: 14px; line-height: 1.2; }
+    .image-registry-remove:disabled { opacity: .35; cursor: not-allowed; }
+    .image-registry-ref { color: var(--yellow); font-size: 10px; word-break: break-all; }
     .service-chain-hint { display: block; margin-top: 4px; color: #b8a4ff; font-size: 9px; }
     .yaml-preview-wrap { margin-bottom: 14px; padding: 12px; border: 1px solid #315f7c; border-radius: 10px; background: #061321; }
     .zoom-shell .yaml-preview-wrap b { display: block; margin-bottom: 7px; color: var(--zoom-accent); font: 11px monospace; letter-spacing: .08em; }
@@ -380,6 +390,7 @@
                 <div class="yaml-note"><b data-i18n="yamlNodesTitle">🖥️ Nodes não são réplicas</b><span data-i18n="yamlNodesText"><code>Cluster.spec.nodes</code> representa computadores do cluster. Altere de <code>3</code> para <code>6</code> e seis Nodes aparecerão.</span></div>
                 <div class="yaml-note"><b data-i18n="yamlPodsTitle">🫛 Pods da aplicação</b><span data-i18n="yamlPodsText"><code>Deployment.spec.replicas</code> representa cópias da aplicação. Altere para <code>5</code> e o Deployment distribuirá cinco Pods pelos Nodes.</span></div>
                 <div class="yaml-note"><b data-i18n="yamlConnectTitle">🔗 Conecte aplicações</b><span data-i18n="yamlConnectText">Crie outro YAML com Deployment + Service. Dentro do cluster, uma aplicação pode chamar outra pelo DNS do Service, por exemplo <code>http://catalog-api:3000</code>.</span></div>
+                <div class="yaml-note" id="imageRegistryNote"><b data-i18n="imageRegistryTitle">📦 Repositório de imagens</b><p class="image-registry-intro" data-i18n="imageRegistryIntro">Catálogo local do laboratório. O campo <code>image:</code> do container deve usar uma referência <code>nome:versão</code> cadastrada aqui — como um registry Docker simplificado.</p><div id="imageRegistryPanel"></div></div>
                 <div class="yaml-note" id="workloadMeshNote"><b data-i18n="workloadMeshTitle">🔀 Comunicação entre workloads</b><p class="workload-mesh-empty" data-i18n="workloadMeshEmpty">Aplique pelo menos dois Deployments com Service para configurar frontend → backend.</p><div id="workloadMeshPanel"></div></div>
                 <div class="yaml-note"><b data-i18n="yamlServiceTypesTitle">🌐 Tipos de Service</b><span data-i18n="yamlServiceTypesText">Use <code>spec.type</code>: <strong>ClusterIP</strong> (padrão, VIP interno), <strong>NodePort</strong> (porta em todos os Nodes), <strong>LoadBalancer</strong> (IP externo + LB na nuvem) ou <strong>ExternalName</strong> (alias DNS <code>externalName</code>, sem endpoints de Pod).</span></div>
                 <div class="yaml-note"><b data-i18n="yamlIdeaTitle">💡 Ideia central</b><span data-i18n="yamlIdeaText">YAML é declarativo: você descreve o estado desejado; o Kubernetes compara com o estado atual e trabalha para reconciliar os dois.</span></div>
@@ -447,9 +458,10 @@
         probeNotReady: "Not Ready", probeUnhealthy: "Unhealthy", probeRestarting: "Restarting", probeLabLoaded: "Lab de Probes carregado. Aplique o YAML e observe o Pod após 30 segundos.",
         probeFailureSoon: "Probe Lab: em {s}s a rota /health começará a falhar (simulação de bug).", probeFailureActive: "Probe Lab: /health falhando — configure probes no container ou o Pod ficará degradado.",
         probeReadinessDrop: "Readiness falhou: Pod removido dos endpoints do Service.", probeLivenessRestart: "Liveness falhou {n} vez(es): kubelet substituiu o Pod por uma nova instância (gen {gen}).",
-        probeStartupPending: "Startup probe: liveness/readiness ainda desativadas.", probeNoReadyPod: "Nenhum Pod Ready para receber tráfego. Verifique a readinessProbe.",
+        probeStartupPending: "Startup probe: liveness/readiness ainda desativadas.", probeNoReadyPod: "Nenhum Pod Ready para receber tráfego. Verifique a readinessProbe.", trafficRequestFailedLabel: "502", trafficRequestFailedEvent: "Request #{n}: o Pod não processou a resposta (app degradada ou Not Ready).",
         probeExplain: "O Deployment <strong>probe-lab</strong> usa uma imagem de treino: após 30s o endpoint <code>/health</code> degrada. Sem <code>livenessProbe</code> o processo continua morto; com liveness, o kubelet recria o Pod.",
-        probeLabToast: "🩺 Manifesto probe-lab.yaml pronto. Clique em <strong>Aplicar todos</strong> para iniciar o cronômetro de 30s."
+        probeLabToast: "🩺 Manifesto probe-lab.yaml pronto. Clique em <strong>Aplicar todos</strong> para iniciar o cronômetro de 30s.",
+        imageRegistryTitle: "📦 Repositório de imagens", imageRegistryIntro: "Catálogo local do laboratório. O campo <code>image:</code> do container deve usar uma referência <code>nome:versão</code> cadastrada aqui — como um registry Docker simplificado.", imageRegistryColName: "Nome da imagem", imageRegistryColVersion: "Versão", imageRegistryColRef: "Referência", imageRegistryAdd: "＋ Adicionar", imageRegistryBuiltin: "padrão do lab", imageRegistryDuplicate: "Já existe uma imagem com a referência {ref}.", imageRegistryInvalid: "Informe nome e versão da imagem.", imageRegistryMissing: "Imagem <code>{image}</code> não está no repositório (Deployment <b>{deployment}</b> em {file}). Cadastre-a ou corrija o YAML.",         imageRegistryMissingSummary: "Não foi possível subir os Pods: {count} imagem(ns) ausente(s) no repositório.", chainBackendNotReady: "Backend <b>{app}</b> sem Pods Ready nos endpoints — a chamada encadeada não foi enfileirada.", trafficMeshPathEvent: "Request #{n}: rota <code>{path}</code> (ida e volta pelos Services do cluster).", trafficMeshRouteHint: "Rota de chamadas"
       },
       "en-US": {
         brandSubtitle: "An interactive expedition inside Kubernetes", missionLabel: "Mission", activePodsLabel: "Active Pods", trainingCenter: "Training center", currentMission: "Current mission", helpButton: "📖 Open quick guide", visualLab: "Visual lab", heroTitle: "Your cluster is alive", heroText: "Watch traffic, create replicas, and safely trigger failures.", deployButton: "🚀 Create application", scaleButton: "↕ Scale", killButton: "💥 Delete this Pod", probeLabButton: "🩺 Probe lab", actionsMenu: "⚡ Lab actions ▾", autoPauseButton: "⏸ Pause auto traffic", controlPlaneDescription: "The brain: watches the desired state and coordinates everything.", clusterMapTitle: "KUBERNETES CLUSTER", deploymentsTitle: "📦 Deployments", trafficButton: "📨 Send request", burstTrafficButton: "⚡ Request burst", trafficEntryLabel: "Entry Service", trafficEntryHint: "Test requests (Send request / burst / auto) start at this Service — like a client hitting the frontend.", trafficEntryBadge: "request entry", trafficNodeBusy: "Serving", trafficProcessing: "proc…", trafficResponse: "response", trafficPortBlockedLabel: "port ✕", trafficPortMismatch: "Traffic blocked at <b>{svc}</b>: <code>targetPort</code> ({targets}) does not match Pod <code>containerPort</code> ({containers}). kube-proxy will not forward to the container.", trafficNoContainerPorts: "Deployment <b>{app}</b> has no <code>containerPort</code>. Add ports on the container so the Service can forward traffic.", trafficNoServicePorts: "Service <b>{svc}</b> has no <code>spec.ports</code>.", trafficPortOk: "Route: Service:{sport} → Pod:{target}", trafficRequestQueued: "Request queued: every Node with a Ready Pod is already serving another request.", trafficBurstStarted: "Burst: {count} requests fired — the Service spreads across free Nodes.", trafficBurstSummary: "Burst done: {count} requests. Remaining queue: {queued}. The Service forwards to Pods on Nodes that are not busy.", autoButton: "▶ Auto", architectureInspector: "Architecture inspector", declarativeLab: "Declarative lab", yamlTitle: "Edit YAML and watch the cluster change", yamlDescription: "Change values and click <strong>Apply YAML</strong>. The simulator interprets the main fields and reconciles the screen with the new desired state.", newYaml: "＋ New YAML", deleteYaml: "🗑 Delete", applyYaml: "✓ Apply all", resetYaml: "↺ Restore", copyYaml: "⧉ Copy", yamlNodesTitle: "🖥️ Nodes are not replicas", yamlNodesText: "<code>Cluster.spec.nodes</code> represents the computers in the cluster. Change <code>3</code> to <code>6</code> and six Nodes will appear.", yamlPodsTitle: "🫛 Application Pods", yamlPodsText: "<code>Deployment.spec.replicas</code> represents application copies. Change it to <code>5</code> and the Deployment will distribute five Pods across the Nodes.", yamlConnectTitle: "🔗 Connect applications", yamlServiceTypesTitle: "🌐 Service types", yamlServiceTypesText: "Set <code>spec.type</code>: <strong>ClusterIP</strong> (default, internal VIP), <strong>NodePort</strong> (port on every Node), <strong>LoadBalancer</strong> (external IP + cloud LB), or <strong>ExternalName</strong> (DNS alias via <code>externalName</code>, no Pod endpoints).", svcExternalClient: "External client", svcNodePortClient: "Client outside cluster", svcNodePortRoute: "Hits any Node at <code>&lt;NodeIP&gt;:{port}</code>", svcNodePortLabel: "NodePort (every Node)", svcExternalNameTraffic: "ExternalName only redirects DNS — it does not forward traffic to Pods in the cluster.", svcTrafficClusterIP: "Request #{n} → {app}: in-cluster traffic via Service ClusterIP/DNS to a Ready Pod.", svcTrafficNodePort: "Request #{n} → {app}: external client → NodePort on a Node → Service → Pod.", svcTrafficLoadBalancer: "Request #{n} → {app}: client → LoadBalancer ({ip}) → Service → Pod.", svcInsightClusterIP: "Internal VIP {ip} — reachable only inside the cluster (DNS <code>{name}</code>).", svcInsightNodePort: "Port <code>{port}</code> open on <strong>every</strong> Node; kube-proxy forwards to the Service.", svcInsightLoadBalancer: "Cloud provider provisions a LB with IP <code>{ip}</code> targeting this Service.", svcInsightExternalName: "Returns CNAME <code>{host}</code> — no selector or Pod endpoints.", yamlConnectText: "Create another YAML with a Deployment + Service. Inside the cluster, one application can call another through the Service DNS, such as <code>http://catalog-api:3000</code>.", yamlIdeaTitle: "💡 Core idea", yamlIdeaText: "YAML is declarative: you describe the desired state; Kubernetes compares it with the current state and works to reconcile both.", whatYouSee: "🧭 What are you seeing?", glossaryTitle: "📚 Clickable glossary", welcomeEyebrow: "Welcome, explorer", welcomeTitle: "Shall we visit Kubernetes? 🚀", welcomeText: "Kubernetes is an <strong>application manager</strong>. You describe how you want your system to look — for example, “I want 3 copies of my website” — and it continuously works to keep that promise.", welcomeLearn: "In this adventure, you will learn:", welcomeList: "<li>how a <strong>cluster</strong> brings together computers called <strong>Nodes</strong>;</li><li>how applications live in <strong>Pods</strong>;</li><li>how <strong>Deployments</strong> maintain copies and scale;</li><li>how a <strong>Service</strong> finds Pods even when they move;</li><li>how Kubernetes recovers from failures automatically.</li>", startButton: "Enter the lab ✨", skipButton: "Explore freely", finishEyebrow: "Training complete", finishTitle: "You think like Kubernetes! 🏆", finishTextStatic: "The most important principle is this: you declare the <strong>desired state</strong>; the Control Plane watches the current state and acts until both match.", continueButton: "Keep exploring", restartButton: "Restart training",
@@ -458,9 +470,10 @@
         probeNotReady: "Not Ready", probeUnhealthy: "Unhealthy", probeRestarting: "Restarting", probeLabLoaded: "Probe lab loaded. Apply the YAML and watch the Pod after 30 seconds.",
         probeFailureSoon: "Probe lab: in {s}s the /health route will start failing (bug simulation).", probeFailureActive: "Probe lab: /health is failing — configure probes in the container or the Pod stays degraded.",
         probeReadinessDrop: "Readiness failed: Pod removed from Service endpoints.", probeLivenessRestart: "Liveness failed {n} time(s): kubelet replaced the Pod with a new instance (gen {gen}).",
-        probeStartupPending: "Startup probe: liveness/readiness still disabled.", probeNoReadyPod: "No Ready Pod to receive traffic. Check readinessProbe.",
+        probeStartupPending: "Startup probe: liveness/readiness still disabled.", probeNoReadyPod: "No Ready Pod to receive traffic. Check readinessProbe.", trafficRequestFailedLabel: "502", trafficRequestFailedEvent: "Request #{n}: the Pod did not return a successful response (degraded app or Not Ready).",
         probeExplain: "The <strong>probe-lab</strong> Deployment uses a training image: after 30s the <code>/health</code> endpoint degrades. Without <code>livenessProbe</code> the process stays dead; with liveness, the kubelet recreates the Pod.",
-        probeLabToast: "🩺 probe-lab.yaml manifest ready. Click <strong>Apply all</strong> to start the 30s timer."
+        probeLabToast: "🩺 probe-lab.yaml manifest ready. Click <strong>Apply all</strong> to start the 30s timer.",
+        imageRegistryTitle: "📦 Image registry", imageRegistryIntro: "Local lab catalog. The container <code>image:</code> field must use a <code>name:version</code> reference listed here — a simplified Docker registry.", imageRegistryColName: "Image name", imageRegistryColVersion: "Version", imageRegistryColRef: "Reference", imageRegistryAdd: "＋ Add", imageRegistryBuiltin: "lab default", imageRegistryDuplicate: "An image with reference {ref} already exists.", imageRegistryInvalid: "Enter image name and version.", imageRegistryMissing: "Image <code>{image}</code> is not in the registry (Deployment <b>{deployment}</b> in {file}). Add it or fix the YAML.",         imageRegistryMissingSummary: "Could not start Pods: {count} image(s) missing from the registry.", chainBackendNotReady: "Backend <b>{app}</b> has no Ready Pods in endpoints — chained call was not queued.", trafficMeshPathEvent: "Request #{n}: route <code>{path}</code> (round trip through cluster Services).", trafficMeshRouteHint: "Call route"
       }
     };
     const structureText = {
@@ -522,7 +535,7 @@
       document.querySelectorAll("[data-i18n]").forEach(element => { element.innerHTML = t(element.dataset.i18n); });
       $("languageToggle").textContent = language === "pt-BR" ? "🇺🇸 English" : "🇧🇷 Português";
       $("health").textContent = state.killed ? t("reconciling") : t("healthy");
-      renderManifestTabs(); renderActionMenu(); renderTrafficEntryControl(); updateUI(); refreshYamlStatus();
+      renderManifestTabs(); renderActionMenu(); renderTrafficEntryControl(); renderImageRegistryPanel(); updateUI(); refreshYamlStatus();
       refreshZoomTabLabels();
       if (!$("objectModal").classList.contains("hidden") && state.inspectTarget) openObjectDetail(state.inspectTarget.id, null, state.inspectTarget.metadata);
       $("zoomCloseHint").textContent = language === "en-US" ? "ESC • CLOSE" : "ESC • FECHAR";
@@ -890,6 +903,74 @@
       }
     };
     k8sApiDocs["control-plane"] = { kind: "Control Plane", apiVersion: "—", url: "https://kubernetes.io/docs/concepts/architecture/#control-plane-components", pt: k8sApiDocs.cluster.pt, en: k8sApiDocs.cluster.en };
+    const IMAGE_REGISTRY_STORAGE_KEY = "kubeworld-image-registry";
+    function defaultImageRegistryEntries() {
+      return [
+        { id: "img-nginx", name: "nginx", version: "1.27", builtin: true },
+        { id: "img-node", name: "node", version: "22-alpine", builtin: true },
+        { id: "img-probe-trainer", name: "kubeworld/probe-trainer", version: "1.0", builtin: true }
+      ];
+    }
+    function formatImageRef(entry) {
+      return `${entry.name}:${entry.version}`;
+    }
+    function normalizeImageRef(ref) {
+      return String(ref || "").trim();
+    }
+    function loadImageRegistry() {
+      try {
+        const raw = localStorage.getItem(IMAGE_REGISTRY_STORAGE_KEY);
+        if (!raw) return defaultImageRegistryEntries();
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed) || !parsed.length) return defaultImageRegistryEntries();
+        return parsed.map((entry, index) => ({
+          id: entry.id || `img-${index}`,
+          name: String(entry.name || "").trim(),
+          version: String(entry.version || "").trim(),
+          builtin: Boolean(entry.builtin)
+        })).filter(entry => entry.name && entry.version);
+      } catch {
+        return defaultImageRegistryEntries();
+      }
+    }
+    function saveImageRegistry() {
+      try { localStorage.setItem(IMAGE_REGISTRY_STORAGE_KEY, JSON.stringify(imageRegistry)); } catch {}
+    }
+    function resetImageRegistryToDefaults() {
+      imageRegistry = defaultImageRegistryEntries();
+      saveImageRegistry();
+      renderImageRegistryPanel();
+    }
+    function registryRefByName(imageName) {
+      const entry = imageRegistry.find(item => item.name === imageName)
+        || defaultImageRegistryEntries().find(item => item.name === imageName);
+      return entry ? formatImageRef(entry) : `${imageName}:latest`;
+    }
+    function isImageRegistered(imageRef) {
+      const normalized = normalizeImageRef(imageRef);
+      return imageRegistry.some(entry => formatImageRef(entry) === normalized);
+    }
+    function findMissingRegistryImages(parsedFiles) {
+      const missing = [];
+      parsedFiles.forEach(({ file, parsed }) => {
+        parsed.apps.forEach(app => {
+          if (!isImageRegistered(app.image)) {
+            missing.push({ file: file.name, deployment: app.name, image: normalizeImageRef(app.image) });
+          }
+        });
+      });
+      return missing;
+    }
+    function assertRegistryImagesAvailable(parsedFiles) {
+      const missing = findMissingRegistryImages(parsedFiles);
+      if (!missing.length) return;
+      const first = missing[0];
+      const summary = t("imageRegistryMissingSummary", { count: missing.length });
+      const err = new Error(`${summary} — ${missing.map(item => item.image).join(", ")}`);
+      err.registryMissing = missing;
+      throw err;
+    }
+    let imageRegistry = loadImageRegistry();
     const defaultYaml = `apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -906,7 +987,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: nginx:1.27
+          image: ${registryRefByName("nginx")}
           ports:
             - containerPort: 80
 ---
@@ -936,7 +1017,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: node:22-alpine
+          image: ${registryRefByName("node")}
           ports:
             - containerPort: 3000
 ---
@@ -957,10 +1038,11 @@ metadata:
 spec:
   nodes: 3`;
     const TRAINING_DONE_KEY = "kubeworld-training-complete";
-    const PROBE_LAB_IMAGE = "kubeworld/probe-trainer:1.0";
     const PROBE_FAILURE_DELAY_MS = 30000;
     const PROBE_TICK_MS = 2500;
-    const probesLabYaml = `# Laboratório de Probes — aplique e espere 30s sem probes configuradas
+    function buildProbesLabYaml() {
+      const probeImage = registryRefByName("kubeworld/probe-trainer");
+      return `# Laboratório de Probes — aplique e espere 30s sem probes configuradas
 # Depois adicione livenessProbe / readinessProbe / startupProbe no container
 apiVersion: apps/v1
 kind: Deployment
@@ -978,7 +1060,7 @@ spec:
     spec:
       containers:
         - name: trainer
-          image: ${PROBE_LAB_IMAGE}
+          image: ${probeImage}
           ports:
             - containerPort: 8080
           # Desafio: descomente e ajuste após observar a falha em /health
@@ -1005,14 +1087,17 @@ spec:
   ports:
     - port: 8080
       targetPort: 8080`;
+    }
     let manifestFiles = [{ id: "web", name: "app-web.yaml", content: defaultYaml }];
     let currentManifest = 0;
     let probeTimers = { failure: {}, tick: null, countdown: null };
+    let lastWorldVisualKey = "";
     const trafficSim = { nodeBusyUntil: [], nodeClearTimers: {}, queue: [], roundRobin: {}, burstActive: false, packetZ: 8, hopMsExtra: 200 };
+    const MESH_MAX_HOPS = 12;
     function trafficHopMs(baseMs) {
       return baseMs + trafficSim.hopMsExtra;
     }
-    let state = { mission: 0, xp: 0, nodes: 3, replicas: 0, deployed: false, service: true, image: "nginx:1.27", apps: {}, services: {}, clusterYaml: "", selectedApp: "app-web", trafficEntryApp: "", traffic: 0, killed: false, killedApp: null, auto: false, timer: null, probeLabActive: false, trainingCompleteAwarded: false, trainingFinishShown: false, inspectTarget: null, zoomActiveTab: "overview" };
+    let state = { mission: 0, xp: 0, nodes: 3, replicas: 0, deployed: false, service: true, image: registryRefByName("nginx"), apps: {}, services: {}, clusterYaml: "", selectedApp: "app-web", trafficEntryApp: "", traffic: 0, killed: false, killedApp: null, auto: false, timer: null, probeLabActive: false, trainingCompleteAwarded: false, trainingFinishShown: false, inspectTarget: null, zoomActiveTab: "overview" };
     const labMenuActions = [
       { id: "probeLab", labelKey: "probeLabButton", structure: "probes", run: () => loadProbeLab() },
       { id: "traffic", labelKey: "trafficButton", structure: "service", run: () => sendTraffic(), disabled: () => !state.deployed },
@@ -1054,6 +1139,27 @@ spec:
     }
     function isProbeLabApp(app) {
       return Boolean(app?.probeLab || (app?.image && app.image.includes("probe-trainer")));
+    }
+    function isPodDeadFromMarkup(dead) {
+      return Boolean(dead);
+    }
+    function podInServiceEndpoints(app, dead) {
+      if (isPodDeadFromMarkup(dead)) return false;
+      if (!isProbeLabApp(app)) return true;
+      const rt = app.probeRuntime;
+      if (!rt) return true;
+      if (rt.restarting) return false;
+      return rt.ready;
+    }
+    function podProcessesRequestsOk(app, dead) {
+      if (!podInServiceEndpoints(app, dead)) return false;
+      if (!isProbeLabApp(app)) return true;
+      const rt = app.probeRuntime;
+      if (!rt) return true;
+      return !rt.healthEndpointDown;
+    }
+    function isPodElementDead(podEl) {
+      return podEl?.dataset?.dead === "true";
     }
     function parseProbeConfig(document, probeName) {
       const re = new RegExp(`\\s${probeName}:\\s*\\n((?:[ \\t]+[^\\n]+\\n)+)`, "m");
@@ -1185,9 +1291,12 @@ spec:
     function serviceExtraHint(service) {
       const type = service.type || "ClusterIP";
       const app = appForService(service);
-      const chain = app?.callsTarget
-        ? `<span class="service-chain-hint">↪ ${t("trafficChainedHint")}: <code>${escapeHtmlText(app.callsTarget.url)}</code></span>`
-        : "";
+      const meshPath = app ? formatMeshRoutePath(app) : "";
+      const chain = meshPath
+        ? `<span class="service-chain-hint">↪ ${t("trafficMeshRouteHint")}: <code>${escapeHtmlText(meshPath)}</code></span>`
+        : (app?.callsTarget
+          ? `<span class="service-chain-hint">↪ ${t("trafficChainedHint")}: <code>${escapeHtmlText(app.callsTarget.url)}</code></span>`
+          : "");
       const entryHint = app && state.trafficEntryApp === app.name
         ? `<span class="service-entry-hint">▶ ${t("trafficEntryBadge")}</span>`
         : "";
@@ -1469,6 +1578,141 @@ spec:
       trafficSim.roundRobin[app.name] = pick + 1;
       return available[pick];
     }
+    function hasEndpointReadyPods(app) {
+      return listReadyPodTargets(app.name).length > 0;
+    }
+    function collectForwardMeshHops(entryApp) {
+      const hops = [];
+      let fromApp = entryApp;
+      for (let step = 0; step < MESH_MAX_HOPS && fromApp?.callsTarget; step += 1) {
+        const toApp = state.apps[fromApp.callsTarget.appName];
+        if (!toApp?.service) break;
+        const service = normalizeServiceRecord(state.services[toApp.serviceName]);
+        hops.push({ fromApp, toApp, service });
+        fromApp = toApp;
+      }
+      return hops;
+    }
+    function meshChainApps(entryApp) {
+      const apps = [entryApp];
+      collectForwardMeshHops(entryApp).forEach(hop => apps.push(hop.toApp));
+      return apps;
+    }
+    function formatMeshRoutePath(entryApp) {
+      const names = meshChainApps(entryApp).map(app => app.name);
+      if (names.length < 2) return "";
+      const back = [...names].reverse();
+      return `${names.join(" → ")} → ${back.slice(1).join(" → ")}`;
+    }
+    function buildMeshTrafficPaths(entryService, entryPodEl, meshHops) {
+      const ingress = buildTrafficPath(entryService, entryPodEl);
+      if (!ingress) return null;
+      const forwardPoints = [...ingress.points];
+      const forwardHopMs = [];
+      for (let i = 0; i < ingress.points.length - 1; i += 1) forwardHopMs.push(ingress.hopMs);
+      meshHops.forEach(hop => {
+        const internal = buildPodToPodPath(hop.service, hop.fromPodEl, hop.toPodEl);
+        if (!internal) return;
+        forwardPoints.push(internal.points[1], internal.points[2]);
+        forwardHopMs.push(internal.hopMs, internal.hopMs);
+      });
+      const backwardPoints = [];
+      const backwardHopMs = [];
+      for (let i = meshHops.length - 1; i >= 0; i -= 1) {
+        const hop = meshHops[i];
+        const internal = buildPodToPodPath(hop.service, hop.toPodEl, hop.fromPodEl);
+        if (!internal) continue;
+        backwardPoints.push(internal.points[0], internal.points[1]);
+        if (i === 0) backwardPoints.push(internal.points[2]);
+        backwardHopMs.push(internal.hopMs, internal.hopMs);
+        if (i === 0) backwardHopMs.push(internal.hopMs);
+      }
+      backwardPoints.push(...ingress.points.slice(0, -1).reverse());
+      for (let i = 0; i < ingress.points.length - 1; i += 1) backwardHopMs.push(ingress.hopMs);
+      return { forwardPoints, forwardHopMs, backwardPoints, backwardHopMs };
+    }
+    function estimateMeshTrafficMs(entryService, entryPodEl, meshHops, options = {}) {
+      const paths = buildMeshTrafficPaths(entryService, entryPodEl, meshHops);
+      if (!paths) return estimateTrafficRoundTripMs(entryService, entryPodEl, options.processMs);
+      const processMs = options.processMs ?? 360;
+      const processEntryMs = options.processEntryMs ?? 260;
+      const forwardMs = paths.forwardHopMs.reduce((sum, ms) => sum + ms, 0);
+      const backwardMs = paths.backwardHopMs.reduce((sum, ms) => sum + ms, 0);
+      return forwardMs + backwardMs + processEntryMs + meshHops.length * processMs + 320;
+    }
+    function prepareMeshDispatch(entryApp, entryTarget) {
+      const hops = collectForwardMeshHops(entryApp);
+      for (const hop of hops) {
+        const portCheck = validateTrafficPorts(hop.toApp, hop.service);
+        if (!portCheck.ok) return { error: "port", portCheck };
+        if (!hasEndpointReadyPods(hop.toApp)) return { error: "backendNotReady", app: hop.toApp };
+      }
+      const resolved = [];
+      const nodeIndexes = new Set([entryTarget.nodeIndex]);
+      let fromPodEl = entryTarget.pod;
+      for (const hop of hops) {
+        const toTarget = pickPodTarget(hop.toApp);
+        if (!toTarget) return { error: "busy" };
+        resolved.push({
+          ...hop,
+          fromPodEl,
+          toPodEl: toTarget.pod,
+          toTarget
+        });
+        fromPodEl = toTarget.pod;
+        nodeIndexes.add(toTarget.nodeIndex);
+      }
+      const entryOk = podProcessesRequestsOk(entryApp, isPodElementDead(entryTarget.pod));
+      const hopOk = resolved.map(h => podProcessesRequestsOk(h.toApp, isPodElementDead(h.toPodEl)));
+      return { hops: resolved, nodeIndexes, entryOk, hopOk };
+    }
+    function animateMeshServiceTraffic(entryService, entryPodEl, meshHops, label, options = {}) {
+      if (!meshHops.length) return animateTrafficRoundTrip(entryService, entryPodEl, label, options);
+      const paths = buildMeshTrafficPaths(entryService, entryPodEl, meshHops);
+      if (!paths) return animateTrafficRoundTrip(entryService, entryPodEl, label, options);
+      const processMs = options.processMs ?? 360;
+      const processEntryMs = options.processEntryMs ?? 260;
+      const entrySuccess = options.entrySuccess !== false;
+      const hopSuccess = options.hopSuccess || meshHops.map(() => true);
+      const podSequence = [entryPodEl, ...meshHops.map(h => h.toPodEl)];
+      const successFlags = [entrySuccess, ...hopSuccess];
+      const world = $("world");
+      const packet = document.createElement("div");
+      packet.className = "packet traffic-packet traffic-request";
+      packet.textContent = label || t("request");
+      trafficSim.packetZ += 1;
+      packet.style.zIndex = String(trafficSim.packetZ);
+      world.appendChild(packet);
+      const runBackward = () => {
+        animateAlongPoints(packet, paths.backwardPoints, paths.backwardHopMs, () => {
+          packet.style.opacity = "0";
+          setTimeout(() => packet.remove(), 240);
+        });
+      };
+      const processAtPod = index => {
+        const podEl = podSequence[index];
+        const ok = successFlags[index] !== false;
+        const isEntry = index === 0;
+        podEl.classList.add("processing");
+        packet.classList.remove("traffic-request");
+        packet.classList.add(index === 0 ? "traffic-processing" : "traffic-internal");
+        packet.textContent = isEntry ? t("trafficProcessing") : "API";
+        setTimeout(() => {
+          if (!ok) {
+            finishTrafficAtPod(packet, podEl, false, runBackward);
+            return;
+          }
+          podEl.classList.remove("processing");
+          if (index + 1 < podSequence.length) {
+            processAtPod(index + 1);
+            return;
+          }
+          finishTrafficAtPod(packet, podEl, true, runBackward);
+        }, isEntry ? processEntryMs : processMs);
+      };
+      animateAlongPoints(packet, paths.forwardPoints, paths.forwardHopMs, () => processAtPod(0));
+      return estimateMeshTrafficMs(entryService, entryPodEl, meshHops, options);
+    }
     function listTrafficEntryApps() {
       return Object.values(state.apps).filter(app => {
         if (!app?.service) return false;
@@ -1527,7 +1771,7 @@ spec:
       if (!rawService) return { error: "noService" };
       const service = normalizeServiceRecord(rawService);
       if (service.type === "ExternalName") return { error: "external" };
-      if (isProbeLabApp(app) && app.probeRuntime && !app.probeRuntime.ready) return { error: "notReady" };
+      if (readyEndpointsForApp(app) === 0) return { error: "notReady" };
       return { app, service };
     }
     function buildTrafficPath(serviceMeta, podEl) {
@@ -1597,12 +1841,26 @@ spec:
       };
       setTimeout(step, 30);
     }
+    function finishTrafficAtPod(packet, podEl, success, runBackward) {
+      podEl.classList.remove("processing");
+      packet.classList.remove("traffic-processing");
+      if (success) {
+        packet.classList.add("traffic-response");
+        packet.textContent = t("trafficResponse");
+      } else {
+        packet.classList.add("traffic-blocked");
+        packet.textContent = t("trafficRequestFailedLabel");
+      }
+      runBackward();
+    }
     function animateChainedServiceTraffic(frontService, frontPodEl, backService, backPodEl, label, options = {}) {
       const ingress = buildTrafficPath(frontService, frontPodEl);
       const internal = buildPodToPodPath(backService, frontPodEl, backPodEl);
       if (!ingress || !internal) return animateTrafficRoundTrip(frontService, frontPodEl, label, options);
       const processFrontMs = options.processFrontMs ?? 260;
       const processBackMs = options.processBackMs ?? 360;
+      const frontSuccess = options.frontSuccess !== false;
+      const backSuccess = options.backSuccess !== false;
       const forwardPoints = [...ingress.points, internal.points[1], internal.points[2]];
       const backwardPoints = [internal.points[2], internal.points[1], ...ingress.points.slice(0, -1).reverse()];
       const forwardHops = [];
@@ -1627,20 +1885,30 @@ spec:
         });
       };
       animateAlongPoints(packet, forwardPoints, forwardHops, () => {
+        if (!frontSuccess) {
+          frontPodEl.classList.add("processing");
+          packet.classList.remove("traffic-request");
+          packet.classList.add("traffic-processing");
+          packet.textContent = t("trafficProcessing");
+          setTimeout(() => finishTrafficAtPod(packet, frontPodEl, false, runBackward), processFrontMs);
+          return;
+        }
         frontPodEl.classList.add("processing");
         packet.classList.remove("traffic-request");
         packet.classList.add("traffic-internal");
         packet.textContent = "API";
         setTimeout(() => {
           frontPodEl.classList.remove("processing");
+          if (!backSuccess) {
+            backPodEl.classList.add("processing");
+            packet.textContent = t("trafficProcessing");
+            setTimeout(() => finishTrafficAtPod(packet, backPodEl, false, runBackward), processBackMs);
+            return;
+          }
           backPodEl.classList.add("processing");
           packet.textContent = t("trafficProcessing");
           setTimeout(() => {
-            backPodEl.classList.remove("processing");
-            packet.classList.remove("traffic-processing");
-            packet.classList.add("traffic-response");
-            packet.textContent = t("trafficResponse");
-            runBackward();
+            finishTrafficAtPod(packet, backPodEl, true, runBackward);
           }, processBackMs);
         }, processFrontMs);
       });
@@ -1674,17 +1942,14 @@ spec:
         hop += 1;
         setTimeout(runForward, path.hopMs);
       };
+      const success = options.success !== false;
       const runProcessing = () => {
         podEl.classList.add("processing");
         packet.classList.remove("traffic-request");
         packet.classList.add("traffic-processing");
         packet.textContent = t("trafficProcessing");
         setTimeout(() => {
-          podEl.classList.remove("processing");
-          packet.classList.remove("traffic-processing");
-          packet.classList.add("traffic-response");
-          packet.textContent = t("trafficResponse");
-          runBackward(path.points.length - 2);
+          finishTrafficAtPod(packet, podEl, success, () => runBackward(path.points.length - 2));
         }, processMs);
       };
       const runBackward = index => {
@@ -1710,15 +1975,7 @@ spec:
         if (!options.silentEvent) reportTrafficPortFailure(portCheck);
         return { ok: false, reason: portCheck.reason };
       }
-      const chainApp = app.callsTarget ? state.apps[app.callsTarget.appName] : null;
-      if (chainApp?.service) {
-        const backSvc = normalizeServiceRecord(state.services[chainApp.serviceName]);
-        const backPortCheck = validateTrafficPorts(chainApp, backSvc);
-        if (!backPortCheck.ok) {
-          if (!options.silentEvent) reportTrafficPortFailure(backPortCheck);
-          return { ok: false, reason: backPortCheck.reason };
-        }
-      }
+      if (!hasEndpointReadyPods(app)) return { ok: false, reason: "notReady" };
       const target = pickPodTarget(app);
       if (!target) {
         if (options.queue !== false) {
@@ -1727,64 +1984,89 @@ spec:
         }
         return { ok: false, reason: "busy" };
       }
-      let backTarget = null;
-      if (chainApp?.service) {
-        backTarget = pickPodTarget(chainApp);
-        if (!backTarget) {
-          if (options.queue !== false) {
-            trafficSim.queue.push({ app, service, options: { ...options, appName: app.name } });
-            return { ok: true, queued: true };
-          }
-          return { ok: false, reason: "busy" };
+      const meshPlan = prepareMeshDispatch(app, target);
+      if (meshPlan.error === "port") {
+        if (!options.silentEvent) reportTrafficPortFailure(meshPlan.portCheck);
+        return { ok: false, reason: meshPlan.portCheck.reason };
+      }
+      if (meshPlan.error === "backendNotReady") {
+        if (!options.silentEvent) {
+          $("eventText").innerHTML = `<span>${t("chainBackendNotReady", { app: meshPlan.app.name })}</span>`;
+          showToast(t("chainBackendNotReady", { app: meshPlan.app.name }));
         }
+        return { ok: false, reason: "backendNotReady" };
+      }
+      if (meshPlan.error === "busy") {
+        if (options.queue !== false) {
+          trafficSim.queue.push({ app, service, options: { ...options, appName: app.name } });
+          return { ok: true, queued: true };
+        }
+        return { ok: false, reason: "busy" };
       }
       state.traffic += 1;
       const processMs = options.processMs ?? 420;
-      const chained = Boolean(chainApp?.service && backTarget);
-      const backSvc = chained ? normalizeServiceRecord(state.services[chainApp.serviceName]) : null;
-      const roundTripMs = chained
-        ? estimateChainedTrafficMs(service, target.pod, backSvc, backTarget.pod, { processMs })
+      const hasMesh = meshPlan.hops.length > 0;
+      const frontProcessOk = meshPlan.entryOk;
+      const requestSucceeded = frontProcessOk && meshPlan.hopOk.every(Boolean);
+      const roundTripMs = hasMesh
+        ? estimateMeshTrafficMs(service, target.pod, meshPlan.hops, { processMs })
         : estimateTrafficRoundTripMs(service, target.pod, processMs);
       const nodeHoldMs = options.nodeHoldMs ?? roundTripMs;
-      lockNode(target.nodeIndex, nodeHoldMs);
+      meshPlan.nodeIndexes.forEach(nodeIndex => lockNode(nodeIndex, nodeHoldMs));
       target.pod.classList.add("serving");
       setTimeout(() => target.pod.classList.remove("serving"), nodeHoldMs);
+      meshPlan.hops.forEach(hop => {
+        hop.toTarget.pod.classList.add("serving");
+        setTimeout(() => hop.toTarget.pod.classList.remove("serving"), nodeHoldMs);
+      });
       let flyMs;
-      if (chained) {
-        lockNode(backTarget.nodeIndex, nodeHoldMs);
-        backTarget.pod.classList.add("serving");
-        setTimeout(() => backTarget.pod.classList.remove("serving"), nodeHoldMs);
-        flyMs = animateChainedServiceTraffic(service, target.pod, backSvc, backTarget.pod, `#${state.traffic}`, { processMs });
+      if (hasMesh) {
+        flyMs = animateMeshServiceTraffic(service, target.pod, meshPlan.hops, `#${state.traffic}`, {
+          processMs,
+          entrySuccess: frontProcessOk,
+          hopSuccess: meshPlan.hopOk
+        });
       } else {
-        flyMs = animateTrafficRoundTrip(service, target.pod, `#${state.traffic}`, { processMs });
+        flyMs = animateTrafficRoundTrip(service, target.pod, `#${state.traffic}`, { processMs, success: frontProcessOk });
       }
       if (!options.silentEvent) {
         $("trafficLine").classList.add("hot");
         const route = portCheck.primary;
         const routeHint = route ? ` • ${t("trafficPortOk", { sport: route.servicePort, target: route.targetPort })}` : "";
-        if (chained) {
-          $("eventText").innerHTML = `<span>${t("trafficChainedEvent", {
-            n: state.traffic,
-            entrySvc: service.name,
-            from: app.name,
-            url: app.callsTarget.url,
-            to: chainApp.name
-          })}${routeHint}</span>`;
+        const outcome = requestSucceeded ? t("trafficResponse") : t("trafficRequestFailedLabel");
+        if (hasMesh) {
+          const path = formatMeshRoutePath(app);
+          const meshText = requestSucceeded
+            ? t("trafficMeshPathEvent", { n: state.traffic, path })
+            : t("trafficRequestFailedEvent", { n: state.traffic });
+          $("eventText").innerHTML = `<span>${meshText}${routeHint}</span>`;
         } else {
-          $("eventText").innerHTML = `<span>${trafficEventForService(app, service)} → <b>node-${target.nodeIndex + 1}</b>${routeHint} → ${t("trafficResponse")}</span>`;
+          const tail = requestSucceeded
+            ? `${trafficEventForService(app, service)} → <b>node-${target.nodeIndex + 1}</b>${routeHint} → ${outcome}`
+            : t("trafficRequestFailedEvent", { n: state.traffic });
+          $("eventText").innerHTML = `<span>${tail}</span>`;
         }
         setTimeout(() => $("trafficLine").classList.remove("hot"), flyMs + 120);
       }
-      return { ok: true, queued: false, nodeIndex: target.nodeIndex, flyMs, chained };
+      return { ok: true, queued: false, nodeIndex: target.nodeIndex, flyMs, chained: hasMesh };
     }
     function drainTrafficQueue() {
-      while (trafficSim.queue.length) {
-        const item = trafficSim.queue[0];
-        const target = pickPodTarget(item.app);
-        if (!target) break;
+      if (!trafficSim.queue.length) return;
+      const item = trafficSim.queue[0];
+      if (!hasEndpointReadyPods(item.app)) {
         trafficSim.queue.shift();
-        dispatchTrafficRequest({ ...item.options, appName: item.app.name, silentEvent: true, queue: true });
+        return;
       }
+      const chainBroken = meshChainApps(item.app).some(meshApp => !hasEndpointReadyPods(meshApp));
+      if (chainBroken) {
+        trafficSim.queue.shift();
+        return;
+      }
+      const target = pickPodTarget(item.app);
+      if (!target) return;
+      trafficSim.queue.shift();
+      const result = dispatchTrafficRequest({ ...item.options, appName: item.app.name, silentEvent: true, queue: true });
+      if (!result.ok && (result.reason === "backendNotReady" || result.reason === "notReady")) return;
     }
     function resetTrafficSimulation() {
       trafficSim.queue = [];
@@ -1996,6 +2278,91 @@ spec:
       }
       return html;
     }
+    function renderImageRegistryPanel() {
+      const host = $("imageRegistryPanel");
+      if (!host) return;
+      const rows = imageRegistry.map(entry => {
+        const ref = formatImageRef(entry);
+        const builtinHint = entry.builtin ? ` <small style="color:var(--muted)">(${t("imageRegistryBuiltin")})</small>` : "";
+        return `<tr data-registry-id="${escapeHtmlText(entry.id)}">
+          <td><input class="image-registry-input" data-field="name" value="${escapeHtmlText(entry.name)}" aria-label="${t("imageRegistryColName")}">${builtinHint}</td>
+          <td><input class="image-registry-input" data-field="version" value="${escapeHtmlText(entry.version)}" aria-label="${t("imageRegistryColVersion")}"></td>
+          <td><code class="image-registry-ref">${escapeHtmlText(ref)}</code></td>
+          <td><button type="button" class="image-registry-remove" data-action="remove" ${entry.builtin ? "disabled" : ""} title="Remove">×</button></td>
+        </tr>`;
+      }).join("");
+      host.innerHTML = `
+        <table class="image-registry-table">
+          <thead><tr>
+            <th>${t("imageRegistryColName")}</th>
+            <th>${t("imageRegistryColVersion")}</th>
+            <th>${t("imageRegistryColRef")}</th>
+            <th></th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div class="image-registry-add">
+          <input type="text" id="imageRegistryNewName" placeholder="${escapeHtmlText(t("imageRegistryColName"))}" aria-label="${t("imageRegistryColName")}">
+          <input type="text" id="imageRegistryNewVersion" placeholder="${escapeHtmlText(t("imageRegistryColVersion"))}" aria-label="${t("imageRegistryColVersion")}">
+          <button type="button" id="imageRegistryAddBtn">${t("imageRegistryAdd")}</button>
+        </div>`;
+      if (!host.dataset.bound) {
+        host.dataset.bound = "true";
+        host.addEventListener("click", event => {
+          if (event.target.closest("#imageRegistryAddBtn")) {
+            const nameInput = host.querySelector("#imageRegistryNewName");
+            const versionInput = host.querySelector("#imageRegistryNewVersion");
+            const name = nameInput?.value.trim() || "";
+            const version = versionInput?.value.trim() || "";
+            if (!name || !version) return showToast(t("imageRegistryInvalid"));
+            const ref = `${name}:${version}`;
+            if (imageRegistry.some(entry => formatImageRef(entry) === ref)) {
+              return showToast(t("imageRegistryDuplicate", { ref }));
+            }
+            imageRegistry.push({ id: `img-${Date.now()}`, name, version, builtin: false });
+            saveImageRegistry();
+            if (nameInput) nameInput.value = "";
+            if (versionInput) versionInput.value = "";
+            renderImageRegistryPanel();
+            return;
+          }
+          const removeBtn = event.target.closest("[data-action='remove']");
+          if (!removeBtn || removeBtn.disabled) return;
+          const row = removeBtn.closest("tr[data-registry-id]");
+          const id = row?.dataset.registryId;
+          if (!id) return;
+          imageRegistry = imageRegistry.filter(entry => entry.id !== id);
+          saveImageRegistry();
+          renderImageRegistryPanel();
+        });
+        host.addEventListener("change", event => {
+          const input = event.target.closest(".image-registry-input");
+          if (!input) return;
+          const row = input.closest("tr[data-registry-id]");
+          const entry = imageRegistry.find(item => item.id === row?.dataset.registryId);
+          if (!entry) return;
+          const field = input.dataset.field;
+          const value = input.value.trim();
+          if (!value) {
+            input.value = field === "name" ? entry.name : entry.version;
+            showToast(t("imageRegistryInvalid"));
+            return;
+          }
+          const draft = { ...entry, [field]: value };
+          const ref = formatImageRef(draft);
+          const duplicate = imageRegistry.some(item => item.id !== entry.id && formatImageRef(item) === ref);
+          if (duplicate) {
+            input.value = field === "name" ? entry.name : entry.version;
+            showToast(t("imageRegistryDuplicate", { ref }));
+            return;
+          }
+          entry[field] = value;
+          saveImageRegistry();
+          const refCell = row.querySelector(".image-registry-ref");
+          if (refCell) refCell.textContent = formatImageRef(entry);
+        });
+      }
+    }
     function renderWorkloadMeshTable(hostElement, filterAppName = null) {
       const apps = Object.values(state.apps);
       const visible = filterAppName ? apps.filter(app => app.name === filterAppName) : apps;
@@ -2123,7 +2490,7 @@ spec:
       const legs = Math.max(0, points.length - 1);
       return { points, hopMs, roundTripMs: hopMs * legs * 2 };
     }
-    function animatePodToPodRoundTrip(fromPodEl, serviceRecord, toPodEl, label) {
+    function animatePodToPodRoundTrip(fromPodEl, serviceRecord, toPodEl, label, options = {}) {
       const path = buildPodToPodPath(serviceRecord, fromPodEl, toPodEl);
       if (!path) return 900;
       const processMs = 380;
@@ -2151,14 +2518,12 @@ spec:
         hop += 1;
         setTimeout(runForward, path.hopMs);
       };
+      const success = options.success !== false;
       const runProcessing = () => {
         toPodEl.classList.add("processing");
         packet.textContent = t("trafficProcessing");
         setTimeout(() => {
-          toPodEl.classList.remove("processing");
-          packet.classList.add("traffic-response");
-          packet.textContent = t("trafficResponse");
-          runBackward(path.points.length - 2);
+          finishTrafficAtPod(packet, toPodEl, success, () => runBackward(path.points.length - 2));
         }, processMs);
       };
       const runBackward = index => {
@@ -2196,7 +2561,9 @@ spec:
       const fromTarget = fromTargets[0];
       const toTarget = pickPodTarget(toApp);
       if (!toTarget) return showToast(t("trafficNodeBusy"));
-      const roundTripMs = animatePodToPodRoundTrip(fromTarget.pod, service, toTarget.pod, "API");
+      const requestOk = podProcessesRequestsOk(toApp, isPodElementDead(toTarget.pod))
+        && podProcessesRequestsOk(fromApp, isPodElementDead(fromTarget.pod));
+      const roundTripMs = animatePodToPodRoundTrip(fromTarget.pod, service, toTarget.pod, "API", { success: requestOk });
       lockNode(fromTarget.nodeIndex, roundTripMs);
       lockNode(toTarget.nodeIndex, roundTripMs);
       fromTarget.pod.classList.add("serving");
@@ -2296,11 +2663,21 @@ spec:
         $("eventText").innerHTML = `<span>${t("probeLivenessRestart", { n: reasonFailures, gen: rt.generation })}</span>`;
         showToast(t("probeLivenessRestart", { n: reasonFailures, gen: rt.generation }));
         renderWorld();
-        if (app.probes?.liveness && state.mission === 6) progress("probes");
       }, 900);
     }
     function probePeriodMs(probe) {
       return Math.min(probe?.periodSeconds || 10, 5) * 1000;
+    }
+    function probeAppVisualToken(app) {
+      const rt = app.probeRuntime;
+      if (!rt) return `${app.name}:na`;
+      return `${app.name}:${rt.ready}:${rt.restarting}:${rt.healthEndpointDown}:${rt.generation}`;
+    }
+    function computeWorldVisualKey() {
+      const apps = Object.values(state.apps);
+      const appPart = apps.map(app => `${app.name}|${app.replicas}|${app.image}|${app.service}|${isProbeLabApp(app) ? probeAppVisualToken(app) : "std"}`).sort().join(";");
+      const svcPart = Object.values(state.services).map(s => `${s.name}:${s.type || "ClusterIP"}`).sort().join(";");
+      return `${state.nodes}|${state.killed}|${state.killedApp}|${state.selectedApp}|${state.trafficEntryApp}|${appPart}|${svcPart}`;
     }
     function evaluateProbeForApp(app) {
       const rt = app.probeRuntime;
@@ -2378,8 +2755,9 @@ spec:
     function startProbeTick() {
       if (probeTimers.tick) return;
       probeTimers.tick = setInterval(() => {
+        const before = computeWorldVisualKey();
         Object.values(state.apps).forEach(app => evaluateProbeForApp(app));
-        if (state.probeLabActive) renderWorld();
+        if (state.probeLabActive && computeWorldVisualKey() !== before) renderWorld();
       }, PROBE_TICK_MS);
     }
     function readyEndpointsForApp(app) {
@@ -2387,18 +2765,18 @@ spec:
       if (state.killed && state.killedApp === app.name && !isProbeLabApp(app)) return Math.max(0, app.replicas - 1);
       if (!isProbeLabApp(app)) return app.replicas;
       const rt = app.probeRuntime;
-      if (!rt || !rt.ready) return 0;
+      if (!rt || !rt.ready || rt.restarting) return 0;
       return app.replicas;
     }
     function loadProbeLab() {
       saveCurrentManifest();
       const existing = manifestFiles.findIndex(file => file.id === "probe-lab");
       if (existing === -1) {
-        manifestFiles.push({ id: "probe-lab", name: "probe-lab.yaml", content: probesLabYaml });
+        manifestFiles.push({ id: "probe-lab", name: "probe-lab.yaml", content: buildProbesLabYaml() });
         currentManifest = manifestFiles.length - 1;
       } else {
         currentManifest = existing;
-        manifestFiles[existing].content = probesLabYaml;
+        manifestFiles[existing].content = buildProbesLabYaml();
       }
       $("yamlEditor").value = manifestFiles[currentManifest].content;
       $("yamlEditor").dataset.dirty = "false";
@@ -2407,7 +2785,6 @@ spec:
       renderManifestTabs();
       setYamlStatus("probeLabLoaded");
       showToast(t("probeLabToast"));
-      if (state.mission < 6) state.mission = 6;
       updateUI();
     }
     function parseYaml(source) {
@@ -2690,6 +3067,7 @@ spec:
           try { return { file, parsed: parseYaml(file.content) }; }
           catch (error) { throw new Error(`${file.name}: ${error.message}`); }
         });
+        assertRegistryImagesAvailable(parsedFiles);
         const payload = buildApplyPayloadFromAllFiles(parsedFiles);
         cpApplyLock = true;
         setYamlApplyBusy(true);
@@ -2705,6 +3083,10 @@ spec:
         clearControlPlaneApplyVisuals();
         cpApplyLock = false;
         setYamlApplyBusy(false);
+        if (error.registryMissing?.length) {
+          const first = error.registryMissing[0];
+          $("eventText").innerHTML = `<span>${t("imageRegistryMissing", { image: first.image, deployment: first.deployment, file: first.file })}</span>`;
+        }
         setYamlStatus("yamlError", { error: error.message }, "yaml-status error");
         showToast(`⚠️ ${error.message}`);
       }
@@ -2960,11 +3342,17 @@ spec:
         }
       }
       const gen = probeLab && rt?.generation > 1 ? ` • g${rt.generation}` : "";
-      const ready = !dead && (!probeLab || !rt || rt.ready);
+      const endpointReady = podInServiceEndpoints(app, dead);
       const upstreamClass = app.callsTarget ? " has-upstream" : "";
-      return `<div class="pod ${extraClass}${upstreamClass}" id="pod-${i}" data-structure="pod" data-app="${app.name}" data-ready="${ready}" style="--app-color:${app.color || "var(--cyan)"}" tabindex="0"><b>${app.name}-${String(i).padStart(2, "0")}</b><small>${status}${gen} • ${app.image}</small></div>`;
+      return `<div class="pod ${extraClass}${upstreamClass}" id="pod-${i}" data-structure="pod" data-app="${app.name}" data-dead="${dead}" data-ready="${endpointReady}" style="--app-color:${app.color || "var(--cyan)"}" tabindex="0"><b>${app.name}-${String(i).padStart(2, "0")}</b><small>${status}${gen} • ${app.image}</small></div>`;
     }
-    function renderWorld() {
+    function renderWorld(options = {}) {
+      const visualKey = computeWorldVisualKey();
+      if (!options.force && visualKey === lastWorldVisualKey) {
+        syncNodeBusyVisuals();
+        return;
+      }
+      lastWorldVisualKey = visualKey;
       const apps = Object.values(state.apps);
       const podQueue = [];
       apps.forEach(app => {
@@ -3001,9 +3389,6 @@ spec:
       syncNodeBusyVisuals();
       renderWorkloadMeshSidebar();
       renderTrafficEntryControl();
-      if (state.inspectTarget && !$("objectModal").classList.contains("hidden")) {
-        openObjectDetail(state.inspectTarget.id, null, state.inspectTarget.metadata);
-      }
     }
     function resizeWorld(distribution, serviceCount, workloadCount) {
       const world = $("world");
@@ -3025,10 +3410,10 @@ spec:
       const nodesHeight = nodeRows * nodeCardHeight + Math.max(0, nodeRows - 1) * 12;
       world.style.minHeight = `${Math.max(575, topContent + nodesHeight + 34)}px`;
     }
-    function updateUI() {
+    function updateUI(options = {}) {
       $("missionCount").textContent = Math.min(state.mission + 1, 7);
       $("xp").textContent = state.xp;
-      renderWorld();
+      if (!options.skipWorld) renderWorld();
       renderActionMenu();
     }
     function showToast(text) { const t = $("toast"); t.innerHTML = text; t.classList.add("show"); clearTimeout(showToast.timer); showToast.timer = setTimeout(() => t.classList.remove("show"), 3600); }
@@ -3053,17 +3438,9 @@ spec:
     function progress(action) {
       const expected = lessons[state.mission]?.action;
       if (expected !== action && !(action === "traffic" && expected === "traffic")) return;
-      if (action === "probes" && state.mission === 6) {
-        if (state.trainingCompleteAwarded || isTrainingFinishDismissed()) return;
-        state.trainingCompleteAwarded = true;
-        state.xp += 100;
-        updateUI();
-        showFinishModalOnce();
-        return;
-      }
       state.xp += 100;
       state.mission = Math.min(state.mission + 1, 6);
-      updateUI();
+      updateUI({ skipWorld: action === "traffic" });
     }
     function sendTraffic() {
       const result = dispatchTrafficRequest({ queue: true });
@@ -3071,12 +3448,15 @@ spec:
         if (result.reason === "noService") showToast(t("noService"));
         else if (result.reason === "external") showToast(t("svcExternalNameTraffic"));
         else if (result.reason === "notReady") showToast(t("probeNoReadyPod"));
+        else if (result.reason === "backendNotReady") {
+          const entry = state.apps[state.trafficEntryApp] || state.apps[state.selectedApp];
+          showToast(t("chainBackendNotReady", { app: entry?.callsTarget?.appName || "backend" }));
+        }
         else if (result.reason === "busy") showToast(t("trafficRequestQueued"));
         else if (result.reason === "portMismatch" || result.reason === "noContainerPorts" || result.reason === "noServicePorts") return;
         return;
       }
       if (result.queued) showToast(t("trafficRequestQueued"));
-      updateUI();
       progress("traffic");
     }
     function killPod(appName) {
@@ -3105,6 +3485,7 @@ spec:
       const file = manifestFiles[currentManifest];
       try {
         const parsed = parseYaml(file.content);
+        assertRegistryImagesAvailable([{ file, parsed }]);
         cpApplyLock = true;
         setYamlApplyBusy(true);
         try {
@@ -3141,6 +3522,10 @@ spec:
         clearControlPlaneApplyVisuals();
         cpApplyLock = false;
         setYamlApplyBusy(false);
+        if (error.registryMissing?.length) {
+          const first = error.registryMissing[0];
+          $("eventText").innerHTML = `<span>${t("imageRegistryMissing", { image: first.image, deployment: first.deployment, file: first.file })}</span>`;
+        }
         setYamlStatus("yamlError", { error: `${file.name}: ${error.message}` }, "yaml-status error");
         showToast(`⚠️ ${error.message}`);
       }
@@ -3261,7 +3646,7 @@ spec:
     $("startButton").onclick = () => { $("welcomeModal").classList.add("hidden"); progress("intro"); };
     $("skipButton").onclick = () => { $("welcomeModal").classList.add("hidden"); state.mission = 6; updateUI(); };
     $("continueButton").onclick = () => { rememberTrainingFinishDismissed(); $("finishModal").classList.add("hidden"); };
-    $("restartButton").onclick = () => { clearTrainingFinishDismissed(); clearProbeSimulation(); resetTrafficSimulation(); state = { mission: 0, xp: 0, nodes: 3, replicas: 0, deployed: false, service: true, image: "nginx:1.27", apps: {}, services: {}, clusterYaml: "", selectedApp: "app-web", trafficEntryApp: "", traffic: 0, killed: false, killedApp: null, auto: false, timer: null, probeLabActive: false, trainingCompleteAwarded: false, trainingFinishShown: false, inspectTarget: null, zoomActiveTab: "overview" }; manifestFiles = [{ id: "web", name: "app-web.yaml", content: defaultYaml }]; currentManifest = 0; $("finishModal").classList.add("hidden"); $("yamlEditor").value = defaultYaml; $("yamlEditor").dataset.dirty = "false"; renderManifestTabs(); setYamlStatus("yamlExampleLoaded"); $("clusterDefaultNote").innerHTML = t("clusterDefault"); updateUI(); };
+    $("restartButton").onclick = () => { clearTrainingFinishDismissed(); clearProbeSimulation(); resetTrafficSimulation(); resetImageRegistryToDefaults(); state = { mission: 0, xp: 0, nodes: 3, replicas: 0, deployed: false, service: true, image: registryRefByName("nginx"), apps: {}, services: {}, clusterYaml: "", selectedApp: "app-web", trafficEntryApp: "", traffic: 0, killed: false, killedApp: null, auto: false, timer: null, probeLabActive: false, trainingCompleteAwarded: false, trainingFinishShown: false, inspectTarget: null, zoomActiveTab: "overview" }; manifestFiles = [{ id: "web", name: "app-web.yaml", content: defaultYaml }]; currentManifest = 0; $("finishModal").classList.add("hidden"); $("yamlEditor").value = defaultYaml; $("yamlEditor").dataset.dirty = "false"; renderManifestTabs(); setYamlStatus("yamlExampleLoaded"); $("clusterDefaultNote").innerHTML = t("clusterDefault"); updateUI(); };
     $("yamlEditor").value = defaultYaml;
     $("yamlEditor").dataset.dirty = "false";
     if (isTrainingFinishDismissed()) {
@@ -3270,7 +3655,7 @@ spec:
       $("finishModal").classList.add("hidden");
     }
     refreshZoomTabLabels();
-    renderManifestTabs(); renderActionMenu(); setYamlStatus("yamlExampleLoaded"); $("clusterDefaultNote").innerHTML = t("clusterDefault"); updateUI(); $("eventText").innerHTML = `<span>${t("welcomeReady")}</span>`;
+    renderManifestTabs(); renderActionMenu(); renderImageRegistryPanel(); setYamlStatus("yamlExampleLoaded"); $("clusterDefaultNote").innerHTML = t("clusterDefault"); updateUI(); $("eventText").innerHTML = `<span>${t("welcomeReady")}</span>`;
   </script>
 </body>
 </html>
